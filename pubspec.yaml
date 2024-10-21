@@ -7,8 +7,10 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  animated_splash_screen: ^1.3.0
   flutter:
     sdk: flutter
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +19,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
