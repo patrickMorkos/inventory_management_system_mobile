@@ -1,7 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
-import 'package:inventory_management_system_mobile/view/screens/auth/LoginScreen/login_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/auth/LoginScreen/login_form.dart';
 
 class SplashScreen extends StatelessWidget {
   //This is the constructor of the Splash Screen
@@ -28,9 +28,9 @@ class SplashScreen extends StatelessWidget {
 
     return SafeArea(
       child: AnimatedSplashScreen(
-        backgroundColor: primaryColor,
+        backgroundColor: kMainColor,
         splash: renderLogo(sw, sh),
-        nextScreen: const LoginScreen(),
+        nextScreen: const LoginForm(),
       ),
     );
   }
