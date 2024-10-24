@@ -5,3 +5,5 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+
+macos\Flutter\GeneratedPluginRegistrant.swift
