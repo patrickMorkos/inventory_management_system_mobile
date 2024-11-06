@@ -10,6 +10,8 @@ class UserModel {
   final String password;
   final dynamic dateOfBirth;
   final dynamic dateOfJoin;
+  final String bloodType;
+  final int userTypeId;
 
   UserModel({
     required this.id,
@@ -20,6 +22,8 @@ class UserModel {
     required this.password,
     required this.dateOfBirth,
     required this.dateOfJoin,
+    required this.bloodType,
+    required this.userTypeId,
   });
 
   UserModel copyWith({
@@ -31,6 +35,8 @@ class UserModel {
     String? password,
     dynamic dateOfBirth,
     dynamic dateOfJoin,
+    String? bloodType,
+    int? userTypeId,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -41,19 +47,23 @@ class UserModel {
       password: password ?? this.password,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       dateOfJoin: dateOfJoin ?? this.dateOfJoin,
+      bloodType: bloodType ?? this.bloodType,
+      userTypeId: userTypeId ?? this.userTypeId,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'phoneNumber': phoneNumber,
+      'first_name': firstName,
+      'last_name': lastName,
+      'phone_number': phoneNumber,
       'email': email,
       'password': password,
-      'dateOfBirth': dateOfBirth,
-      'dateOfJoin': dateOfJoin,
+      'date_of_birth': dateOfBirth,
+      'date_of_join': dateOfJoin,
+      'blood_type': bloodType,
+      'user_type_id': userTypeId,
     };
   }
 
@@ -67,6 +77,8 @@ class UserModel {
       password: map['password'] ?? '',
       dateOfBirth: map['date_of_birth'],
       dateOfJoin: map['date_of_join'],
+      bloodType: map['blood_type'] ?? '',
+      userTypeId: map['user_type_id']?.toInt() ?? 0,
     );
   }
 
@@ -77,7 +89,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email, password: $password, dateOfBirth: $dateOfBirth, dateOfJoin: $dateOfJoin)';
+    return 'UserModel(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email, password: $password, dateOfBirth: $dateOfBirth, dateOfJoin: $dateOfJoin, bloodType: $bloodType, userTypeId: $userTypeId)';
   }
 
   @override
@@ -92,7 +104,9 @@ class UserModel {
         other.email == email &&
         other.password == password &&
         other.dateOfBirth == dateOfBirth &&
-        other.dateOfJoin == dateOfJoin;
+        other.dateOfJoin == dateOfJoin &&
+        other.bloodType == bloodType &&
+        other.userTypeId == userTypeId;
   }
 
   @override
@@ -104,6 +118,8 @@ class UserModel {
         email.hashCode ^
         password.hashCode ^
         dateOfBirth.hashCode ^
-        dateOfJoin.hashCode;
+        dateOfJoin.hashCode ^
+        bloodType.hashCode ^
+        userTypeId.hashCode;
   }
 }

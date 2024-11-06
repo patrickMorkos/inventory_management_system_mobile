@@ -12,7 +12,6 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: Center(
-        child: Text("Dashboard screen,${loggedInUserController.loggedInUser}"),
       ),
     );
   }

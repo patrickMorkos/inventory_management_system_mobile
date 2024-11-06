@@ -105,6 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
       password: "",
       dateOfBirth: "",
       dateOfJoin: "",
+      bloodType: "",
+      userTypeId: 0,
     );
     String accessToken = "";
     await postRequest(path: "/api/auth/login", body: body).then((value) {
