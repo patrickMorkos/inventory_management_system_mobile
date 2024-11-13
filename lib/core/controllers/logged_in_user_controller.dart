@@ -5,15 +5,15 @@ import 'package:inventory_management_system_mobile/core/models/user_model.dart';
 class LoggedInUserController extends GetxController {
   Rx<UserModel> loggedInUser = UserModel(
     id: -1,
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    email: "",
-    password: "",
-    dateOfBirth: "",
-    dateOfJoin: "",
-    bloodType: "",
-    userTypeId: 0,
+    firstName: "N/A",
+    lastName: "N/A",
+    phoneNumber: "N/A",
+    email: "N/A",
+    password: "N/A",
+    dateOfBirth: "N/A",
+    dateOfJoin: "N/A",
+    bloodType: "N/A",
+    userTypeId: -1,
   ).obs;
 
   RxString accessToken = "".obs;
