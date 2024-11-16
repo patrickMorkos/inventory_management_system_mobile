@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/Navigation/navigation.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
-import 'package:inventory_management_system_mobile/view/screens/SplashScreen/splash_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/Splash/splash_screen.dart';
 
 void main() {
   runApp(const MainApp());

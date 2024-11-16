@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
 
 class DashboardGridCards extends StatefulWidget {
@@ -40,6 +41,7 @@ class _DashboardGridCardsState extends State<DashboardGridCards> {
               if (kDebugMode) {
                 print("navigate to screen");
               }
+              Get.toNamed(widget.gridItems.route);
             },
             child: SvgPicture.asset(
               widget.gridItems.icon,
