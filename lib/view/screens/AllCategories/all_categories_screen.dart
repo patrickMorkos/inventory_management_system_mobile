@@ -81,9 +81,18 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: kBorderColorTextField),
-                image: DecorationImage(
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  element["category_picture_url"],
                   fit: BoxFit.cover,
-                  image: NetworkImage(element["category_picture_url"]),
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 30,
+                    );
+                  },
                 ),
               ),
             ),

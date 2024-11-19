@@ -143,14 +143,21 @@ class DashboardScreen extends StatelessWidget {
           height: 40,
           width: 40,
           decoration: BoxDecoration(
-            image: const DecorationImage(
-              image: NetworkImage(
-                'https://static.vecteezy.com/system/resources/thumbnails/026/497/734/small_2x/businessman-on-isolated-png.png',
-              ),
-              fit: BoxFit.cover,
-            ),
             shape: BoxShape.circle,
             border: Border.all(color: kBorderColorTextField),
+          ),
+          child: ClipOval(
+            child: Image.network(
+              'https://static.vecteezy.com/system/resources/thumbnails/026/497/734/small_2x/businessman-on-isolated-png.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.person,
+                  color: Colors.grey,
+                  size: 24,
+                );
+              },
+            ),
           ),
         ),
       ),
