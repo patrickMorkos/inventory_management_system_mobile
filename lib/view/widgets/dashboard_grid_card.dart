@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
 
@@ -43,11 +42,10 @@ class _DashboardGridCardsState extends State<DashboardGridCards> {
               }
               Get.toNamed(widget.gridItems.route);
             },
-            child: SvgPicture.asset(
+            child: Image.asset(
               widget.gridItems.icon,
               height: 40.0,
               width: 40.0,
-              allowDrawingOutsideViewBox: false,
               fit: BoxFit.contain,
             ),
           ),

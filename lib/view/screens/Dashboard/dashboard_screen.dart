@@ -34,52 +34,52 @@ class DashboardScreen extends StatelessWidget {
     GridItems(
       title: "All Categories",
       route: 'all-categories',
-      icon: 'images/category-icon.svg',
+      icon: 'assets/images/category-icon.png',
     ),
     GridItems(
       title: "All Products",
       route: 'all-products',
-      icon: 'images/product.svg',
+      icon: 'assets/images/product.png',
     ),
     GridItems(
       title: "Van Categories",
       route: 'van-categories',
-      icon: 'images/sales.svg',
+      icon: 'assets/images/sales.png',
     ),
     GridItems(
       title: "Van Products",
       route: 'van-products',
-      icon: 'images/delivery-van-icon.svg',
+      icon: 'assets/images/delivery-van-icon.png',
     ),
     GridItems(
       title: "Client QR code scan",
       route: 'client-qr-code-scan',
-      icon: 'images/qr-code-scan-icon.svg',
+      icon: 'assets/images/qr-code-scan-icon.png',
     ),
     GridItems(
       title: "Clients",
       route: 'clients',
-      icon: 'images/parties.svg',
+      icon: 'assets/images/parties.png',
     ),
     GridItems(
       title: "Create New Client",
       route: 'create-new-client',
-      icon: 'images/new-client.svg',
+      icon: 'assets/images/new-client.png',
     ),
     GridItems(
       title: "Create New Order",
       route: 'create-new-order',
-      icon: 'images/create-receipt-doc.svg',
+      icon: 'assets/images/create-receipt-doc.png',
     ),
     GridItems(
       title: "Client Stock Screen",
       route: 'client-stock-screen',
-      icon: 'images/warehouse-svgrepo-com.svg',
+      icon: 'assets/images/warehouse-svgrepo-com.png',
     ),
     GridItems(
       title: "Return Product",
       route: 'return-product',
-      icon: 'images/return-product-icon.svg',
+      icon: 'assets/images/return-product-icon.png',
     ),
   ];
 
@@ -88,42 +88,42 @@ class DashboardScreen extends StatelessWidget {
     GridItems(
       title: "All Categories",
       route: 'all-categories',
-      icon: 'images/category-icon.svg',
+      icon: 'assets/images/category-icon.png',
     ),
     GridItems(
       title: "All Products",
       route: 'all-products',
-      icon: 'images/product.svg',
+      icon: 'assets/images/product.png',
     ),
     GridItems(
       title: "Client QR code scan",
       route: 'client-qr-code-scan',
-      icon: 'images/qr-code-scan-icon.svg',
+      icon: 'assets/images/qr-code-scan-icon.png',
     ),
     GridItems(
       title: "Clients",
       route: 'clients',
-      icon: 'images/parties.svg',
+      icon: 'assets/images/parties.png',
     ),
     GridItems(
       title: "Create New Client",
       route: 'create-new-client',
-      icon: 'images/new-client.svg',
+      icon: 'assets/images/new-client.png',
     ),
     GridItems(
       title: "Create New Order",
       route: 'create-new-order',
-      icon: 'images/create-receipt-doc.svg',
+      icon: 'assets/images/create-receipt-doc.png',
     ),
     GridItems(
       title: "Client Stock Screen",
       route: 'client-stock-screen',
-      icon: 'images/warehouse-svgrepo-com.svg',
+      icon: 'assets/images/warehouse-svgrepo-com.png',
     ),
     GridItems(
       title: "Return Product",
       route: 'return-product',
-      icon: 'images/return-product-icon.svg',
+      icon: 'assets/images/return-product-icon.png',
     ),
   ];
 
