@@ -238,8 +238,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       if (validateAndSave()) {
                         login();
-                      } else {
-                        Get.toNamed('/dashboard');
                       }
                     },
                     iconWidget: null,
