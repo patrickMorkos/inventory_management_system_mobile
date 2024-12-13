@@ -22,6 +22,7 @@ const String loginScreenLogo = 'assets/images/sblogo.png';
 const String appName = 'Inventory Management System';
 
 //The host
+//TODO change the host on deployment
 const String host = 'http://localhost:3000';
 
 //A button decoration
