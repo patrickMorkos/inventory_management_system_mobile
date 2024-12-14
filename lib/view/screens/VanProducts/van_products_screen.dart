@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -21,7 +23,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   //******************************************************************VARIABLES
 
   //This variable is the list of all the products that will be listed
-  //TODO - replace products list from constants
+  List<dynamic> productsList = [];
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -32,14 +34,30 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   //This variable is the value entered for search
   String searchedProduct = "";
 
+  //This variable is the logged in user
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
+
   //******************************************************************FUNCTIONS
+
+  //This function call the get van products API
+  Future<void> getVanProducts() async {
+    await getRequest(
+      path:
+          "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}",
+      requireToken: true,
+    ).then((value) {
+      setState(() {
+        productsList = value;
+        searchedProductsList = productsList;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      searchedProductsList = productsList;
-    });
+    getVanProducts();
   }
 
   //This function renders the products list
@@ -83,7 +101,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
               ),
               child: ClipOval(
                 child: Image.network(
-                  element["product_picture_url"],
+                  element["Product"]["image_url"] ?? "",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
@@ -96,11 +114,11 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
               ),
             ),
             title: Text(
-              element["product_name"],
+              element["Product"]["name"] ?? "",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text("Brand: ${element["product_brand"]}"),
+            subtitle: Text("Brand: ${element["Product"]["brand"] ?? ""}"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -109,11 +127,11 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Quantity: ${element["quantity"]}",
+                      "Quantity: ${element["quantity"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["price"]}",
+                      "Price: \$${element["Product"]["ProductPrice"]["pricea1"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
