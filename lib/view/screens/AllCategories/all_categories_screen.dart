@@ -1,8 +1,6 @@
 //! All Categories screen UI
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -96,7 +94,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
               ),
               child: ClipOval(
                 child: Image.network(
-                  element["category_image_url"],
+                  element["category_image_url"] ?? "",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
@@ -109,7 +107,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
               ),
             ),
             title: Text(
-              element["category_name"],
+              element["category_name"] ?? "",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -125,46 +123,6 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
     }
 
     return tmp;
-  }
-
-  // This function open the barcode scanner
-  Future<void> openBarcodeScanner(sw, sh) async {
-    String barcodeScanRes;
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666",
-        "Cancel",
-        true,
-        ScanMode.BARCODE,
-      );
-    } on PlatformException {
-      barcodeScanRes = "Failed to get platform version.";
-    }
-    if (!mounted) return;
-    searchCategory(barcodeScanRes, sw, sh);
-  }
-
-  //This function search for the category barcode inside the list of categories
-  void searchCategory(String barcode, sw, sh) {
-    //Condition if the barcode scanning is canceled
-    if (barcode == "-1") {
-      searchedCategoriesList = categoriesList;
-    }
-
-    //Condition if the scanned barcode is found
-    if (searchedCategoriesList
-        .any((element) => element["barcode"] == barcode)) {
-      setState(() {
-        searchedCategoriesList = categoriesList.where((element) {
-          return element["barcode"]
-              .toString()
-              .toLowerCase()
-              .contains(barcode.toLowerCase());
-        }).toList();
-      });
-    } else {
-      searchedCategoriesList = categoriesList;
-    }
   }
 
   //This function renders the app bar

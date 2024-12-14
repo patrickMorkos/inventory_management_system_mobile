@@ -6,6 +6,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -21,7 +22,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //******************************************************************VARIABLES
 
   //This variable is the list of all the products that will be listed
-  //TODO - replace products list from constants
+  List<dynamic> productsList = [];
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -34,12 +35,23 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
   //******************************************************************FUNCTIONS
 
+  //This function call the get main warehouse products API
+  Future<void> getMainWarehouseProducts() async {
+    await getRequest(
+      path: "/api/main-warehouse-stock/get-all-main-warehouse-stock-products",
+      requireToken: true,
+    ).then((value) {
+      setState(() {
+        productsList = value;
+        searchedProductsList = productsList;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    setState(() {
-      searchedProductsList = productsList;
-    });
+    getMainWarehouseProducts();
   }
 
   //This function renders the products list
@@ -83,7 +95,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               ),
               child: ClipOval(
                 child: Image.network(
-                  element["product_picture_url"],
+                  element["Product"]["image_url"] ?? "",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
@@ -96,11 +108,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               ),
             ),
             title: Text(
-              element["product_name"],
+              element["Product"]["name"] ?? "",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text("Brand: ${element["product_brand"]}"),
+            subtitle: Text(
+                "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -109,11 +122,11 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Quantity: ${element["quantity"]}",
+                      "Quantity: ${element["quantity"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["price"]}",
+                      "Price: \$${element["Product"]["ProductPrice"]["pricea1"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
@@ -160,10 +173,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
     //Condition if the scanned barcode is found
     if (searchedProductsList
-        .any((element) => element["product_barcode"] == barcode)) {
+        .any((element) => element["Product"]["barcod"] == barcode)) {
       setState(() {
         searchedProductsList = productsList.where((element) {
-          return element["product_barcode"]
+          return element["Product"]["name"]
               .toString()
               .toLowerCase()
               .contains(barcode.toLowerCase());
@@ -205,7 +218,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         onChanged: (value) {
           setState(() {
             searchedProductsList = productsList.where((element) {
-              return element["product_name"]
+              return element["Product"]["name"]
                   .toString()
                   .toLowerCase()
                   .contains(value.toLowerCase());
