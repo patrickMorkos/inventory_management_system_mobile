@@ -1,11 +1,11 @@
 //! Van Categories screen UI
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -20,7 +20,7 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
   //******************************************************************VARIABLES
 
   //This variable is the list of all the categories that will be listed
-  //TODO - replace categories list from constants
+  List<dynamic> categoriesList = [];
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -31,14 +31,30 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
   //This variable is the value entered for search
   String searchedCategory = "";
 
+  //This variable is the logged in user
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
+
   //******************************************************************FUNCTIONS
+
+  //This function call the get van categories API
+  Future<void> getVanCategories() async {
+    await getRequest(
+      path:
+          "/api/van-products/get-all-van-products-categories/${loggedInUserController.loggedInUser.value.id}",
+      requireToken: true,
+    ).then((value) {
+      setState(() {
+        categoriesList = value;
+        searchedCategoriesList = categoriesList;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      searchedCategoriesList = categoriesList;
-    });
+    getVanCategories();
   }
 
   //This function renders the categories list
@@ -84,7 +100,7 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
               ),
               child: ClipOval(
                 child: Image.network(
-                  element["category_picture_url"],
+                  element["category_image_url"] ?? "",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
@@ -97,7 +113,7 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
               ),
             ),
             title: Text(
-              element["category_name"],
+              element["category_name"] ?? "",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -113,46 +129,6 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
     }
 
     return tmp;
-  }
-
-  // This function open the barcode scanner
-  Future<void> openBarcodeScanner(sw, sh) async {
-    String barcodeScanRes;
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666",
-        "Cancel",
-        true,
-        ScanMode.BARCODE,
-      );
-    } on PlatformException {
-      barcodeScanRes = "Failed to get platform version.";
-    }
-    if (!mounted) return;
-    searchCategory(barcodeScanRes, sw, sh);
-  }
-
-  //This function search for the category barcode inside the list of categories
-  void searchCategory(String barcode, sw, sh) {
-    //Condition if the barcode scanning is canceled
-    if (barcode == "-1") {
-      searchedCategoriesList = categoriesList;
-    }
-
-    //Condition if the scanned barcode is found
-    if (searchedCategoriesList
-        .any((element) => element["barcode"] == barcode)) {
-      setState(() {
-        searchedCategoriesList = categoriesList.where((element) {
-          return element["barcode"]
-              .toString()
-              .toLowerCase()
-              .contains(barcode.toLowerCase());
-        }).toList();
-      });
-    } else {
-      searchedCategoriesList = categoriesList;
-    }
   }
 
   //This function renders the app bar
