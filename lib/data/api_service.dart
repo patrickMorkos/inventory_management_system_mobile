@@ -33,3 +33,26 @@ Future<dynamic> postRequest({
     debugPrint("------------- ERROR IN postRequest url: $url -------------");
   }
 }
+
+//Get request API call
+Future<dynamic> getRequest({
+  required String path,
+  bool requireToken = false,
+}) async {
+  final String url = host + path;
+  try {
+    final http.Response response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        if (requireToken)
+          "Authorization": loggedInUserController.accessToken.value,
+      },
+    );
+    return jsonDecode(response.body);
+  } catch (e) {
+    Get.snackbar("Error", e.toString());
+    debugPrint("------------- ERROR IN getRequest url: $url -------------");
+    debugPrint("error in get request: $e");
+  }
+}

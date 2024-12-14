@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 
 class AllCategoriesScreen extends StatefulWidget {
   const AllCategoriesScreen({super.key});
@@ -20,7 +21,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
   //******************************************************************VARIABLES
 
   //This variable is the list of all the categories that will be listed
-  //TODO - replace categories list from constants
+  List<dynamic> categoriesList = [];
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -33,12 +34,23 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
 
   //******************************************************************FUNCTIONS
 
+  //This function call the get main warehouse categories API
+  Future<void> getMainWarehouseCategories() async {
+    await getRequest(
+      path: "/api/main-warehouse-stock/get-all-main-warehouse-stock-categories",
+      requireToken: true,
+    ).then((value) {
+      setState(() {
+        categoriesList = value;
+        searchedCategoriesList = categoriesList;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    setState(() {
-      searchedCategoriesList = categoriesList;
-    });
+    getMainWarehouseCategories();
   }
 
   //This function renders the categories list
@@ -84,7 +96,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
               ),
               child: ClipOval(
                 child: Image.network(
-                  element["category_picture_url"],
+                  element["category_image_url"],
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
