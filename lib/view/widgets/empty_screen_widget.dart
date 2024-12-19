@@ -9,7 +9,7 @@ class EmptyScreenWidget extends StatelessWidget {
       padding: const EdgeInsets.all(50),
       child: Column(
         children: [
-          Image.asset("images/empty_screen.png"),
+          // Image.asset("images/empty_screen.png"),
           const SizedBox(height: 30),
           const Text(
             "No Data",

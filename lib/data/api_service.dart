@@ -31,6 +31,7 @@ Future<dynamic> postRequest({
   } catch (e) {
     Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN postRequest url: $url -------------");
+    debugPrint("error in post request: $e");
   }
 }
 
