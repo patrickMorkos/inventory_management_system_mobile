@@ -44,6 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
   //This variable is a flag to either show the alert that phone is not connected to wifi or not
   bool isAlertSet = false;
 
+  //This flag to check if the email and password are wrong
+  bool isEmailAndPasswordWrong = false;
+
   //******************************************************************FUNCTIONS
 
   //This function validate the email and password input
@@ -110,11 +113,22 @@ class _LoginScreenState extends State<LoginScreen> {
     );
     String accessToken = "";
     await postRequest(path: "/api/auth/login", body: body).then((value) {
-      user = UserModel.fromMap(value['user']);
-      accessToken = value['token'];
+      if (value['error'] == "Invalid credentials") {
+        setState(() {
+          isEmailAndPasswordWrong = true;
+        });
+      } else {
+        setState(() {
+          isEmailAndPasswordWrong = false;
+        });
+        user = UserModel.fromMap(value['user']);
+        accessToken = value['token'];
+      }
     });
-    loggedInUserController.setUserInfo(user, accessToken);
-    Get.toNamed('/dashboard');
+    if (!isEmailAndPasswordWrong) {
+      loggedInUserController.setUserInfo(user, accessToken);
+      Get.toNamed('/dashboard');
+    }
   }
 
   //This function shows the alert dialog
@@ -146,6 +160,21 @@ class _LoginScreenState extends State<LoginScreen> {
     getConnectivity();
     checkInternet();
     super.initState();
+  }
+
+  //This function renders the error message
+  Widget renderErrorMessage() {
+    if (isEmailAndPasswordWrong) {
+      return Text(
+        "Invalid Email or Password",
+        style: const TextStyle(
+          color: Colors.red,
+          fontSize: 16,
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 
   @override
@@ -243,6 +272,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     iconWidget: null,
                     iconColor: Colors.white,
                   ),
+
+                  //Error message
+                  renderErrorMessage(),
                 ],
               ),
             ),
