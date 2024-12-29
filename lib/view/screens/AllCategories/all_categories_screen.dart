@@ -83,7 +83,9 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
         tmp.add(
           ListTile(
             onTap: () {
-              Get.toNamed("/all-products");
+              Get.toNamed("/all-products", arguments: {
+                "category_id": element["id"],
+              });
             },
             leading: Container(
               height: 50,

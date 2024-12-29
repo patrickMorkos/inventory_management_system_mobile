@@ -33,6 +33,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //This variable is the value entered for search
   String searchedProduct = "";
 
+  //This variable is the category id
+  int categoryId = -1;
+
   //******************************************************************FUNCTIONS
 
   //This function call the get main warehouse products API
@@ -46,12 +49,26 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         searchedProductsList = productsList;
       });
     });
+    if (Get.arguments != null) {
+      final arguments = Get.arguments as Map<String, dynamic>;
+      categoryId = arguments["category_id"];
+      filterProductsList(categoryId);
+    }
   }
 
   @override
   void initState() {
     super.initState();
     getMainWarehouseProducts();
+  }
+
+  //This function filters the products list
+  void filterProductsList(int categoryId) {
+    setState(() {
+      searchedProductsList = productsList.where((element) {
+        return element["Product"]["category_id"] == categoryId;
+      }).toList();
+    });
   }
 
   //This function renders the products list
