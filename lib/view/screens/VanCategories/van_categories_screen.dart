@@ -89,7 +89,9 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
         tmp.add(
           ListTile(
             onTap: () {
-              Get.toNamed("/van-products");
+              Get.toNamed("/van-products", arguments: {
+                "category_id": element["id"],
+              });
             },
             leading: Container(
               height: 50,

@@ -38,6 +38,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   final LoggedInUserController loggedInUserController =
       Get.put(LoggedInUserController());
 
+  //This variable is the category id
+  int categoryId = -1;
+
   //******************************************************************FUNCTIONS
 
   //This function call the get van products API
@@ -52,12 +55,26 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         searchedProductsList = productsList;
       });
     });
+    if (Get.arguments != null) {
+      final arguments = Get.arguments as Map<String, dynamic>;
+      categoryId = arguments["category_id"];
+      filterProductsList(categoryId);
+    }
   }
 
   @override
   void initState() {
     super.initState();
     getVanProducts();
+  }
+
+  //This function filters the products list
+  void filterProductsList(int categoryId) {
+    setState(() {
+      searchedProductsList = productsList.where((element) {
+        return element["Product"]["category_id"] == categoryId;
+      }).toList();
+    });
   }
 
   //This function renders the products list
