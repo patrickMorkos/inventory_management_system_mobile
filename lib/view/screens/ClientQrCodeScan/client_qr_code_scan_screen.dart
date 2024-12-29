@@ -85,7 +85,6 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               ScanMode.BARCODE,
             );
             getClientFromQrCode(barcodeScanRes);
-            print("barcodeScanRes===>$barcodeScanRes");
           },
           child: Text(
             "Scan QR Code",
