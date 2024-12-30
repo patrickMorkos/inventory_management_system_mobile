@@ -102,7 +102,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       for (var element in searchedProductsList) {
         tmp.add(
           ListTile(
-            onTap: () {},
             leading: Container(
               height: 50,
               width: 50,
