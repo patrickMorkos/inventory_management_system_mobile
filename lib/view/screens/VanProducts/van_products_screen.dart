@@ -5,10 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
+import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -41,6 +43,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   //This variable is the category id
   int categoryId = -1;
 
+  //This function is the client controller
+  final ClientController clientController = Get.put(ClientController());
+
   //******************************************************************FUNCTIONS
 
   //This function call the get van products API
@@ -72,20 +77,20 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   void filterProductsList(int categoryId) {
     setState(() {
       searchedProductsList = productsList.where((element) {
-        return element["Product"]["category_id"] == categoryId;
+        return element["Product"]["Category"]["id"] == categoryId;
       }).toList();
     });
   }
 
   //This function renders the products list
-  Widget renderProductsListing() {
+  Widget renderProductsListing(sw, sh) {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: getProductsCards(),
+            children: getProductsCards(sw, sh),
           ),
         ),
       ),
@@ -93,7 +98,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   }
 
   //This function returns the products cards list
-  List<Widget> getProductsCards() {
+  List<Widget> getProductsCards(sw,sh) {
     List<Widget> tmp = [];
     if (searchedProductsList.isEmpty) {
       tmp.add(
@@ -108,7 +113,15 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       for (var element in searchedProductsList) {
         tmp.add(
           ListTile(
-            onTap: () {},
+            onTap: () {
+              openProductDetailsDialog(
+                context,
+                sw,
+                sh,
+                element,
+                clientController.clientInfo,
+              );
+            },
             leading: Container(
               height: 50,
               width: 50,
@@ -325,7 +338,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
               renderSearchBar(sw, sh),
 
               //Products list
-              renderProductsListing()
+              renderProductsListing(sw, sh)
             ],
           ),
         ),

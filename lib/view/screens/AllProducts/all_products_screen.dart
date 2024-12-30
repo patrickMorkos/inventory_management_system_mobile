@@ -66,7 +66,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   void filterProductsList(int categoryId) {
     setState(() {
       searchedProductsList = productsList.where((element) {
-        return element["Product"]["category_id"] == categoryId;
+        return element["Product"]["Category"]["id"] == categoryId;
       }).toList();
     });
   }
