@@ -148,7 +148,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text("Brand: ${element["Product"]["brand"] ?? ""}"),
+            subtitle: Text("Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
