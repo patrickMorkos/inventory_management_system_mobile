@@ -98,7 +98,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   }
 
   //This function returns the products cards list
-  List<Widget> getProductsCards(sw,sh) {
+  List<Widget> getProductsCards(sw, sh) {
     List<Widget> tmp = [];
     if (searchedProductsList.isEmpty) {
       tmp.add(
@@ -148,7 +148,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            subtitle: Text("Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
+            subtitle: Text(
+              "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}",
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
