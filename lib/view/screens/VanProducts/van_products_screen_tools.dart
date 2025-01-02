@@ -1,4 +1,3 @@
-
 //This function renders the product descrption header
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -50,7 +49,7 @@ Widget renderProductItems(sw, sh, prefix, title) {
   return Container(
     width: sw * 0.7,
     padding: EdgeInsets.only(
-      top: sh / 50,
+      top: sh / 40,
     ),
     child: Text(
       "-$prefix: $title",
@@ -119,10 +118,10 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                 children: [
                   //Alert dialog Header
                   renderProductDescriptionHeader(sh),
-              
+
                   //Product Image
                   renderProductImage(sw, sh, product),
-              
+
                   //Product Name
                   renderProductItems(
                     sw,
@@ -130,7 +129,7 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                     "Name",
                     product["Product"]["name"] ?? "",
                   ),
-              
+
                   //Product Brand
                   renderProductItems(
                     sw,
@@ -138,7 +137,7 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                     "Brand",
                     product["Product"]["Brand"]["brand_name"] ?? "",
                   ),
-              
+
                   //Product Category
                   renderProductItems(
                     sw,
@@ -146,7 +145,7 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                     "Category",
                     product["Product"]["Category"]["category_name"] ?? "",
                   ),
-              
+
                   //Product Quantity
                   renderProductItems(
                     sw,
@@ -154,7 +153,7 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                     "Quantity",
                     product["quantity"] ?? "",
                   ),
-              
+
                   //Product Price
                   renderProductItems(
                     sw,
@@ -162,7 +161,7 @@ void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
                     "Price",
                     product["Product"]["ProductPrice"]["pricea1"] ?? "",
                   ),
-              
+
                   //Add product to cart
                   renderAddProductToCartButton(
                     context,
