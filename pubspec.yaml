@@ -19,6 +19,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   intl: ^0.20.0
   nb_utils: ^7.0.6
+  input_quantity: ^2.5.1
 
 dev_dependencies:
   flutter_test:

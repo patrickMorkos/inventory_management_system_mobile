@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -46,7 +47,154 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   //This function is the client controller
   final ClientController clientController = Get.put(ClientController());
 
+  //This variable is the quantity of the product
+  int quantity = 0;
+
   //******************************************************************FUNCTIONS
+
+  //This function renders the add product to cart button
+  Widget renderAddProductToCartButton(
+    context,
+    sw,
+    sh,
+    product,
+    clientInfo,
+  ) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: sh / 50,
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          // addProductToCart(context, sw, sh, product, clientInfo);
+          print("quantity:$quantity");
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child: const Text(
+          'Add to Cart',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  //This function renders the product quantity
+  Widget renderQuantityPickUp(sh, product) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: sh / 50,
+      ),
+      child: InputQty(
+        maxVal: product["quantity"],
+        decoration: QtyDecorationProps(
+          btnColor: kMainColor,
+          fillColor: Colors.white,
+        ),
+        onQtyChanged: (value) {
+          setState(() {
+            quantity = value.toString().toInt();
+          });
+        },
+      ),
+    );
+  }
+
+  void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: kMainColor,
+          insetPadding: EdgeInsets.zero,
+          shape: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+          actions: [
+            SizedBox(
+              // width: sw * 0.8,
+              height: sh * 0.5,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    //Alert dialog Header
+                    renderProductDescriptionHeader(sh),
+
+                    //Product Image
+                    renderProductImage(sw, sh, product),
+
+                    //Product Name
+                    renderProductItems(
+                      sw,
+                      sh,
+                      "Name",
+                      product["Product"]["name"] ?? "",
+                    ),
+
+                    //Product Brand
+                    renderProductItems(
+                      sw,
+                      sh,
+                      "Brand",
+                      product["Product"]["Brand"]["brand_name"] ?? "",
+                    ),
+
+                    //Product Category
+                    renderProductItems(
+                      sw,
+                      sh,
+                      "Category",
+                      product["Product"]["Category"]["category_name"] ?? "",
+                    ),
+
+                    //Product Quantity
+                    renderProductItems(
+                      sw,
+                      sh,
+                      "Quantity",
+                      product["quantity"] ?? "",
+                    ),
+
+                    //Product Price
+                    renderProductItems(
+                      sw,
+                      sh,
+                      "Price",
+                      product["Product"]["ProductPrice"]["pricea1"] ?? "",
+                    ),
+
+                    //Quantity pick-up
+                    if (clientInfo["id"] != -1)
+                      renderQuantityPickUp(sh, product),
+
+                    //Add product to cart
+                    if (clientInfo["id"] != -1)
+                      renderAddProductToCartButton(
+                        context,
+                        sw,
+                        sh,
+                        product,
+                        clientInfo,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   //This function call the get van products API
   Future<void> getVanProducts() async {
