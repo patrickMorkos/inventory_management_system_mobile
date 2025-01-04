@@ -23,7 +23,8 @@ const String appName = 'Inventory Management System';
 
 //The host
 //TODO change the host on deployment
-const String host = 'http://localhost:3000';
+const String ip = "192.168.0.106";
+const String host = 'http://$ip:3000';
 
 //A button decoration
 const kButtonDecoration = BoxDecoration(
