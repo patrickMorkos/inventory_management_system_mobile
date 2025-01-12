@@ -7,6 +7,7 @@ import 'package:inventory_management_system_mobile/core/controllers/logged_in_us
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:intl/intl.dart';
 
 class ClientQrCodeScanScreen extends StatefulWidget {
   const ClientQrCodeScanScreen({super.key});
@@ -104,6 +105,17 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
     });
   }
 
+  // Function to format the date
+  String formatDate(String dateString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateString);
+      return DateFormat('dd-MMM-yyyy')
+          .format(dateTime);
+    } catch (e) {
+      return dateString;
+    }
+  }
+
   // Render client orders listing
   Widget renderClientOrdersListing() {
     if (clientController.clientInfo["sales"] != null) {
@@ -120,10 +132,23 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               : Column(
                   children: clientOrders.map((order) {
                     return ListTile(
+                      onTap: () {
+                        print("See sale product and add to order");
+                      },
                       leading: Icon(Icons.receipt, color: kMainColor),
                       title: Text("Order #${order["id"]}"),
-                      subtitle: Text("Amount: \$${order["amount"]}"),
-                      trailing: Text("${order["date"]}"),
+                      subtitle: Text("Total: \$${order["total_price_usd"]}"),
+                      trailing: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Issue Date: ${formatDate(order["issue_date"])}",
+                          ),
+                          Text(
+                            "Due Date: ${order["due_date"] != null ? formatDate(order["due_date"]) : "Pending"}",
+                          ),
+                        ],
+                      ),
                     );
                   }).toList(),
                 ),
