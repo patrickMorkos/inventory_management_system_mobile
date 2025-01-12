@@ -5,8 +5,6 @@ class ClientController extends GetxController {
   RxMap<String, dynamic> clientInfo = RxMap<String, dynamic>(
     {
       "id": -1,
-      "first_name": "N/A",
-      "last_name": "N/A",
     },
   );
 

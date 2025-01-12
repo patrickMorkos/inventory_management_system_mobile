@@ -3,6 +3,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -20,8 +21,12 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   //This variable is the client controller
   final ClientController clientController = Get.put(ClientController());
 
-  //This variable is a flag to show the cllient info or not
-  bool flag = false;
+  //This variable is the logged in user controller
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
+
+  //This variable is used to store the client orders
+  List<dynamic> clientOrders = [];
 
   //******************************************************************FUNCTIONS
 
@@ -47,24 +52,91 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   //This function gets the client from the QR code
   Future<void> getClientFromQrCode(String qrCode) async {
-    int id = qrCode.toInt();
+    int clientId = qrCode.toInt();
+
+    if (clientController.clientInfo["id"] != -1) {
+      // If already checked in, perform check-out
+      await postRequest(
+        path:
+            "/api/salesman-client-visits/client-check-out/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+        body: {},
+        requireToken: true,
+      ).then((value) {
+        setState(() {
+          clientOrders.clear();
+          clientController.setClientInfo(
+            {
+              "id": -1,
+            },
+          );
+        });
+      });
+    } else {
+      // Get client info
+      await getRequest(
+        path: "/api/client/get-client/$clientId",
+        requireToken: true,
+      ).then((value) {
+        clientController.setClientInfo(value);
+        fetchClientOrders(clientId);
+      });
+
+      // Perform check-in
+      await postRequest(
+        path:
+            "/api/salesman-client-visits/client-check-in/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+        body: {},
+        requireToken: true,
+      );
+    }
+  }
+
+  //This function fetches the client orders
+  Future<void> fetchClientOrders(int clientId) async {
     await getRequest(
-      path: "/api/client/get-client/$id",
+      path: "/api/sale/get-all-client-sales/1?client_id=$clientId",
       requireToken: true,
     ).then((value) {
-      //Todo : continue here
-      clientController.setClientInfo(value);
       setState(() {
-        flag = true;
+        clientOrders = value;
+        clientController.clientInfo["sales"] = clientOrders;
       });
     });
+  }
+
+  // Render client orders listing
+  Widget renderClientOrdersListing() {
+    if (clientController.clientInfo["sales"] != null) {
+      clientOrders = clientController.clientInfo["sales"];
+    }
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: clientController.clientInfo["sales"] == null
+              ? const Center(
+                  child: Text("No previous orders found."),
+                )
+              : Column(
+                  children: clientOrders.map((order) {
+                    return ListTile(
+                      leading: Icon(Icons.receipt, color: kMainColor),
+                      title: Text("Order #${order["id"]}"),
+                      subtitle: Text("Amount: \$${order["amount"]}"),
+                      trailing: Text("${order["date"]}"),
+                    );
+                  }).toList(),
+                ),
+        ),
+      ),
+    );
   }
 
   //This function renders the scan QR code button
   Widget renderScanQrCodeButton(sw, sh) {
     return Container(
       width: sw * 0.85,
-      height: sh * 0.35,
+      height: sh * 0.2,
       decoration: BoxDecoration(
         color: grey.withOpacity(0.2),
         borderRadius: BorderRadius.circular(10),
@@ -84,10 +156,14 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               true,
               ScanMode.BARCODE,
             );
-            getClientFromQrCode(barcodeScanRes);
+            if (barcodeScanRes != "-1") {
+              getClientFromQrCode(4.toString());
+            }
           },
           child: Text(
-            "Scan QR Code",
+            clientController.clientInfo["id"] != -1
+                ? "Check-Out"
+                : "Scan QR Code",
             style: GoogleFonts.poppins(
               color: Colors.white,
             ),
@@ -99,15 +175,15 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   //Render client info
   Widget renderClientInfo(sw, sh) {
-    return Container(
-      width: sw * 0.85,
-      height: sh * 0.35,
-      decoration: BoxDecoration(
-        color: grey.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: flag == true
-          ? Column(
+    return clientController.clientInfo["id"] != -1
+        ? Container(
+            width: sw * 0.85,
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: grey.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -117,22 +193,17 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 20),
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "${clientController.clientInfo["first_name"]} ${clientController.clientInfo["last_name"]}",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
+                const SizedBox(height: 10),
+                Text(
+                  "${clientController.clientInfo["first_name"]} ${clientController.clientInfo["last_name"]}",
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
                   ),
                 ),
               ],
-            )
-          : SizedBox(),
-    );
+            ),
+          )
+        : SizedBox.shrink();
   }
 
   @override
@@ -157,11 +228,14 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
             ),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              //Scan QR code button
-              renderClientInfo(sw, sh),
+              const SizedBox(height: 20),
               renderScanQrCodeButton(sw, sh),
+              const SizedBox(height: 20),
+              renderClientInfo(sw, sh),
+              const SizedBox(height: 20),
+              renderClientOrdersListing(),
             ],
           ),
         ),
