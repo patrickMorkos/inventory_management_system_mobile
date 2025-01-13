@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -28,6 +29,10 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   //This variable is used to store the client orders
   List<dynamic> clientOrders = [];
+
+  //This variable is the vanProductsController
+  final VanProductsController vanProductsController =
+      Get.put(VanProductsController());
 
   //******************************************************************FUNCTIONS
 
@@ -89,6 +94,16 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
         body: {},
         requireToken: true,
       );
+    }
+
+    if (vanProductsController.vanProductsList.isEmpty) {
+      await getRequest(
+        path:
+            "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}",
+        requireToken: true,
+      ).then((value) {
+        vanProductsController.setVanProductsInfo(value);
+      });
     }
   }
 
@@ -181,7 +196,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               ScanMode.BARCODE,
             );
             if (barcodeScanRes != "-1") {
-              getClientFromQrCode(4.toString());
+              getClientFromQrCode(barcodeScanRes);
             }
           },
           child: Text(

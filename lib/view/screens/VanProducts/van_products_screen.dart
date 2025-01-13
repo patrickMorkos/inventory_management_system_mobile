@@ -8,6 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
@@ -24,9 +26,6 @@ class VanProductsScreen extends StatefulWidget {
 
 class _VanProductsScreenState extends State<VanProductsScreen> {
   //******************************************************************VARIABLES
-
-  //This variable is the list of all the products that will be listed
-  List<dynamic> productsList = [];
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -48,7 +47,14 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   final ClientController clientController = Get.put(ClientController());
 
   //This variable is the quantity of the product
-  int quantity = 0;
+  int quantity = 1;
+
+  //This variable is the order controller
+  final OrderController orderController = Get.put(OrderController());
+
+  //This variable is the van products controller
+  final VanProductsController vanProductsController =
+      Get.put(VanProductsController());
 
   //******************************************************************FUNCTIONS
 
@@ -66,8 +72,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          // addProductToCart(context, sw, sh, product, clientInfo);
-          print("quantity:$quantity");
+          orderController.addProductToOrder(product["Product"], quantity);
+          vanProductsController.deductQuantity(
+            product["Product"]["id"],
+            quantity,
+          );
+          Navigator.of(context).pop();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
@@ -124,69 +134,74 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
             SizedBox(
               // width: sw * 0.8,
               height: sh * 0.5,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    //Alert dialog Header
-                    renderProductDescriptionHeader(sh),
+              child: Scrollbar(
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      //Alert dialog Header
+                      renderProductDescriptionHeader(sh),
 
-                    //Product Image
-                    renderProductImage(sw, sh, product),
+                      //Product Image
+                      renderProductImage(sw, sh, product),
 
-                    //Product Name
-                    renderProductItems(
-                      sw,
-                      sh,
-                      "Name",
-                      product["Product"]["name"] ?? "",
-                    ),
-
-                    //Product Brand
-                    renderProductItems(
-                      sw,
-                      sh,
-                      "Brand",
-                      product["Product"]["Brand"]["brand_name"] ?? "",
-                    ),
-
-                    //Product Category
-                    renderProductItems(
-                      sw,
-                      sh,
-                      "Category",
-                      product["Product"]["Category"]["category_name"] ?? "",
-                    ),
-
-                    //Product Quantity
-                    renderProductItems(
-                      sw,
-                      sh,
-                      "Quantity",
-                      product["quantity"] ?? "",
-                    ),
-
-                    //Product Price
-                    renderProductItems(
-                      sw,
-                      sh,
-                      "Price",
-                      product["Product"]["ProductPrice"]["pricea1"] ?? "",
-                    ),
-
-                    //Quantity pick-up
-                    if (clientInfo["id"] != -1)
-                      renderQuantityPickUp(sh, product),
-
-                    //Add product to cart
-                    if (clientInfo["id"] != -1)
-                      renderAddProductToCartButton(
-                        context,
+                      //Product Name
+                      renderProductItems(
                         sw,
                         sh,
-                        product,
-                        clientInfo,
+                        "Name",
+                        product["Product"]["name"] ?? "",
                       ),
-                  ],
+
+                      //Product Brand
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Brand",
+                        product["Product"]["Brand"]["brand_name"] ?? "",
+                      ),
+
+                      //Product Category
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Category",
+                        product["Product"]["Category"]["category_name"] ?? "",
+                      ),
+
+                      //Product Quantity
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Quantity",
+                        product["quantity"] ?? "",
+                      ),
+
+                      //Product Price
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Price",
+                        product["Product"]["ProductPrice"]["pricea1"] != null
+                            ? "\$${product["Product"]["ProductPrice"]["pricea1"]}"
+                            : "",
+                      ),
+
+                      //Quantity pick-up
+                      if (clientInfo["id"] != -1)
+                        renderQuantityPickUp(sh, product),
+
+                      //Add product to cart
+                      if (clientInfo["id"] != -1)
+                        renderAddProductToCartButton(
+                          context,
+                          sw,
+                          sh,
+                          product,
+                          clientInfo,
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -203,9 +218,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}",
       requireToken: true,
     ).then((value) {
+      vanProductsController.setVanProductsInfo(value);
       setState(() {
-        productsList = value;
-        searchedProductsList = productsList;
+        searchedProductsList = vanProductsController.vanProductsList;
       });
     });
     if (Get.arguments != null) {
@@ -218,13 +233,23 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   @override
   void initState() {
     super.initState();
-    getVanProducts();
+    if (clientController.clientInfo["id"] == -1) {
+      getVanProducts();
+    } else {
+      searchedProductsList = vanProductsController.vanProductsList;
+      if (Get.arguments != null) {
+        final arguments = Get.arguments as Map<String, dynamic>;
+        categoryId = arguments["category_id"];
+        filterProductsList(categoryId);
+      }
+    }
   }
 
   //This function filters the products list
   void filterProductsList(int categoryId) {
     setState(() {
-      searchedProductsList = productsList.where((element) {
+      searchedProductsList =
+          vanProductsController.vanProductsList.where((element) {
         return element["Product"]["Category"]["id"] == categoryId;
       }).toList();
     });
@@ -353,13 +378,14 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   void searchProduct(String barcode, sw, sh) {
     //Condition if the barcode scanning is canceled
     if (barcode == "-1") {
-      searchedProductsList = productsList;
+      searchedProductsList = vanProductsController.vanProductsList;
     }
 
     //Condition if the scanned barcode is found
     if (searchedProductsList.any((element) => element["barcode"] == barcode)) {
       setState(() {
-        searchedProductsList = productsList.where((element) {
+        searchedProductsList =
+            vanProductsController.vanProductsList.where((element) {
           return element["barcode"]
               .toString()
               .toLowerCase()
@@ -367,7 +393,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         }).toList();
       });
     } else {
-      searchedProductsList = productsList;
+      searchedProductsList = vanProductsController.vanProductsList;
       openDialog(context, sw, sh, [], barcode);
     }
   }
@@ -401,7 +427,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         textFieldType: TextFieldType.NAME,
         onChanged: (value) {
           setState(() {
-            searchedProductsList = productsList.where((element) {
+            searchedProductsList =
+                vanProductsController.vanProductsList.where((element) {
               return element["product_name"]
                   .toString()
                   .toLowerCase()
@@ -410,7 +437,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           });
           if (value.isEmpty) {
             setState(() {
-              searchedProductsList = productsList;
+              searchedProductsList = vanProductsController.vanProductsList;
             });
           }
           setState(() {
@@ -442,7 +469,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                      searchedProductsList = productsList;
+                      searchedProductsList =
+                          vanProductsController.vanProductsList;
                       searchEditController.text = "";
                     });
                   },

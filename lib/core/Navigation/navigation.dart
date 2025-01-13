@@ -53,7 +53,7 @@ class Navigation {
     ),
     GetPage(
       name: "/create-new-order",
-      page: () => const CreateNewOrderScreen(),
+      page: () => CreateNewOrderScreen(),
     ),
     GetPage(
       name: "/client-stock-screen",
