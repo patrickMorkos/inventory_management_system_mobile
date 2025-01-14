@@ -1,5 +1,6 @@
 //! This is the api service where post/put/get/delete function are created
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
@@ -55,5 +56,59 @@ Future<dynamic> getRequest({
     Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN getRequest url: $url -------------");
     debugPrint("error in get request: $e");
+  }
+}
+
+Future<dynamic> postRequestWithFiles({
+  required String path,
+  required Map<String, dynamic> data,
+  required Map<String, File?> files,
+  bool requireToken = false,
+}) async {
+  final String url = host + path;
+  final request = http.MultipartRequest('POST', Uri.parse(url));
+
+  try {
+    // Add data fields
+    data.forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    // Add file fields
+    files.forEach((key, file) {
+      if (file != null) {
+        request.files.add(http.MultipartFile(
+          key,
+          file.readAsBytes().asStream(),
+          file.lengthSync(),
+          filename: file.path.split('/').last,
+        ));
+      }
+    });
+
+    // Add headers
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      if (requireToken)
+        "Authorization": loggedInUserController.accessToken.value,
+    });
+
+    // Send the request
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    // Parse and return the response
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(
+        'Failed to upload files. Status code: ${response.statusCode}. Response: ${response.body}',
+      );
+    }
+  } catch (e) {
+    Get.snackbar("Error", e.toString());
+    debugPrint(
+        "------------- ERROR IN postRequestWithFiles url: $url -------------");
+    debugPrint("error in post request with files: $e");
   }
 }

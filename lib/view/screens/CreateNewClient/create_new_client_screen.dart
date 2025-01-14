@@ -1,13 +1,371 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
+import 'package:inventory_management_system_mobile/view/widgets/button_global.dart';
+import 'package:inventory_management_system_mobile/core/utils/constants.dart';
+import 'package:nb_utils/nb_utils.dart';
 
-class CreateNewClientScreen extends StatelessWidget {
+class CreateNewClientScreen extends StatefulWidget {
   const CreateNewClientScreen({super.key});
 
   @override
+  State<CreateNewClientScreen> createState() => _CreateNewClientScreenState();
+}
+
+class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
+  //******************************************************************VARIABLES
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController companyNameController = TextEditingController();
+  TextEditingController commercialRegisterController = TextEditingController();
+  TextEditingController mofNumberController = TextEditingController();
+  TextEditingController vatRegisterController = TextEditingController();
+
+  String selectedLocationArea = "1"; // Default to first location
+  List<dynamic> locationAreas = [];
+
+  // For File Pickers
+  File? izaaTijariyePdf;
+  File? photocopyIdCardPdf;
+
+  // Form key for validation
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  //This variable is the logged in user controller
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
+
+  //******************************************************************FUNCTIONS
+
+  Future<void> getLocationAreas() async {
+    var response = await getRequest(
+        path: "/api/client/get-location-areas", requireToken: true);
+    setState(() {
+      locationAreas = response;
+    });
+  }
+
+  Future<void> selectFileForIzaaTijariyePdf() async {
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+    if (result != null) {
+      setState(() {
+        izaaTijariyePdf = File(result.files.single.path!);
+      });
+    }
+  }
+
+  Future<void> selectFileForPhotocopyIdCardPdf() async {
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+    if (result != null) {
+      setState(() {
+        photocopyIdCardPdf = File(result.files.single.path!);
+      });
+    }
+  }
+
+  // This function handles the API call for creating a new client with files
+  Future<void> createClient() async {
+    if (formKey.currentState!.validate()) {
+      Map<String, String> body = {
+        "first_name": firstNameController.text,
+        "last_name": lastNameController.text,
+        "phone_number": phoneNumberController.text,
+        "address": addressController.text,
+        "company_name": companyNameController.text,
+        "commercial_register": commercialRegisterController.text,
+        "mof_number": mofNumberController.text,
+        "vat_register": vatRegisterController.text,
+        "location_area_id": selectedLocationArea,
+        "qr_code": "test" // Fixed qr_code
+      };
+
+      Map<String, File?> files = {
+        "izaa_tijariye_pdf_url": izaaTijariyePdf,
+        "photocopy_id_card_url": photocopyIdCardPdf,
+      };
+
+      var response = await postRequestWithFiles(
+        path:
+            "/api/client/create-client/${loggedInUserController.loggedInUser.value.id}",
+        data: body,
+        files: files,
+        requireToken: true,
+      );
+
+      if (response['error'] == null) {
+        // Navigate to the next screen if successful
+        Get.toNamed('/dashboard');
+      } else {
+        // Handle the error response
+        print("Error: ${response['error']}");
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getLocationAreas();
+  }
+
+  //******************************************************************UI Rendering
+
+  // This function renders the app bar
+  AppBar renderAppBar() {
+    return AppBar(
+      backgroundColor: kMainColor,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: Colors.white),
+      leading: const Icon(Icons.arrow_back, color: Colors.white)
+          .onTap(() => Get.toNamed("/dashboard")),
+      title: Text("Create New Client", style: TextStyle(color: Colors.white)),
+      centerTitle: true,
+    );
+  }
+
+  //The function renders the first name field
+  Widget renderFirstNameField() {
+    return TextFormField(
+      controller: firstNameController,
+      decoration: const InputDecoration(
+        labelText: "First Name",
+        hintText: "Enter first name",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'First Name is required' : null,
+    );
+  }
+
+  //The function renders the last name field
+  Widget renderLastNameField() {
+    return TextFormField(
+      controller: lastNameController,
+      decoration: const InputDecoration(
+        labelText: "Last Name",
+        hintText: "Enter last name",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'Last Name is required' : null,
+    );
+  }
+
+  //The function renders the phone number field
+  Widget renderPhoneNumberField() {
+    return TextFormField(
+      controller: phoneNumberController,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+        labelText: "Phone Number",
+        hintText: "Enter phone number",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'Phone Number is required' : null,
+    );
+  }
+
+  //The function renders the address field
+  Widget renderAddressField() {
+    return TextFormField(
+      controller: addressController,
+      decoration: const InputDecoration(
+        labelText: "Address",
+        hintText: "Enter address",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'Address is required' : null,
+    );
+  }
+
+  //The function renders the company name field
+  Widget renderCompanyNameField() {
+    return TextFormField(
+      controller: companyNameController,
+      decoration: const InputDecoration(
+        labelText: "Company Name",
+        hintText: "Enter company name",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'Company Name is required' : null,
+    );
+  }
+
+  //The function renders the commercial register field
+  Widget renderCommercialRegisterField() {
+    return TextFormField(
+      controller: commercialRegisterController,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+        labelText: "Commercial Register",
+        hintText: "Enter commercial register",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) =>
+          value!.isEmpty ? 'Commercial Register is required' : null,
+    );
+  }
+
+  //The function renders the mof number field
+  Widget renderMofNumberField() {
+    return TextFormField(
+      controller: mofNumberController,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+        labelText: "MOF Number",
+        hintText: "Enter MOF number",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'MOF Number is required' : null,
+    );
+  }
+
+  //The function renders the VAT Register Field
+  Widget renderVatRegisterField() {
+    return TextFormField(
+      controller: vatRegisterController,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+        labelText: "VAT Register",
+        hintText: "Enter VAT register",
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) => value!.isEmpty ? 'VAT Register is required' : null,
+    );
+  }
+
+  //The function renders the location area field
+  Widget renderLocationAreaField() {
+    return DropdownButtonFormField<String>(
+      value: selectedLocationArea,
+      decoration: const InputDecoration(
+        labelText: "Location Area",
+        border: OutlineInputBorder(),
+      ),
+      items: locationAreas.map((area) {
+        return DropdownMenuItem<String>(
+          value: area['id'].toString(),
+          child: Text(area['location_area_name']),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedLocationArea = value!;
+        });
+      },
+    );
+  }
+
+  //This function renders the izaa tijariyye file upload field
+  Widget renderIzaaTijariyyeField() {
+    return ElevatedButton(
+      onPressed: selectFileForIzaaTijariyePdf,
+      child: Text(izaaTijariyePdf == null
+          ? "Select Izaa Tijariye PDF"
+          : "File Selected"),
+    );
+  }
+
+  //This function renders the photocopie of id file upload field
+  Widget renderPhotocopieOfIdField() {
+    return ElevatedButton(
+      onPressed: selectFileForPhotocopyIdCardPdf,
+      child: Text(photocopyIdCardPdf == null
+          ? "Select Photocopy ID Card PDF"
+          : "File Selected"),
+    );
+  }
+
+  //This function renders the create new client button
+  Widget renderCreateNewClientButton() {
+    return ButtonGlobal(
+      buttontext: "Create Client",
+      buttonDecoration: kButtonDecoration.copyWith(color: kMainColor),
+      onPressed: createClient,
+      iconWidget: null,
+      iconColor: Colors.white,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Material(
-      child: Center(
-        child: Text("CreateNewClientScreen"),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: kMainColor,
+        appBar: renderAppBar(),
+        body: Container(
+          alignment: Alignment.topCenter,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30),
+              topLeft: Radius.circular(30),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    // First Name Field
+                    renderFirstNameField(),
+                    const SizedBox(height: 20),
+
+                    // Last Name Field
+                    renderLastNameField(),
+                    const SizedBox(height: 20),
+
+                    // Phone Number Field
+                    renderPhoneNumberField(),
+                    const SizedBox(height: 20),
+
+                    // Address Field
+                    renderAddressField(),
+                    const SizedBox(height: 20),
+
+                    // Company Name Field
+                    renderCompanyNameField(),
+                    const SizedBox(height: 20),
+
+                    // Commercial Register Field
+                    renderCommercialRegisterField(),
+                    const SizedBox(height: 20),
+
+                    // MOF Number Field
+                    renderMofNumberField(),
+                    const SizedBox(height: 20),
+
+                    // VAT Register Field
+                    renderVatRegisterField(),
+                    const SizedBox(height: 20),
+
+                    // Location Area Dropdown
+                    renderLocationAreaField(),
+                    const SizedBox(height: 20),
+
+                    // PDF Picker for Izaa Tijariye PDF
+                    renderIzaaTijariyyeField(),
+                    const SizedBox(height: 20),
+
+                    // PDF Picker for Photocopy ID Card
+                    renderPhotocopieOfIdField(),
+                    const SizedBox(height: 20),
+
+                    // Create Client Button
+                    renderCreateNewClientButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
