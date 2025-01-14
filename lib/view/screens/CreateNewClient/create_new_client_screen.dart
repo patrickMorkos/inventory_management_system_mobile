@@ -172,8 +172,6 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-          // Handle the error response
-          print("Error: ${response['error']}");
         }
       } catch (e) {
         // Handle the error if something goes wrong with the API request

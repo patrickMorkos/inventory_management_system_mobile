@@ -109,9 +109,18 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           fillColor: Colors.white,
         ),
         onQtyChanged: (value) {
-          setState(() {
-            quantity = value.toString().toInt();
-          });
+          if (value is String && value.isNotEmpty) {
+            final parsedValue = double.tryParse(value);
+            if (parsedValue != null) {
+              setState(() {
+                quantity = parsedValue.toInt();
+              });
+            }
+          } else if (value is double || value is int) {
+            setState(() {
+              quantity = value.toInt();
+            });
+          }
         },
       ),
     );

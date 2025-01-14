@@ -36,6 +36,14 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   //******************************************************************FUNCTIONS
 
+  @override
+  void initState() {
+    if (clientController.clientInfo["id"] != -1) {
+      fetchClientOrders(clientController.clientInfo["id"]);
+    }
+    super.initState();
+  }
+
   //This function renders the app bar
   AppBar renderAppBar() {
     return AppBar(
@@ -147,7 +155,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                   children: clientOrders.map((order) {
                     return ListTile(
                       onTap: () {
-                        print("See sale product and add to order");
+                        //TODO: replicate sale to current order
                       },
                       leading: Icon(Icons.receipt, color: kMainColor),
                       title: Text("Order #${order["id"]}"),

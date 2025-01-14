@@ -1,8 +1,9 @@
 //! This is the order controller to globally save the order info
-import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class OrderController extends GetxController {
   RxMap<String, dynamic> orderInfo = RxMap<String, dynamic>(
@@ -43,6 +44,10 @@ class OrderController extends GetxController {
         (product) => product["product"] == productObj)["quantity"] -= 1;
   }
 
+  void resetOrder() {
+    orderInfo["products"] = [];
+  }
+
   void createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
@@ -53,11 +58,11 @@ class OrderController extends GetxController {
       });
     }
 
-    int sale_type_id = 0;
+    int saleTypeId = 0;
     if (saleType == "Cash Van") {
-      sale_type_id = 1;
+      saleTypeId = 1;
     } else if (saleType == "Presale") {
-      sale_type_id = 2;
+      saleTypeId = 2;
     }
 
     Map<String, dynamic> orderData = {
@@ -65,7 +70,7 @@ class OrderController extends GetxController {
       "total_price_lbp": totalPriceUsd * 89500,
       "vat_value": 11,
       "is_pending_payment": isPendingPayment,
-      "sale_type_id": sale_type_id,
+      "sale_type_id": saleTypeId,
       "client_id": clientId,
       "products": orderProducts,
     };
@@ -74,6 +79,28 @@ class OrderController extends GetxController {
       path: "/api/sale/create-sale/$salesmanId",
       body: orderData,
       requireToken: true,
-    );
+    ).then((response) {
+      if (response['id'] != null) {
+        Fluttertoast.showToast(
+          msg: "Order created successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        Get.toNamed("/dashboard");
+        resetOrder();
+      } else {
+        Fluttertoast.showToast(
+          msg: "Error: ${response['error']}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    });
   }
 }

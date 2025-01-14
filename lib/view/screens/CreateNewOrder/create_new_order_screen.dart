@@ -186,7 +186,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   //This function renders the total order price
   Widget renderTotalOrderPrice() {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -263,7 +263,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   // Function to render payment and sale type radio buttons
   Widget renderPaymentAndSaleTypeOptions() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -273,59 +273,50 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
-          Row(
+          Column(
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Radio<bool>(
-                      value: true,
-                      groupValue: isPendingPayment,
-                      onChanged: (value) {
-                        setState(() {
-                          isPendingPayment = value ?? false;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "Pending Payment",
-                      style: GoogleFonts.poppins(fontSize: 14),
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  Radio<bool>(
+                    value: true,
+                    groupValue: isPendingPayment,
+                    onChanged: (value) {
+                      setState(() {
+                        isPendingPayment = value ?? false;
+                      });
+                    },
+                  ),
+                  Text(
+                    "Pending Payment",
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
+                ],
               ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Radio<bool>(
-                      value: false,
-                      groupValue: isPendingPayment,
-                      onChanged: (value) {
-                        setState(() {
-                          isPendingPayment = value ?? false;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "Immediate Payment",
-                      style: GoogleFonts.poppins(fontSize: 14),
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  Radio<bool>(
+                    value: false,
+                    groupValue: isPendingPayment,
+                    onChanged: (value) {
+                      setState(() {
+                        isPendingPayment = value ?? false;
+                      });
+                    },
+                  ),
+                  Text(
+                    "Immediate Payment",
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 20),
           // Sale type radio buttons
           Text(
             "Sale Type:",
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -340,7 +331,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         });
                       },
                     ),
-                    const SizedBox(width: 5),
                     Text(
                       "Cash Van",
                       style: GoogleFonts.poppins(fontSize: 14),
@@ -360,7 +350,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         });
                       },
                     ),
-                    const SizedBox(width: 5),
                     Text(
                       "Presale",
                       style: GoogleFonts.poppins(fontSize: 14),
