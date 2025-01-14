@@ -16,6 +16,9 @@ class CreateNewClientScreen extends StatefulWidget {
   State<CreateNewClientScreen> createState() => _CreateNewClientScreenState();
 }
 
+// Variable to hold the selected file type (Image or Document)
+enum FileTypeOption { image, document }
+
 class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
   //******************************************************************VARIABLES
   TextEditingController firstNameController = TextEditingController();
@@ -29,6 +32,10 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
 
   String selectedLocationArea = "1"; // Default to first location
   List<dynamic> locationAreas = [];
+
+  // Initial file type for Izaa Tijariye and Photocopy ID
+  FileTypeOption _selectedFileTypeIzaa = FileTypeOption.document;
+  FileTypeOption _selectedFileTypePhotocopy = FileTypeOption.document;
 
   // For File Pickers
   File? izaaTijariyePdf;
@@ -59,21 +66,24 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
 
   // Function to pick a file for Izaa Tijariye PDF or Image
   Future<void> selectFileForIzaaTijariyePdf() async {
-    final ImagePicker picker = ImagePicker();
-
-    if (isImageFileIzaa) {
-      // If the user selects image, open the camera
+    if (_selectedFileTypeIzaa == FileTypeOption.image) {
+      // Open the camera to capture an image
+      final ImagePicker picker = ImagePicker();
       final XFile? pickedFile =
           await picker.pickImage(source: ImageSource.camera);
+
       if (pickedFile != null) {
         setState(() {
-          izaaTijariyePdf = File(pickedFile.path);
+          izaaTijariyePdf =
+              File(pickedFile.path); // Assign the selected image file
         });
       }
     } else {
-      // If it's not an image, pick a PDF file
-      final result = await FilePicker.platform
-          .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+      // Otherwise, use the FilePicker to select a PDF file
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
       if (result != null) {
         setState(() {
           izaaTijariyePdf = File(result.files.single.path!);
@@ -84,21 +94,24 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
 
 // Function to pick a file for Photocopy ID Card or Image
   Future<void> selectFileForPhotocopyIdCardPdf() async {
-    final ImagePicker picker = ImagePicker();
-
-    if (isImageFilePhotocopy) {
-      // If the user selects image, open the camera
+    if (_selectedFileTypePhotocopy == FileTypeOption.image) {
+      // Open the camera to capture an image
+      final ImagePicker picker = ImagePicker();
       final XFile? pickedFile =
           await picker.pickImage(source: ImageSource.camera);
+
       if (pickedFile != null) {
         setState(() {
-          photocopyIdCardPdf = File(pickedFile.path);
+          photocopyIdCardPdf =
+              File(pickedFile.path); // Assign the selected image file
         });
       }
     } else {
-      // If it's not an image, pick a PDF file
-      final result = await FilePicker.platform
-          .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+      // Otherwise, use the FilePicker to select a PDF file
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
       if (result != null) {
         setState(() {
           photocopyIdCardPdf = File(result.files.single.path!);
@@ -128,20 +141,50 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
         "photocopy_id_card_url": photocopyIdCardPdf,
       };
 
-      var response = await postRequestWithFiles(
-        path:
-            "/api/client/create-client/${loggedInUserController.loggedInUser.value.id}",
-        data: body,
-        files: files,
-        requireToken: true,
-      );
+      try {
+        var response = await postRequestWithFiles(
+          path:
+              "/api/client/create-client/${loggedInUserController.loggedInUser.value.id}",
+          data: body,
+          files: files,
+          requireToken: true,
+        );
+        if (response['error'] == null) {
+          // Successfully created the client, show a success toast
 
-      if (response['error'] == null) {
-        // Navigate to the next screen if successful
-        Get.toNamed('/dashboard');
-      } else {
-        // Handle the error response
-        print("Error: ${response['error']}");
+          Fluttertoast.showToast(
+            msg: "Client created successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          // Navigate to the next screen if successful
+          Get.toNamed('/dashboard');
+        } else {
+          // API returned an error, show the error message in a toast
+          Fluttertoast.showToast(
+            msg: "Error: ${response['error']}",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          // Handle the error response
+          print("Error: ${response['error']}");
+        }
+      } catch (e) {
+        // Handle the error if something goes wrong with the API request
+        Fluttertoast.showToast(
+          msg: "Failed to create client. Please try again.",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       }
     }
   }
@@ -300,21 +343,101 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
 
   //This function renders the izaa tijariyye file upload field
   Widget renderIzaaTijariyyeField() {
-    return ElevatedButton(
-      onPressed: selectFileForIzaaTijariyePdf,
-      child: Text(izaaTijariyePdf == null
-          ? "Select Izaa Tijariye PDF"
-          : "File Selected"),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Select Izaa Tijariye:"),
+        Row(
+          children: [
+            Radio<FileTypeOption>(
+              value: FileTypeOption.image,
+              groupValue: _selectedFileTypeIzaa,
+              onChanged: (FileTypeOption? value) {
+                setState(() {
+                  _selectedFileTypeIzaa = value!;
+                });
+              },
+            ),
+            const Text('Image'),
+            const SizedBox(width: 20),
+            Radio<FileTypeOption>(
+              value: FileTypeOption.document,
+              groupValue: _selectedFileTypeIzaa,
+              onChanged: (FileTypeOption? value) {
+                setState(() {
+                  _selectedFileTypeIzaa = value!;
+                });
+              },
+            ),
+            const Text('Document'),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: selectFileForIzaaTijariyePdf,
+          child: Text(izaaTijariyePdf == null
+              ? "Select Izaa Tijariye File"
+              : "File Selected"),
+        ),
+        if (izaaTijariyePdf != null) ...[
+          _selectedFileTypeIzaa == FileTypeOption.image
+              ? Image.file(izaaTijariyePdf!, height: 50, width: 50)
+              : Text(izaaTijariyePdf!.path.split('/').last),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: deleteFileIzaa,
+          ),
+        ]
+      ],
     );
   }
 
   //This function renders the photocopie of id file upload field
   Widget renderPhotocopieOfIdField() {
-    return ElevatedButton(
-      onPressed: selectFileForPhotocopyIdCardPdf,
-      child: Text(photocopyIdCardPdf == null
-          ? "Select Photocopy ID Card PDF"
-          : "File Selected"),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Select Photocopy ID Card:"),
+        Row(
+          children: [
+            Radio<FileTypeOption>(
+              value: FileTypeOption.image,
+              groupValue: _selectedFileTypePhotocopy,
+              onChanged: (FileTypeOption? value) {
+                setState(() {
+                  _selectedFileTypePhotocopy = value!;
+                });
+              },
+            ),
+            const Text('Image'),
+            const SizedBox(width: 20),
+            Radio<FileTypeOption>(
+              value: FileTypeOption.document,
+              groupValue: _selectedFileTypePhotocopy,
+              onChanged: (FileTypeOption? value) {
+                setState(() {
+                  _selectedFileTypePhotocopy = value!;
+                });
+              },
+            ),
+            const Text('Document'),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: selectFileForPhotocopyIdCardPdf,
+          child: Text(photocopyIdCardPdf == null
+              ? "Select Photocopy ID Card File"
+              : "File Selected"),
+        ),
+        if (photocopyIdCardPdf != null) ...[
+          _selectedFileTypePhotocopy == FileTypeOption.image
+              ? Image.file(photocopyIdCardPdf!, height: 50, width: 50)
+              : Text(photocopyIdCardPdf!.path.split('/').last),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: deleteFilePhotocopy,
+          ),
+        ]
+      ],
     );
   }
 
@@ -469,15 +592,15 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
                     const SizedBox(height: 20),
 
                     // File Type Selection for Izaa
-                    renderFileTypeToggleIzaa(),
+                    // renderFileTypeToggleIzaa(),
                     renderIzaaTijariyyeField(),
-                    renderFilePreviewIzaa(),
+                    // renderFilePreviewIzaa(),
                     const SizedBox(height: 20),
 
                     // File Type Selection for Photocopy
-                    renderFileTypeTogglePhotocopy(),
+                    // renderFileTypeTogglePhotocopy(),
                     renderPhotocopieOfIdField(),
-                    renderFilePreviewPhotocopy(),
+                    // renderFilePreviewPhotocopy(),
                     const SizedBox(height: 20),
 
                     // Create Client Button
