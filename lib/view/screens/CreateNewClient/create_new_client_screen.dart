@@ -7,6 +7,7 @@ import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/button_global.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateNewClientScreen extends StatefulWidget {
   const CreateNewClientScreen({super.key});
@@ -33,6 +34,12 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
   File? izaaTijariyePdf;
   File? photocopyIdCardPdf;
 
+  // Flag to choose image or file for Izaa Tijariye
+  bool isImageFileIzaa = false;
+
+  // Flag to choose image or file for Photocopy ID Card
+  bool isImageFilePhotocopy = false;
+
   // Form key for validation
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -50,23 +57,53 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
     });
   }
 
+  // Function to pick a file for Izaa Tijariye PDF or Image
   Future<void> selectFileForIzaaTijariyePdf() async {
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
-    if (result != null) {
-      setState(() {
-        izaaTijariyePdf = File(result.files.single.path!);
-      });
+    final ImagePicker picker = ImagePicker();
+
+    if (isImageFileIzaa) {
+      // If the user selects image, open the camera
+      final XFile? pickedFile =
+          await picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        setState(() {
+          izaaTijariyePdf = File(pickedFile.path);
+        });
+      }
+    } else {
+      // If it's not an image, pick a PDF file
+      final result = await FilePicker.platform
+          .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+      if (result != null) {
+        setState(() {
+          izaaTijariyePdf = File(result.files.single.path!);
+        });
+      }
     }
   }
 
+// Function to pick a file for Photocopy ID Card or Image
   Future<void> selectFileForPhotocopyIdCardPdf() async {
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
-    if (result != null) {
-      setState(() {
-        photocopyIdCardPdf = File(result.files.single.path!);
-      });
+    final ImagePicker picker = ImagePicker();
+
+    if (isImageFilePhotocopy) {
+      // If the user selects image, open the camera
+      final XFile? pickedFile =
+          await picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        setState(() {
+          photocopyIdCardPdf = File(pickedFile.path);
+        });
+      }
+    } else {
+      // If it's not an image, pick a PDF file
+      final result = await FilePicker.platform
+          .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
+      if (result != null) {
+        setState(() {
+          photocopyIdCardPdf = File(result.files.single.path!);
+        });
+      }
     }
   }
 
@@ -292,6 +329,87 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
     );
   }
 
+  Future<void> deleteFileIzaa() async {
+    setState(() {
+      izaaTijariyePdf = null;
+    });
+  }
+
+  Future<void> deleteFilePhotocopy() async {
+    setState(() {
+      photocopyIdCardPdf = null;
+    });
+  }
+
+  // Toggle between image or file
+  Widget renderFileTypeToggleIzaa() {
+    return Row(
+      children: [
+        Text("Select Image: "),
+        Switch(
+          value: isImageFileIzaa,
+          onChanged: (value) {
+            setState(() {
+              isImageFileIzaa = value;
+            });
+          },
+        ),
+        Text(isImageFileIzaa ? "Image" : "PDF"),
+      ],
+    );
+  }
+
+  Widget renderFileTypeTogglePhotocopy() {
+    return Row(
+      children: [
+        Text("Select Image: "),
+        Switch(
+          value: isImageFilePhotocopy,
+          onChanged: (value) {
+            setState(() {
+              isImageFilePhotocopy = value;
+            });
+          },
+        ),
+        Text(isImageFilePhotocopy ? "Image" : "PDF"),
+      ],
+    );
+  }
+
+  Widget renderFilePreviewIzaa() {
+    if (izaaTijariyePdf != null) {
+      return Row(
+        children: [
+          isImageFileIzaa
+              ? Image.file(izaaTijariyePdf!, height: 50, width: 50)
+              : Text(izaaTijariyePdf!.path.split('/').last),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: deleteFileIzaa,
+          ),
+        ],
+      );
+    }
+    return SizedBox.shrink();
+  }
+
+  Widget renderFilePreviewPhotocopy() {
+    if (photocopyIdCardPdf != null) {
+      return Row(
+        children: [
+          isImageFilePhotocopy
+              ? Image.file(photocopyIdCardPdf!, height: 50, width: 50)
+              : Text(photocopyIdCardPdf!.path.split('/').last),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: deleteFilePhotocopy,
+          ),
+        ],
+      );
+    }
+    return SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -350,12 +468,16 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
                     renderLocationAreaField(),
                     const SizedBox(height: 20),
 
-                    // PDF Picker for Izaa Tijariye PDF
+                    // File Type Selection for Izaa
+                    renderFileTypeToggleIzaa(),
                     renderIzaaTijariyyeField(),
+                    renderFilePreviewIzaa(),
                     const SizedBox(height: 20),
 
-                    // PDF Picker for Photocopy ID Card
+                    // File Type Selection for Photocopy
+                    renderFileTypeTogglePhotocopy(),
                     renderPhotocopieOfIdField(),
+                    renderFilePreviewPhotocopy(),
                     const SizedBox(height: 20),
 
                     // Create Client Button
