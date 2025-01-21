@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/models/user_model.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/button_global.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,9 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
   //This variable is a flag to check either the phone is connected to the wifi or not
   bool isDeviceConnected = false;
 
-  //This variable is a flag to either show the alert that phone is not connected to wifi or not
-  bool isAlertSet = false;
-
   //This flag to check if the email and password are wrong
   bool isEmailAndPasswordWrong = false;
 
@@ -57,40 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return true;
     }
     return false;
-  }
-
-  //This function is to check for internet connectivity
-  void connectivityCallback(List<ConnectivityResult> results) async {
-    isDeviceConnected = await InternetConnectionChecker().hasConnection;
-    if (!isDeviceConnected && !isAlertSet) {
-      showDialogBox();
-      setState(() => isAlertSet = true);
-    }
-  }
-
-  //This function is to get the devices connectivity
-  getConnectivity() {
-    if (kIsWeb) {
-      return;
-    }
-    subscription = Connectivity()
-        .onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
-      connectivityCallback(results);
-    });
-  }
-
-  //This function check the internet connection as well
-  checkInternet() async {
-    if (kIsWeb) {
-      return;
-    }
-
-    isDeviceConnected = await InternetConnectionChecker().hasConnection;
-    if (!isDeviceConnected) {
-      showDialogBox();
-      setState(() => isAlertSet = true);
-    }
   }
 
   //This function logs the user in execute the api call and redirect to the dashboard
@@ -140,13 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async {
+                var connectivityResult =
+                    await Connectivity().checkConnectivity();
                 Navigator.pop(context, 'Cancel');
-                setState(() => isAlertSet = false);
-                isDeviceConnected =
-                    await InternetConnectionChecker().hasConnection;
-                if (!isDeviceConnected && isAlertSet == false) {
+                if ((connectivityResult[0].toString() == "ConnectivityResult.none")) {
                   showDialogBox();
-                  setState(() => isAlertSet = true);
                 }
               },
               child: const Text("Try Again"),
@@ -155,11 +116,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
 
-  @override
-  void initState() {
-    getConnectivity();
-    checkInternet();
-    super.initState();
+  Future<void> checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult[0].toString() == "ConnectivityResult.none") {
+      showDialogBox();
+    }
   }
 
   //This function renders the error message
@@ -179,6 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!kIsWeb) {
+      checkInternetConnection();
+    }
     return SafeArea(
       child: Scaffold(
         body: Consumer(builder: (context, ref, child) {
