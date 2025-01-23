@@ -185,7 +185,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
       width: sw * 0.85,
       height: sh * 0.2,
       decoration: BoxDecoration(
-        color: grey.withOpacity(0.2),
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(10),
       ),
       child: Center(
@@ -227,7 +227,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
             width: sw * 0.85,
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: grey.withOpacity(0.2),
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
