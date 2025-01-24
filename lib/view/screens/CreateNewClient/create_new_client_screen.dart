@@ -32,6 +32,18 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
 
   String selectedLocationArea = "1"; // Default to first location
   List<dynamic> locationAreas = [];
+  String? selectedPriceClass;
+  List<String> priceClasses = [
+    "None",
+    "a1",
+    "a2",
+    "b1",
+    "b2",
+    "c1",
+    "c2",
+    "d1",
+    "d2"
+  ];
 
   // Initial file type for Izaa Tijariye and Photocopy ID
   FileTypeOption _selectedFileTypeIzaa = FileTypeOption.document;
@@ -133,6 +145,7 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
         "mof_number": mofNumberController.text,
         "vat_register": vatRegisterController.text,
         "location_area_id": selectedLocationArea,
+        if (selectedPriceClass != null) "price_class": selectedPriceClass!,
         "qr_code": "test" // Fixed qr_code
       };
 
@@ -462,41 +475,6 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
     });
   }
 
-  // Toggle between image or file
-  Widget renderFileTypeToggleIzaa() {
-    return Row(
-      children: [
-        Text("Select Image: "),
-        Switch(
-          value: isImageFileIzaa,
-          onChanged: (value) {
-            setState(() {
-              isImageFileIzaa = value;
-            });
-          },
-        ),
-        Text(isImageFileIzaa ? "Image" : "PDF"),
-      ],
-    );
-  }
-
-  Widget renderFileTypeTogglePhotocopy() {
-    return Row(
-      children: [
-        Text("Select Image: "),
-        Switch(
-          value: isImageFilePhotocopy,
-          onChanged: (value) {
-            setState(() {
-              isImageFilePhotocopy = value;
-            });
-          },
-        ),
-        Text(isImageFilePhotocopy ? "Image" : "PDF"),
-      ],
-    );
-  }
-
   Widget renderFilePreviewIzaa() {
     if (izaaTijariyePdf != null) {
       return Row(
@@ -529,6 +507,31 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
       );
     }
     return SizedBox.shrink();
+  }
+
+  // The function renders the client price class dropdown
+  Widget renderClientPriceClassDropdown() {
+    return DropdownButtonFormField<String>(
+      value: selectedPriceClass ?? "None", // Default to "None"
+      decoration: const InputDecoration(
+        labelText: "Client Price Class",
+        border: OutlineInputBorder(),
+      ),
+      items: priceClasses.map((priceClass) {
+        return DropdownMenuItem<String>(
+          value: priceClass,
+          child: Text(priceClass),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedPriceClass =
+              value == "None" ? null : value; // Set null if "None" is selected
+        });
+      },
+      isExpanded: true,
+      hint: const Text("Select Price Class"),
+    );
   }
 
   @override
@@ -589,16 +592,16 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
                     renderLocationAreaField(),
                     const SizedBox(height: 20),
 
+                    // Client Price Class Dropdown
+                    renderClientPriceClassDropdown(),
+                    const SizedBox(height: 20),
+
                     // File Type Selection for Izaa
-                    // renderFileTypeToggleIzaa(),
                     renderIzaaTijariyyeField(),
-                    // renderFilePreviewIzaa(),
                     const SizedBox(height: 20),
 
                     // File Type Selection for Photocopy
-                    // renderFileTypeTogglePhotocopy(),
                     renderPhotocopieOfIdField(),
-                    // renderFilePreviewPhotocopy(),
                     const SizedBox(height: 20),
 
                     // Create Client Button
