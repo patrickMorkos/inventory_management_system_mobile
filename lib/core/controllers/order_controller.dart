@@ -55,6 +55,7 @@ class OrderController extends GetxController {
       orderProducts.add({
         "product_id": element["product"]["id"],
         "quantity": element["quantity"],
+        "product_price": double.parse((element["product"]["ProductPrice"]["price"]).toString())
       });
     }
 
