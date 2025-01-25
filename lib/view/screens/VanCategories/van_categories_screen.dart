@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
@@ -35,13 +36,20 @@ class _VanCategoriesScreenState extends State<VanCategoriesScreen> {
   final LoggedInUserController loggedInUserController =
       Get.put(LoggedInUserController());
 
+  //This variable is the client controller
+  final ClientController clientController = Get.put(ClientController());
+
   //******************************************************************FUNCTIONS
 
   //This function call the get van categories API
   Future<void> getVanCategories() async {
+    int? clientId;
+    if (clientController.clientInfo["id"] != -1) {
+      clientId = clientController.clientInfo["id"];
+    }
     await getRequest(
       path:
-          "/api/van-products/get-all-van-products-categories/${loggedInUserController.loggedInUser.value.id}",
+          "/api/van-products/get-all-van-products-categories/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       setState(() {

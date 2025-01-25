@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
@@ -36,12 +37,19 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //This variable is the category id
   int categoryId = -1;
 
+  //This variable is the client controller
+  final ClientController clientController = Get.put(ClientController());
+
   //******************************************************************FUNCTIONS
 
   //This function call the get main warehouse products API
   Future<void> getMainWarehouseProducts() async {
+    int? clientId;
+    if (clientController.clientInfo["id"] != -1) {
+      clientId = clientController.clientInfo["id"];
+    }
     await getRequest(
-      path: "/api/main-warehouse-stock/get-all-main-warehouse-stock-products",
+      path: "/api/main-warehouse-stock/get-all-main-warehouse-stock-products?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       setState(() {
@@ -142,7 +150,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["Product"]["ProductPrice"]["pricea1"] ?? ""}",
+                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],

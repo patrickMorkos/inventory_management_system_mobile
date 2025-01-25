@@ -191,8 +191,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                         sw,
                         sh,
                         "Price",
-                        product["Product"]["ProductPrice"]["pricea1"] != null
-                            ? "\$${product["Product"]["ProductPrice"]["pricea1"]}"
+                        product["Product"]["ProductPrice"]["price"] != null
+                            ? "\$${product["Product"]["ProductPrice"]["price"]}"
                             : "",
                       ),
 
@@ -222,9 +222,13 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
 
   //This function call the get van products API
   Future<void> getVanProducts() async {
+    int? clientId;
+    if (clientController.clientInfo["id"] != -1) {
+      clientId = clientController.clientInfo["id"];
+    }
     await getRequest(
       path:
-          "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}",
+          "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       vanProductsController.setVanProductsInfo(value);
@@ -345,7 +349,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["Product"]["ProductPrice"]["pricea1"] ?? ""}",
+                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],

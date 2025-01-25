@@ -54,7 +54,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           orderController.orderInfo["products"].fold(0.0, (sum, product) {
         return sum +
             (product['quantity'] *
-                product['product']['ProductPrice']['pricea1']);
+                product['product']['ProductPrice']['price']);
       });
     });
   }
@@ -101,7 +101,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: Text(
-              "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['pricea1']} = \$${(product['quantity'] * product['product']['ProductPrice']['pricea1']).toStringAsFixed(2)}",
+              "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['price']} = \$${(product['quantity'] * product['product']['ProductPrice']['price']).toStringAsFixed(2)}",
               style: TextStyle(color: Colors.grey),
             ),
             trailing: Row(

@@ -104,15 +104,13 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
       );
     }
 
-    if (vanProductsController.vanProductsList.isEmpty) {
-      await getRequest(
-        path:
-            "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}",
-        requireToken: true,
-      ).then((value) {
-        vanProductsController.setVanProductsInfo(value);
-      });
-    }
+    await getRequest(
+      path:
+          "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+      requireToken: true,
+    ).then((value) {
+      vanProductsController.setVanProductsInfo(value);
+    });
   }
 
   //This function fetches the client orders
@@ -156,6 +154,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                     return ListTile(
                       onTap: () {
                         //TODO: replicate sale to current order
+                        print("Replicate sale to current order");
                       },
                       leading: Icon(Icons.receipt, color: kMainColor),
                       title: Text("Order #${order["id"]}"),
