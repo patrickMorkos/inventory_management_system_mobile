@@ -53,8 +53,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       totalOrderPrice =
           orderController.orderInfo["products"].fold(0.0, (sum, product) {
         return sum +
-            (product['quantity'] *
-                product['product']['ProductPrice']['price']);
+            (product['quantity'] * product['product']['ProductPrice']['price']);
       });
     });
   }
