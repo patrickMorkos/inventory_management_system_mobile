@@ -59,6 +59,56 @@ Future<dynamic> getRequest({
   }
 }
 
+//Put request API call
+Future<dynamic> putRequest({
+  required String path,
+  required dynamic body,
+  bool requireToken = false,
+}) async {
+  final String url = host + path;
+  try {
+    final http.Response response = await http.put(
+      Uri.parse(url),
+      body: jsonEncode(body),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        if (requireToken)
+          "Authorization": loggedInUserController.accessToken.value,
+      },
+    );
+    return jsonDecode(response.body);
+  } catch (e) {
+    Get.snackbar("Error", e.toString());
+    debugPrint("------------- ERROR IN putRequest url: $url -------------");
+    debugPrint("error in put request: $e");
+  }
+}
+
+//Delete request API call
+Future<dynamic> deleteRequest({
+  required String path,
+  required dynamic body,
+  bool requireToken = false,
+}) async {
+  final String url = host + path;
+  try {
+    final http.Response response = await http.delete(
+      Uri.parse(url),
+      body: jsonEncode(body),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        if (requireToken)
+          "Authorization": loggedInUserController.accessToken.value,
+      },
+    );
+    return jsonDecode(response.body);
+  } catch (e) {
+    Get.snackbar("Error", e.toString());
+    debugPrint("------------- ERROR IN deleteRequest url: $url -------------");
+    debugPrint("error in delete request: $e");
+  }
+}
+
 Future<dynamic> postRequestWithFiles({
   required String path,
   required Map<String, dynamic> data,
