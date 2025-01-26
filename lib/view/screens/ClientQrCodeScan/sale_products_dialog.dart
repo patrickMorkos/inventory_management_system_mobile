@@ -13,7 +13,7 @@ class SaleProductsDialog extends StatefulWidget {
   });
 
   @override
-  _SaleProductsDialogState createState() => _SaleProductsDialogState();
+  State<SaleProductsDialog> createState() => _SaleProductsDialogState();
 }
 
 class _SaleProductsDialogState extends State<SaleProductsDialog> {
