@@ -48,7 +48,11 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   void showSaleProductsDialog(BuildContext context, List<dynamic> products) {
     showDialog(
       context: context,
-      builder: (context) => SaleProductsDialog(products: products),
+      builder: (context) {
+        return SaleProductsDialog(
+          products: products,
+        );
+      },
     );
   }
 
