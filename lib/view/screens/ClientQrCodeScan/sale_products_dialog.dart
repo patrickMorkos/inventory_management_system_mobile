@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 
 class SaleProductsDialog extends StatefulWidget {
   final List<dynamic> products;
-  final Function(List<dynamic> products, bool useOldPrices) onReplicateSale;
 
   const SaleProductsDialog({
     super.key,
     required this.products,
-    required this.onReplicateSale,
   });
 
   @override
@@ -27,6 +27,9 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
   }
 
   final ScrollController _scrollController = ScrollController();
+
+  //This variable is the order controller
+  final OrderController orderController = Get.put(OrderController());
 
   //******************************************************************FUNCTIONS
 
@@ -154,8 +157,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              print("add sale products to cart");
-              print("price selection: $priceSelection");
+              orderController.addSaleProductsToOrder(widget.products);
               Navigator.of(context).pop(); // Close dialog
             },
             style: ElevatedButton.styleFrom(
