@@ -63,6 +63,72 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     Get.toNamed("/van-products");
   }
 
+  // This function renders the sale products list
+  Widget renderSaleProductsList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            "Products from Previous Sale",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ...getSaleProductsCards(),
+      ],
+    );
+  }
+
+  // This function returns the sale products cards list
+  List<Widget> getSaleProductsCards() {
+    List<Widget> tmp = [];
+    if (orderController.orderInfo["saleProducts"] == null ||
+        orderController.orderInfo["saleProducts"].isEmpty) {
+      tmp.add(
+        const Center(
+          child: Text("No products from previous sales available."),
+        ),
+      );
+      return tmp;
+    }
+
+    for (var product in orderController.orderInfo["saleProducts"]) {
+      tmp.add(
+        ListTile(
+          title: Text(
+            product["product"]["name"] ?? "Unnamed Product",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            "Quantity: ${product['quantity']} x \$${product['product_price']} = \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
+            style: const TextStyle(color: Colors.grey),
+          ),
+          leading: Image.network(
+            product["product"]["image_url"] ?? "",
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.broken_image);
+            },
+          ),
+        ),
+      );
+      tmp.add(
+        const SizedBox(
+          height: 20,
+          child: Divider(),
+        ),
+      );
+    }
+    return tmp;
+  }
+
   //This function renders the order products list
   Widget renderOrderProductsList() {
     return Expanded(
@@ -70,8 +136,58 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
         child: Container(
           padding: const EdgeInsets.all(30),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getOrderProductsCards(),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header for current products
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  "Products from Current Sale",
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Check for null or empty products list
+              if (orderController.orderInfo["products"] == null ||
+                  orderController.orderInfo["products"].isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Text(
+                    "No products added to the current order yet.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+              else
+                ...getOrderProductsCards(),
+              const Divider(
+                thickness: 2,
+                color: Colors.grey,
+              ),
+              // Sale products section
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  "Products from Previous Sale",
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              if (orderController.orderInfo["saleProducts"] == null ||
+                  orderController.orderInfo["saleProducts"].isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Text(
+                    "No products from previous sales available.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+              else
+                ...getSaleProductsCards(),
+            ],
           ),
         ),
       ),
@@ -81,7 +197,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   //This function returns the order product cards list
   List<Widget> getOrderProductsCards() {
     List<Widget> tmp = [];
-    if (orderController.orderInfo["products"].isEmpty) {
+    if (orderController.orderInfo["products"] == null ||
+        orderController.orderInfo["products"].isEmpty) {
       tmp.add(
         const Center(
           child: Padding(
@@ -94,14 +211,25 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       for (var product in orderController.orderInfo["products"]) {
         tmp.add(
           ListTile(
+            leading: Image.network(
+              product["product"]["image_url"] ?? "",
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.broken_image);
+              },
+            ),
             title: Text(
-              product["product"]["name"] ?? "",
+              product["product"]["name"] ?? "Unnamed Product",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                  fontSize: 14, fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
               "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['price']} = \$${(product['quantity'] * product['product']['ProductPrice']['price']).toStringAsFixed(2)}",
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -109,7 +237,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                      // product['quantity'] += 1;
                       orderController
                           .increaseProductQuantity(product['product']);
                       vanProductsController.deductQuantity(
@@ -117,13 +244,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       updateTotalPrice();
                     });
                   },
-                  icon: Icon(Icons.add),
+                  icon: const Icon(Icons.add, size: 20),
                 ),
                 IconButton(
                   onPressed: () {
                     setState(() {
                       if (product['quantity'] > 1) {
-                        // product['quantity'] -= 1;
                         orderController
                             .decreaseProductQuantity(product['product']);
                         vanProductsController.addQuantity(
@@ -132,7 +258,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       }
                     });
                   },
-                  icon: Icon(Icons.remove),
+                  icon: const Icon(Icons.remove, size: 20),
                 ),
                 IconButton(
                   onPressed: () {
@@ -144,7 +270,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       updateTotalPrice();
                     });
                   },
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete, size: 20),
                 ),
               ],
             ),
