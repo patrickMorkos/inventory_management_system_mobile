@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_stock_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
@@ -21,6 +23,8 @@ class AllProductsScreen extends StatefulWidget {
 
 class _AllProductsScreenState extends State<AllProductsScreen> {
   //******************************************************************VARIABLES
+
+  bool isFromClientStock = false;
 
   //This variable is the list of all the products that will be listed
   List<dynamic> productsList = [];
@@ -40,7 +44,96 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //This variable is the client controller
   final ClientController clientController = Get.put(ClientController());
 
+  //This variable is the client stock controller
+  final ClientStockController clientStockController =
+      Get.put(ClientStockController());
+
+  //This variable is the quantity of the product
+  int quantity = 1;
+
   //******************************************************************FUNCTIONS
+
+  //This function renders the product quantity
+  Widget renderQuantityPickUp(sh, product) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: sh / 50,
+      ),
+      child: InputQty(
+        maxVal: product["quantity"],
+        decoration: QtyDecorationProps(
+          btnColor: kMainColor,
+          fillColor: Colors.white,
+        ),
+        onQtyChanged: (value) {
+          if (value is String && value.isNotEmpty) {
+            final parsedValue = double.tryParse(value);
+            if (parsedValue != null) {
+              setState(() {
+                quantity = parsedValue.toInt();
+              });
+            }
+          } else if (value is double || value is int) {
+            setState(() {
+              quantity = value.toInt();
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  void showQuantityDialog(BuildContext context, dynamic product) {
+    int quantity = 1; // Default quantity value
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add ${product["Product"]["name"]}"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Enter quantity:"),
+              renderQuantityPickUp(MediaQuery.of(context).size.height, product),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(); // Close dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                addProductToClientStock(
+                  product["Product"]["id"],
+                  quantity,
+                );
+                Get.back(); // Close dialog
+              },
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void addProductToClientStock(int productId, int quantity) async {
+    final clientId = clientController.clientInfo["id"];
+    if (clientId != -1) {
+      await clientStockController.addProductToClientStock(
+          clientId, productId, quantity);
+      Get.snackbar(
+        "Success",
+        "Product added to client stock successfully!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    }
+  }
 
   //This function call the get main warehouse products API
   Future<void> getMainWarehouseProducts() async {
@@ -68,7 +161,18 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   @override
   void initState() {
     super.initState();
-    getMainWarehouseProducts();
+    try {
+      if (Get.arguments != null) {
+        final arguments = Get.arguments as Map<String, dynamic>;
+        isFromClientStock = arguments["fromClientStock"] ?? false;
+        categoryId = arguments["category_id"] ?? -1;
+        filterProductsList(categoryId);
+      } else {
+      }
+
+      getMainWarehouseProducts();
+    } catch (e) {
+    }
   }
 
   //This function filters the products list
@@ -110,53 +214,60 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     } else {
       for (var element in searchedProductsList) {
         tmp.add(
-          ListTile(
-            leading: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: kBorderColorTextField),
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  element["Product"]["image_url"] ?? "",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.broken_image,
-                      color: Colors.grey,
-                      size: 30,
-                    );
-                  },
+          GestureDetector(
+            onTap: isFromClientStock
+                ? () {
+                    showQuantityDialog(context, element);
+                  }
+                : null,
+            child: ListTile(
+              leading: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: kBorderColorTextField),
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    element["Product"]["image_url"] ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 30,
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            title: Text(
-              element["Product"]["name"] ?? "",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-                "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Quantity: ${element["quantity"] ?? ""}",
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    Text(
-                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ],
+              title: Text(
+                element["Product"]["name"] ?? "",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                  "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Quantity: ${element["quantity"] ?? ""}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      Text(
+                        "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

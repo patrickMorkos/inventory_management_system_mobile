@@ -136,7 +136,6 @@ class DashboardScreen extends StatelessWidget {
         onTap: () {
           if (kDebugMode) {
             //TODO - implement profile
-            print("Profile");
           }
         },
         child: Container(

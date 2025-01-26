@@ -1,4 +1,5 @@
 //! This is the client stock controller to globally save the client stock products info
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 
@@ -14,7 +15,7 @@ class ClientStockController extends GetxController {
       );
       clientStockProducts.value = response;
     } catch (e) {
-      print("Error fetching client stock products: $e");
+      debugPrint("Error fetching client stock products: $e");
     }
   }
 
@@ -37,7 +38,7 @@ class ClientStockController extends GetxController {
         }
       }
     } catch (e) {
-      print("Error updating product quantity: $e");
+      debugPrint("Error updating product quantity: $e");
     }
   }
 
@@ -56,12 +57,42 @@ class ClientStockController extends GetxController {
         (product) => product["Product"]["id"] == productId,
       );
     } catch (e) {
-      print("Error deleting product: $e");
+      debugPrint("Error deleting product: $e");
     }
   }
 
   // Set the client stock products info
   void setClientStockProducts(List<dynamic> clientStockProductsList) {
     clientStockProducts.value = clientStockProductsList;
+  }
+
+  Future<void> addProductToClientStock(
+      int clientId, int productId, int quantity) async {
+    try {
+      await postRequest(
+        path: "/api/client-stock/add-products/$clientId",
+        body: {
+          "product_id": productId,
+          "quantity": quantity,
+        },
+        requireToken: true,
+      ).then((value) => {
+            if (value["error"] != null)
+              {
+                Get.snackbar(
+                  duration: Duration(seconds: 6),
+                  "Error",
+                  "${value["error"]}",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                ),
+                throw Exception(
+                    "Failed to add product to client stock ${value["error"]}"),
+              }
+          });
+      await fetchClientStockProducts(clientId); // Refresh the client stock
+    } catch (e) {
+      throw Exception("Failed to add product to client stock");
+    }
   }
 }

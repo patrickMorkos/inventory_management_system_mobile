@@ -207,6 +207,13 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Get.toNamed('/all-products', arguments: {"fromClientStock": true});
+          },
+          backgroundColor: kMainColor,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

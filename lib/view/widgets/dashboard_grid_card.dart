@@ -37,9 +37,6 @@ class _DashboardGridCardsState extends State<DashboardGridCards> {
           ),
           child: TextButton(
             onPressed: () {
-              if (kDebugMode) {
-                print("navigate to screen");
-              }
               Get.toNamed(widget.gridItems.route);
             },
             child: Image.asset(
