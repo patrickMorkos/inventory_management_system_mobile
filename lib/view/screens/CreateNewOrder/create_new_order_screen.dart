@@ -50,11 +50,25 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   //This function updates the total order price based on the products in the order
   void updateTotalPrice() {
     setState(() {
-      totalOrderPrice =
-          orderController.orderInfo["products"].fold(0.0, (sum, product) {
-        return sum +
-            (product['quantity'] * product['product']['ProductPrice']['price']);
-      });
+      totalOrderPrice = 0.0;
+
+      // Safely calculate the total price for products
+      if (orderController.orderInfo["products"] != null) {
+        totalOrderPrice +=
+            orderController.orderInfo["products"].fold(0.0, (sum, product) {
+          return sum +
+              (product['quantity'] *
+                  product['product']['ProductPrice']['price']);
+        });
+      }
+
+      // Safely calculate the total price for sale products
+      if (orderController.orderInfo["saleProducts"] != null) {
+        totalOrderPrice +=
+            orderController.orderInfo["saleProducts"].fold(0.0, (sum, product) {
+          return sum + (product['quantity'] * product['product_price']);
+        });
+      }
     });
   }
 
@@ -99,15 +113,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     for (var product in orderController.orderInfo["saleProducts"]) {
       tmp.add(
         ListTile(
-          title: Text(
-            product["product"]["name"] ?? "Unnamed Product",
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(
-            "Quantity: ${product['quantity']} x \$${product['product_price']} = \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
-            style: const TextStyle(color: Colors.grey),
-          ),
           leading: Image.network(
             product["product"]["image_url"] ?? "",
             width: 50,
@@ -116,6 +121,56 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             errorBuilder: (context, error, stackTrace) {
               return const Icon(Icons.broken_image);
             },
+          ),
+          title: Text(
+            product["product"]["name"] ?? "Unnamed Product",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            "Quantity: ${product['quantity']} x \$${product['product_price']} = \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
+            style: const TextStyle(color: Colors.grey),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    // Increase product quantity
+                    product["quantity"] += 1;
+                    updateTotalPrice();
+                  });
+                },
+                icon: const Icon(Icons.add, size: 20),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    // Decrease product quantity
+                    if (product["quantity"] > 1) {
+                      product["quantity"] -= 1;
+                      updateTotalPrice();
+                    }
+                  });
+                },
+                icon: const Icon(Icons.remove, size: 20),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    // Remove product from the sale products list
+                    orderController.orderInfo["saleProducts"].remove(product);
+                    updateTotalPrice();
+                  });
+                },
+                icon: const Icon(Icons.delete, size: 20),
+              ),
+            ],
           ),
         ),
       );
@@ -149,7 +204,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   ),
                 ),
               ),
-              // Check for null or empty products list
               if (orderController.orderInfo["products"] == null ||
                   orderController.orderInfo["products"].isEmpty)
                 const Padding(

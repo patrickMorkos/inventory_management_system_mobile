@@ -9,6 +9,7 @@ class OrderController extends GetxController {
   RxMap<String, dynamic> orderInfo = RxMap<String, dynamic>(
     {
       "products": [],
+      "saleProducts": [],
     },
   );
 
