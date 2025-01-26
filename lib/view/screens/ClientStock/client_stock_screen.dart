@@ -212,7 +212,10 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
             Get.toNamed('/all-products', arguments: {"fromClientStock": true});
           },
           backgroundColor: kMainColor,
-          child: const Icon(Icons.add),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
         ),
       ),
     );
