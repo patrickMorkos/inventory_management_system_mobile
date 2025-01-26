@@ -7,6 +7,7 @@ import 'package:inventory_management_system_mobile/core/controllers/logged_in_us
 import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
+import 'package:inventory_management_system_mobile/view/screens/ClientQrCodeScan/sale_products_dialog.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:intl/intl.dart';
 
@@ -42,6 +43,13 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
       fetchClientOrders(clientController.clientInfo["id"]);
     }
     super.initState();
+  }
+
+  void showSaleProductsDialog(BuildContext context, List<dynamic> products) {
+    showDialog(
+      context: context,
+      builder: (context) => SaleProductsDialog(products: products),
+    );
   }
 
   //This function renders the app bar
@@ -155,6 +163,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                       onTap: () {
                         //TODO: replicate sale to current order
                         print("Replicate sale to current order");
+                        showSaleProductsDialog(context, order['products']);
                       },
                       leading: Icon(Icons.receipt, color: kMainColor),
                       title: Text("Order #${order["id"]}"),
