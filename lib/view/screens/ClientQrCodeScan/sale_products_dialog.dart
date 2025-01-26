@@ -2,13 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 
-class SaleProductsDialog extends StatelessWidget {
+class SaleProductsDialog extends StatefulWidget {
   final List<dynamic> products;
+  final Function(List<dynamic> products, bool useOldPrices) onReplicateSale;
 
   const SaleProductsDialog({
     super.key,
     required this.products,
+    required this.onReplicateSale,
   });
+
+  @override
+  _SaleProductsDialogState createState() => _SaleProductsDialogState();
+}
+
+class _SaleProductsDialogState extends State<SaleProductsDialog> {
+  String priceSelection = "Old Prices"; // Default to "Old Prices"
+
+  // Calculate the total price of the sale
+  double getTotalSalePrice() {
+    return widget.products.fold(0.0, (total, product) {
+      return total + (product['quantity'] * product['product_price']);
+    });
+  }
+
+  final ScrollController _scrollController = ScrollController();
 
   //******************************************************************FUNCTIONS
 
@@ -36,13 +54,15 @@ class SaleProductsDialog extends StatelessWidget {
     );
   }
 
-  //This function renders the products list
+  //This function renders the products list with total price for each product
   Widget renderProductList() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: products.length,
+      itemCount: widget.products.length,
       itemBuilder: (context, index) {
-        final product = products[index];
+        final product = widget.products[index];
+        final productTotalPrice =
+            product['quantity'] * product['product_price'];
         return ListTile(
           leading: CircleAvatar(
             backgroundImage:
@@ -58,7 +78,7 @@ class SaleProductsDialog extends StatelessWidget {
             ),
           ),
           subtitle: Text(
-            "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}",
+            "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$${productTotalPrice.toStringAsFixed(2)}",
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -69,21 +89,129 @@ class SaleProductsDialog extends StatelessWidget {
     );
   }
 
-  //This function renders close button
-  Widget renderCloseButton(context) {
-    return ElevatedButton(
-      onPressed: () => Navigator.of(context).pop(),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.redAccent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Text(
-        "Close",
-        style: GoogleFonts.poppins(color: Colors.white),
+  //This function renders the price selection radio buttons
+  Widget renderPriceSelection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Price Selection:",
+            style:
+                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Column(
+            children: [
+              Row(
+                children: [
+                  Radio<String>(
+                    activeColor: Colors.black,
+                    value: "Old Prices",
+                    groupValue: priceSelection,
+                    onChanged: (value) {
+                      setState(() {
+                        priceSelection = value!;
+                      });
+                    },
+                  ),
+                  Text(
+                    "Use Old Prices",
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Radio<String>(
+                    activeColor: Colors.black,
+                    value: "New Prices",
+                    groupValue: priceSelection,
+                    onChanged: (value) {
+                      setState(() {
+                        priceSelection = value!;
+                      });
+                    },
+                  ),
+                  Text(
+                    "Use New Prices",
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  //This function renders buttons aligned horizontally
+  Widget renderActionButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              print("add sale products to cart");
+              print("price selection: $priceSelection");
+              Navigator.of(context).pop(); // Close dialog
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              "Replicate Sale",
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              "Close",
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  //This function renders the total sale price at the bottom
+  Widget renderTotalSalePrice() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Text(
+          "Total Sale Price: \$${getTotalSalePrice().toStringAsFixed(2)}",
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,18 +228,25 @@ class SaleProductsDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.5,
+        height: MediaQuery.of(context).size.height * 0.6,
         child: Scrollbar(
           thumbVisibility: true,
+          controller: _scrollController,
           child: SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 renderHeader(),
                 const SizedBox(height: 16),
-                products.isEmpty ? renderEmptySale() : renderProductList(),
+                widget.products.isEmpty
+                    ? renderEmptySale()
+                    : renderProductList(),
                 const SizedBox(height: 16),
-                renderCloseButton(context),
+                renderPriceSelection(),
+                renderTotalSalePrice(),
+                const SizedBox(height: 16),
+                renderActionButtons(context),
               ],
             ),
           ),
