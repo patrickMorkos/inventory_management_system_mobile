@@ -49,7 +49,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       clientId = clientController.clientInfo["id"];
     }
     await getRequest(
-      path: "/api/main-warehouse-stock/get-all-main-warehouse-stock-products?client_id=$clientId",
+      path:
+          "/api/main-warehouse-stock/get-all-main-warehouse-stock-products?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       setState(() {
