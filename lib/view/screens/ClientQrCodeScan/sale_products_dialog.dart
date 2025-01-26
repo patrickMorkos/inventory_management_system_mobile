@@ -157,7 +157,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              orderController.addSaleProductsToOrder(widget.products);
+              orderController.addSaleProductsToOrder(widget.products, priceSelection);
               Navigator.of(context).pop(); // Close dialog
             },
             style: ElevatedButton.styleFrom(

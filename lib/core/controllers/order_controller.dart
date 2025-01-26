@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -30,12 +31,31 @@ class OrderController extends GetxController {
     }
   }
 
-  void addSaleProductsToOrder(List<dynamic> saleProductsList) {
+  void addSaleProductsToOrder(
+      List<dynamic> saleProductsList, String priceSelection) {
+    // This variable is the vanProductsController
+    final VanProductsController vanProductsController =
+        Get.put(VanProductsController());
     if (!orderInfo.containsKey("saleProducts")) {
       orderInfo["saleProducts"] = [];
     }
 
     for (var saleProduct in saleProductsList) {
+      if (priceSelection == "New Prices") {
+        // Retrieve the corresponding product from vanProductsController
+        var vanProduct = vanProductsController.vanProductsList.firstWhere(
+          (vp) => vp["Product"]["id"] == saleProduct["Product"]["id"],
+          orElse: () => null,
+        );
+
+        // Update product_price with the new price if vanProduct exists
+        if (vanProduct != null) {
+          saleProduct["product_price"] =
+              vanProduct["Product"]["ProductPrice"]["price"];
+        }
+      }
+
+      // Check if the product already exists in orderInfo["saleProducts"]
       var existingProduct = orderInfo["saleProducts"].firstWhere(
         (product) => product["product"] == saleProduct["Product"],
         orElse: () => null,
@@ -76,13 +96,31 @@ class OrderController extends GetxController {
   void createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
-    for (var element in orderInfo["products"]) {
-      orderProducts.add({
-        "product_id": element["product"]["id"],
-        "quantity": element["quantity"],
-        "product_price": double.parse(
-            (element["product"]["ProductPrice"]["price"]).toString())
-      });
+
+    // Check if orderInfo exists and contains products
+    if (orderInfo["products"] != null && orderInfo["products"].isNotEmpty) {
+      for (var element in orderInfo["products"]) {
+        orderProducts.add({
+          "product_id": element["product"]["id"],
+          "quantity": element["quantity"],
+          "product_price": double.parse(
+            (element["product"]["ProductPrice"]["price"]).toString(),
+          ),
+        });
+      }
+    }
+
+    // Check if orderInfo exists and contains saleProducts
+    if (orderInfo["saleProducts"] != null &&
+        orderInfo["saleProducts"].isNotEmpty) {
+      for (var element in orderInfo["saleProducts"]) {
+        orderProducts.add({
+          "product_id": element["product"]["id"],
+          "quantity": element["quantity"],
+          "product_price":
+              element["product_price"], // Assuming it's already a number
+        });
+      }
     }
 
     int saleTypeId = 0;
@@ -101,7 +139,7 @@ class OrderController extends GetxController {
       "client_id": clientId,
       "products": orderProducts,
     };
-    // dynamic body = jsonEncode(orderData);
+
     await postRequest(
       path: "/api/sale/create-sale/$salesmanId",
       body: orderData,
