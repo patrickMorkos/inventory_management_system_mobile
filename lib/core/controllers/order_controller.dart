@@ -29,6 +29,30 @@ class OrderController extends GetxController {
     }
   }
 
+  void addSaleProductsToOrder(List<dynamic> saleProductsList) {
+    if (!orderInfo.containsKey("saleProducts")) {
+      orderInfo["saleProducts"] = [];
+    }
+
+    for (var saleProduct in saleProductsList) {
+      var existingProduct = orderInfo["saleProducts"].firstWhere(
+        (product) => product["product"] == saleProduct["Product"],
+        orElse: () => null,
+      );
+
+      if (existingProduct != null) {
+        existingProduct["quantity"] += saleProduct["quantity"];
+      } else {
+        Map<String, dynamic> newProduct = {
+          "product": saleProduct["Product"],
+          "quantity": saleProduct["quantity"],
+          "product_price": saleProduct["product_price"],
+        };
+        orderInfo["saleProducts"].add(newProduct);
+      }
+    }
+  }
+
   void removeProductFromOrder(Map<dynamic, dynamic> productObj) {
     orderInfo["products"]
         .removeWhere((product) => product["product"] == productObj);
@@ -55,7 +79,8 @@ class OrderController extends GetxController {
       orderProducts.add({
         "product_id": element["product"]["id"],
         "quantity": element["quantity"],
-        "product_price": double.parse((element["product"]["ProductPrice"]["price"]).toString())
+        "product_price": double.parse(
+            (element["product"]["ProductPrice"]["price"]).toString())
       });
     }
 
