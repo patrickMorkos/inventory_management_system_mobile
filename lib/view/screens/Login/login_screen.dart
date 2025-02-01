@@ -105,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () async {
                 var connectivityResult =
                     await Connectivity().checkConnectivity();
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context, 'Cancel');
                 if ((connectivityResult[0].toString() == "ConnectivityResult.none")) {
                   showDialogBox();

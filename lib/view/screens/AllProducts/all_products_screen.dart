@@ -172,6 +172,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
       getMainWarehouseProducts();
     } catch (e) {
+      debugPrint(e.toString());
     }
   }
 

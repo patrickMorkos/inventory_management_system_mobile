@@ -165,8 +165,6 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                   children: clientOrders.map((order) {
                     return ListTile(
                       onTap: () {
-                        //TODO: replicate sale to current order
-                        print("Replicate sale to current order");
                         showSaleProductsDialog(context, order['products']);
                       },
                       leading: Icon(Icons.receipt, color: kMainColor),
