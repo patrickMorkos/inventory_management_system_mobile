@@ -37,6 +37,17 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   @override
   void initState() {
     super.initState();
+
+    final userTypeId = loggedInUserController.loggedInUser.value.userTypeId;
+
+    // Ensure "Presale" is selected by default if userTypeId == 3
+    if (userTypeId == 3 && orderController.orderInfo["saleType"] != "Presale") {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        orderController.orderInfo["saleType"] = "Presale";
+        orderController.update();
+      });
+    }
+
     updateTotalPrice();
   }
 
@@ -483,6 +494,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
 
   // Function to render payment and sale type radio buttons
   Widget renderPaymentAndSaleTypeOptions() {
+    final userTypeId = loggedInUserController.loggedInUser.value.userTypeId;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -503,13 +516,18 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       Radio<String>(
                         value: "Cash Van",
                         groupValue: orderController.orderInfo["saleType"],
-                        onChanged: (value) {
-                          _confirmSaleTypeChange(value!);
-                        },
+                        onChanged: userTypeId == 3
+                            ? null
+                            : (value) {
+                                _confirmSaleTypeChange(value!);
+                              },
                       ),
                       Text(
                         "Cash Van",
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: userTypeId == 3 ? Colors.grey : Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -526,7 +544,10 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       ),
                       Text(
                         "Presale",
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
