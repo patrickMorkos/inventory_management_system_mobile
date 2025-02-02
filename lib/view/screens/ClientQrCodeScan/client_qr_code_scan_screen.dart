@@ -157,29 +157,100 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(16.0),
-          child: clientController.clientInfo["sales"] == null
+          child: clientOrders.isEmpty
               ? const Center(
                   child: Text("No previous orders found."),
                 )
               : Column(
                   children: clientOrders.map((order) {
-                    return ListTile(
-                      onTap: () {
-                        showSaleProductsDialog(context, order['products']);
-                      },
-                      leading: Icon(Icons.receipt, color: kMainColor),
-                      title: Text("Order #${order["id"]}"),
-                      subtitle: Text("Total: \$${order["total_price_usd"]}"),
-                      trailing: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Issue Date: ${formatDate(order["issue_date"])}",
-                          ),
-                          Text(
-                            "Due Date: ${order["due_date"] != null ? formatDate(order["due_date"]) : "Pending"}",
-                          ),
-                        ],
+                    return Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          showSaleProductsDialog(context, order['products']);
+                        },
+                        leading: Icon(Icons.receipt, color: kMainColor),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Order #${order["id"]}",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              "Total: \$${order["total_price_usd"]}",
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(Icons.calendar_today,
+                                    size: 14, color: Colors.grey[600]),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "Issue Date: ${formatDate(order["issue_date"])}",
+                                  style: GoogleFonts.poppins(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.timer,
+                                    size: 14, color: Colors.grey[600]),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "Due Date: ${order["due_date"] != null ? formatDate(order["due_date"]) : "Pending"}",
+                                  style: GoogleFonts.poppins(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            // Sale Type Chip
+                            Row(
+                              children: [
+                                Icon(Icons.storefront,
+                                    size: 14, color: Colors.grey[600]),
+                                const SizedBox(width: 5),
+                                Flexible(
+                                  child: Chip(
+                                    backgroundColor: order["SaleType"]["id"] == 1
+                                        ? Colors.green[100]
+                                        : Colors.blue[100],
+                                    label: Text(
+                                      order["SaleType"]["sale_type_name"],
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: order["SaleType"]["id"] == 1
+                                            ? Colors.green[800]
+                                            : Colors.blue[800],
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: -2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios,
+                            size: 16, color: Colors.grey),
                       ),
                     );
                   }).toList(),
