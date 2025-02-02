@@ -21,6 +21,9 @@ class DashboardGridCards extends StatefulWidget {
 class _DashboardGridCardsState extends State<DashboardGridCards> {
   @override
   Widget build(BuildContext context) {
+    if (!widget.gridItems.showCard) {
+      return Container();
+    }
     return Column(
       children: [
         //Grid card circle

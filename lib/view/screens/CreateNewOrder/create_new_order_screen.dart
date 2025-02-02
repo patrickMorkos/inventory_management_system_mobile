@@ -19,9 +19,6 @@ class CreateNewOrderScreen extends StatefulWidget {
 class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   //******************************************************************VARIABLES
 
-  //This variable is the list of products added to the order
-  // List<dynamic> orderProductsList = [];
-
   //This variable is the total price of the order
   double totalOrderPrice = 0.0;
 
@@ -31,10 +28,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   //This variable is the van products controller
   final VanProductsController vanProductsController =
       Get.put(VanProductsController());
-
-  // Variables to track checkbox states
-  bool isPendingPayment = false;
-  String saleType = "Cash Van";
 
   //This variable is the client controller
   final ClientController clientController = Get.put(ClientController());
@@ -74,7 +67,15 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
 
   //This function calls to add more products to the order
   void addMoreProducts() {
-    Get.toNamed("/van-products");
+    if (orderController.orderInfo["saleType"] == "Cash Van") {
+      Get.toNamed("/van-products", arguments: {
+        "isFromCreateOrderScreen": true,
+      });
+    } else {
+      Get.toNamed("/all-products", arguments: {
+        "isFromCreateOrderScreen": true,
+      });
+    }
   }
 
   // This function renders the sale products list
@@ -353,7 +354,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
         color: Colors.white,
       ).onTap(() => Get.toNamed("/dashboard")),
       title: Text(
-        "Create New Order",
+        "Order Cart",
         style: GoogleFonts.poppins(
           color: Colors.white,
         ),
@@ -414,8 +415,10 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 // Add functionality for creating an order here
                 orderController.createOrder(
                   totalOrderPrice,
-                  isPendingPayment,
-                  saleType,
+                  orderController.orderInfo["saleType"] == "Cash Van"
+                      ? false
+                      : true,
+                  orderController.orderInfo["saleType"],
                   clientController.clientInfo['id'],
                   loggedInUserController.loggedInUser.value.id,
                 );
@@ -439,6 +442,45 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     );
   }
 
+  void _confirmSaleTypeChange(String newSaleType) {
+    if (orderController.orderInfo["saleType"] != newSaleType) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Change Sale Type?",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            content: Text(
+              "Switching the sale type will remove all products from the cart. Do you want to continue?",
+              style: GoogleFonts.poppins(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cancel
+                },
+                child: Text("Cancel",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  orderController.clearOrderController();
+                  orderController.orderInfo["saleType"] = newSaleType;
+                  orderController.update();
+                  setState(() {});
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text("Continue",
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold, color: Colors.red)),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   // Function to render payment and sale type radio buttons
   Widget renderPaymentAndSaleTypeOptions() {
     return Padding(
@@ -446,97 +488,51 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Payment status radio buttons
-          Text(
-            "Payment Status:",
-            style:
-                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Radio<bool>(
-                    value: true,
-                    groupValue: isPendingPayment,
-                    onChanged: (value) {
-                      setState(() {
-                        isPendingPayment = value ?? false;
-                      });
-                    },
-                  ),
-                  Text(
-                    "Pending Payment",
-                    style: GoogleFonts.poppins(fontSize: 14),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Radio<bool>(
-                    value: false,
-                    groupValue: isPendingPayment,
-                    onChanged: (value) {
-                      setState(() {
-                        isPendingPayment = value ?? false;
-                      });
-                    },
-                  ),
-                  Text(
-                    "Immediate Payment",
-                    style: GoogleFonts.poppins(fontSize: 14),
-                  ),
-                ],
-              ),
-            ],
-          ),
           // Sale type radio buttons
           Text(
             "Sale Type:",
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Radio<String>(
-                      value: "Cash Van",
-                      groupValue: saleType,
-                      onChanged: (value) {
-                        setState(() {
-                          saleType = value!;
-                        });
-                      },
-                    ),
-                    Text(
-                      "Cash Van",
-                      style: GoogleFonts.poppins(fontSize: 14),
-                    ),
-                  ],
+          Obx(
+            () => Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Radio<String>(
+                        value: "Cash Van",
+                        groupValue: orderController.orderInfo["saleType"],
+                        onChanged: (value) {
+                          _confirmSaleTypeChange(value!);
+                        },
+                      ),
+                      Text(
+                        "Cash Van",
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Radio<String>(
-                      value: "Presale",
-                      groupValue: saleType,
-                      onChanged: (value) {
-                        setState(() {
-                          saleType = value!;
-                        });
-                      },
-                    ),
-                    Text(
-                      "Presale",
-                      style: GoogleFonts.poppins(fontSize: 14),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Radio<String>(
+                        value: "Presale",
+                        groupValue: orderController.orderInfo["saleType"],
+                        onChanged: (value) {
+                          _confirmSaleTypeChange(value!);
+                        },
+                      ),
+                      Text(
+                        "Presale",
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -8,9 +8,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_stock_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
+import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -25,6 +28,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //******************************************************************VARIABLES
 
   bool isFromClientStock = false;
+
+  bool isFromCreateOrderScreen = false;
+
+  //This variable is the order controller
+  final OrderController orderController = Get.put(OrderController());
+
+  //This variable is the van products controller
+  final VanProductsController vanProductsController =
+      Get.put(VanProductsController());
 
   //This variable is the list of all the products that will be listed
   List<dynamic> productsList = [];
@@ -90,7 +102,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Add ${product["Product"]["name"]}"),
+          title: Text("Add '${product["Product"]["name"]}' to client stock"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -153,8 +165,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     });
     if (Get.arguments != null) {
       final arguments = Get.arguments as Map<String, dynamic>;
-      categoryId = arguments["category_id"];
-      filterProductsList(categoryId);
+      categoryId = arguments["category_id"] ?? -1;
+      if (categoryId != -1) filterProductsList(categoryId);
     }
   }
 
@@ -165,9 +177,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       if (Get.arguments != null) {
         final arguments = Get.arguments as Map<String, dynamic>;
         isFromClientStock = arguments["fromClientStock"] ?? false;
+        isFromCreateOrderScreen = arguments["isFromCreateOrderScreen"] ?? false;
         categoryId = arguments["category_id"] ?? -1;
-        filterProductsList(categoryId);
-      } else {
+        if (categoryId != -1) filterProductsList(categoryId);
       }
 
       getMainWarehouseProducts();
@@ -186,14 +198,149 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   }
 
   //This function renders the products list
-  Widget renderProductsListing() {
+  Widget renderProductsListing(sw, sh) {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: getProductsCards(),
+            children: getProductsCards(sw, sh),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
+    final scrollController = ScrollController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: kMainColor,
+          insetPadding: EdgeInsets.zero,
+          shape: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(
+              color: Colors.white,
+            ),
+          ),
+          actions: [
+            SizedBox(
+              height: sh * 0.5,
+              child: Scrollbar(
+                thumbVisibility: true,
+                controller: scrollController,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      //Alert dialog Header
+                      renderProductDescriptionHeader(sh),
+
+                      //Product Image
+                      renderProductImage(sw, sh, product),
+
+                      //Product Name
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Name",
+                        product["Product"]["name"] ?? "",
+                      ),
+
+                      //Product Brand
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Brand",
+                        product["Product"]["Brand"]["brand_name"] ?? "",
+                      ),
+
+                      //Product Category
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Category",
+                        product["Product"]["Category"]["category_name"] ?? "",
+                      ),
+
+                      //Product Quantity
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Quantity",
+                        product["quantity"] ?? "",
+                      ),
+
+                      //Product Price
+                      renderProductItems(
+                        sw,
+                        sh,
+                        "Price",
+                        product["Product"]["ProductPrice"]["price"] != null
+                            ? "\$${product["Product"]["ProductPrice"]["price"]}"
+                            : "",
+                      ),
+
+                      //Quantity pick-up
+                      if (clientInfo["id"] != -1)
+                        renderQuantityPickUp(sh, product),
+
+                      //Add product to cart
+                      if (clientInfo["id"] != -1)
+                        renderAddProductToCartButton(
+                          context,
+                          sw,
+                          sh,
+                          product,
+                          clientInfo,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //This function renders the add product to cart button
+  Widget renderAddProductToCartButton(
+    context,
+    sw,
+    sh,
+    product,
+    clientInfo,
+  ) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: sh / 50,
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          orderController.addProductToOrder(product["Product"], quantity);
+          vanProductsController.deductQuantity(
+            product["Product"]["id"],
+            quantity,
+          );
+          Navigator.of(context).pop();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child: const Text(
+          'Add to Cart',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -201,7 +348,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   }
 
   //This function returns the products cards list
-  List<Widget> getProductsCards() {
+  List<Widget> getProductsCards(sw, sh) {
     List<Widget> tmp = [];
     if (searchedProductsList.isEmpty) {
       tmp.add(
@@ -215,60 +362,66 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     } else {
       for (var element in searchedProductsList) {
         tmp.add(
-          GestureDetector(
-            onTap: isFromClientStock
-                ? () {
-                    showQuantityDialog(context, element);
-                  }
-                : null,
-            child: ListTile(
-              leading: Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: kBorderColorTextField),
+          ListTile(
+            onTap: () {
+              if (isFromClientStock) {
+                showQuantityDialog(context, element);
+              } else if (isFromCreateOrderScreen) {
+                openProductDetailsDialog(
+                  context,
+                  sw,
+                  sh,
+                  element,
+                  clientController.clientInfo,
+                );
+              }
+            },
+            leading: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: kBorderColorTextField),
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  element["Product"]["image_url"] ?? "",
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 30,
+                    );
+                  },
                 ),
-                child: ClipOval(
-                  child: Image.network(
-                    element["Product"]["image_url"] ?? "",
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.broken_image,
-                        color: Colors.grey,
-                        size: 30,
-                      );
-                    },
-                  ),
+              ),
+            ),
+            title: Text(
+              element["Product"]["name"] ?? "",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+                "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Quantity: ${element["quantity"] ?? ""}",
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
                 ),
-              ),
-              title: Text(
-                element["Product"]["name"] ?? "",
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                  "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Quantity: ${element["quantity"] ?? ""}",
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      Text(
-                        "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
         );
@@ -441,7 +594,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               renderSearchBar(sw, sh),
 
               //Products list
-              renderProductsListing()
+              renderProductsListing(sw, sh)
             ],
           ),
         ),

@@ -29,103 +29,72 @@ class DashboardScreen extends StatelessWidget {
     const Color(0xffD9EEFF),
   ];
 
-  //This variable is a list of the icon of cash van salesman
-  final List<GridItems> cashVanSalesmanIcons = [
-    GridItems(
-      title: "All Categories",
-      route: 'all-categories',
-      icon: 'assets/images/category-icon.png',
-    ),
-    GridItems(
-      title: "All Products",
-      route: 'all-products',
-      icon: 'assets/images/product.png',
-    ),
-    GridItems(
-      title: "Van Categories",
-      route: 'van-categories',
-      icon: 'assets/images/sales.png',
-    ),
-    GridItems(
-      title: "Van Products",
-      route: 'van-products',
-      icon: 'assets/images/delivery-van-icon.png',
-    ),
-    GridItems(
-      title: "Client QR code scan",
-      route: 'client-qr-code-scan',
-      icon: 'assets/images/qr-code-scan-icon.png',
-    ),
-    GridItems(
-      title: "Clients",
-      route: 'clients',
-      icon: 'assets/images/parties.png',
-    ),
-    GridItems(
-      title: "Create New Client",
-      route: 'create-new-client',
-      icon: 'assets/images/new-client.png',
-    ),
-    GridItems(
-      title: "Create New Order",
-      route: 'create-new-order',
-      icon: 'assets/images/create-receipt-doc.png',
-    ),
-    GridItems(
-      title: "Client Stock Screen",
-      route: 'client-stock-screen',
-      icon: 'assets/images/warehouse-svgrepo-com.png',
-    ),
-    GridItems(
-      title: "Return Product",
-      route: 'return-product',
-      icon: 'assets/images/return-product-icon.png',
-    ),
-  ];
+  List<GridItems> _getCashVanSalesmanIcons() {
+    final userTypeId = loggedInUserController.loggedInUser.value.userTypeId;
 
-  //This variable is a list of the icon of marchandise salesman
-  final List<GridItems> marchandiseSalesmanIcons = [
-    GridItems(
-      title: "All Categories",
-      route: 'all-categories',
-      icon: 'assets/images/category-icon.png',
-    ),
-    GridItems(
-      title: "All Products",
-      route: 'all-products',
-      icon: 'assets/images/product.png',
-    ),
-    GridItems(
-      title: "Client QR code scan",
-      route: 'client-qr-code-scan',
-      icon: 'assets/images/qr-code-scan-icon.png',
-    ),
-    GridItems(
-      title: "Clients",
-      route: 'clients',
-      icon: 'assets/images/parties.png',
-    ),
-    GridItems(
-      title: "Create New Client",
-      route: 'create-new-client',
-      icon: 'assets/images/new-client.png',
-    ),
-    GridItems(
-      title: "Create New Order",
-      route: 'create-new-order',
-      icon: 'assets/images/create-receipt-doc.png',
-    ),
-    GridItems(
-      title: "Client Stock Screen",
-      route: 'client-stock-screen',
-      icon: 'assets/images/warehouse-svgrepo-com.png',
-    ),
-    GridItems(
-      title: "Return Product",
-      route: 'return-product',
-      icon: 'assets/images/return-product-icon.png',
-    ),
-  ];
+    return [
+      GridItems(
+        title: "All Categories",
+        route: 'all-categories',
+        showCard: true,
+        icon: 'assets/images/category-icon.png',
+      ),
+      GridItems(
+        title: "All Products",
+        route: 'all-products',
+        showCard: true,
+        icon: 'assets/images/product.png',
+      ),
+      GridItems(
+        title: "Van Categories",
+        route: 'van-categories',
+        showCard: userTypeId == 3 ? false : true,
+        icon: 'assets/images/sales.png',
+      ),
+      GridItems(
+        title: "Van Products",
+        route: 'van-products',
+        showCard: userTypeId == 3 ? false : true,
+        icon: 'assets/images/delivery-van-icon.png',
+      ),
+      GridItems(
+        title: "Client QR code scan",
+        route: 'client-qr-code-scan',
+        showCard: true,
+        icon: 'assets/images/qr-code-scan-icon.png',
+      ),
+      GridItems(
+        title: "Clients",
+        route: 'clients',
+        showCard: true,
+        icon: 'assets/images/parties.png',
+      ),
+      GridItems(
+        title: "Create New Client",
+        route: 'create-new-client',
+        showCard: true,
+        icon: 'assets/images/new-client.png',
+      ),
+      GridItems(
+        title: "Order Cart",
+        route: 'create-new-order',
+        showCard: true,
+        icon: 'assets/images/create-receipt-doc.png',
+      ),
+      GridItems(
+        title: "Client Stock Screen",
+        route: 'client-stock-screen',
+        showCard: true,
+        icon: 'assets/images/warehouse-svgrepo-com.png',
+      ),
+      GridItems(
+        title: "Return Product",
+        route: 'return-product',
+        showCard: true,
+        icon: 'assets/images/return-product-icon.png',
+      ),
+    ];
+  }
 
   //******************************************************************FUNCTIONS
   //This function render the profile picture
@@ -211,7 +180,8 @@ class DashboardScreen extends StatelessWidget {
 
   //This function renders the dashboard body
   Widget renderDashboardBody() {
-    int userType = loggedInUserController.loggedInUser.value.userTypeId;
+    final visibleItems =
+        _getCashVanSalesmanIcons().where((item) => item.showCard).toList();
 
     return Expanded(
       child: SingleChildScrollView(
@@ -228,13 +198,9 @@ class DashboardScreen extends StatelessWidget {
                 mainAxisSpacing: 0,
                 crossAxisCount: 3,
                 children: List.generate(
-                  userType == 3
-                      ? marchandiseSalesmanIcons.length
-                      : cashVanSalesmanIcons.length,
+                  visibleItems.length,
                   (index) => DashboardGridCards(
-                    gridItems: userType == 3
-                        ? marchandiseSalesmanIcons[index]
-                        : cashVanSalesmanIcons[index],
+                    gridItems: visibleItems[index],
                     color: color[index],
                   ),
                 ),

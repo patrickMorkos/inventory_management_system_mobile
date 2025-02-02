@@ -26,6 +26,7 @@ class VanProductsScreen extends StatefulWidget {
 
 class _VanProductsScreenState extends State<VanProductsScreen> {
   //******************************************************************VARIABLES
+  bool isFromCreateOrderScreen = false;
 
   //This variable is a text editing controller for the search bar
   TextEditingController searchEditController = TextEditingController();
@@ -127,6 +128,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   }
 
   void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
+    final scrollController = ScrollController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -141,11 +144,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           ),
           actions: [
             SizedBox(
-              // width: sw * 0.8,
               height: sh * 0.5,
               child: Scrollbar(
                 thumbVisibility: true,
+                controller: scrollController,
                 child: SingleChildScrollView(
+                  controller: scrollController,
                   child: Column(
                     children: [
                       //Alert dialog Header
@@ -239,23 +243,20 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     if (Get.arguments != null) {
       final arguments = Get.arguments as Map<String, dynamic>;
       categoryId = arguments["category_id"];
-      filterProductsList(categoryId);
+      if (categoryId != -1) filterProductsList(categoryId);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    if (clientController.clientInfo["id"] == -1) {
-      getVanProducts();
-    } else {
-      searchedProductsList = vanProductsController.vanProductsList;
-      if (Get.arguments != null) {
-        final arguments = Get.arguments as Map<String, dynamic>;
-        categoryId = arguments["category_id"];
-        filterProductsList(categoryId);
-      }
+    if (Get.arguments != null) {
+      final arguments = Get.arguments as Map<String, dynamic>;
+      categoryId = arguments["category_id"] ?? -1;
+      isFromCreateOrderScreen = arguments["isFromCreateOrderScreen"] ?? false;
+      if (categoryId != -1) filterProductsList(categoryId);
     }
+    getVanProducts();
   }
 
   //This function filters the products list
@@ -300,13 +301,15 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         tmp.add(
           ListTile(
             onTap: () {
-              openProductDetailsDialog(
-                context,
-                sw,
-                sh,
-                element,
-                clientController.clientInfo,
-              );
+              if (isFromCreateOrderScreen) {
+                openProductDetailsDialog(
+                  context,
+                  sw,
+                  sh,
+                  element,
+                  clientController.clientInfo,
+                );
+              }
             },
             leading: Container(
               height: 50,

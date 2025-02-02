@@ -11,8 +11,19 @@ class OrderController extends GetxController {
     {
       "products": [],
       "saleProducts": [],
+      "saleType" : "Cash Van",
     },
   );
+
+  void clearOrderController() {
+    orderInfo.clear();
+    orderInfo.addAll({
+      "products": [],
+      "saleProducts": [],
+      "saleType" : "Cash Van",
+    });
+    update();
+  }
 
   void addProductToOrder(Map<dynamic, dynamic> productObj, int quantity) {
     var existingProduct = orderInfo["products"].firstWhere(
