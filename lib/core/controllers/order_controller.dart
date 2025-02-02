@@ -178,5 +178,7 @@ class OrderController extends GetxController {
         );
       }
     });
+    // Reset the orderInfo after creating the order
+    clearOrderController();
   }
 }

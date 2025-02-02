@@ -242,7 +242,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     });
     if (Get.arguments != null) {
       final arguments = Get.arguments as Map<String, dynamic>;
-      categoryId = arguments["category_id"];
+      categoryId = arguments["category_id"] ?? -1;
       if (categoryId != -1) filterProductsList(categoryId);
     }
   }

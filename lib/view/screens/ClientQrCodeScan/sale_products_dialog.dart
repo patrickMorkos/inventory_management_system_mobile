@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class SaleProductsDialog extends StatefulWidget {
   final List<dynamic> products;
@@ -157,7 +158,20 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              orderController.addSaleProductsToOrder(widget.products, priceSelection);
+              orderController.addSaleProductsToOrder(
+                  widget.products, priceSelection);
+
+              // Show toast message
+              Fluttertoast.showToast(
+                msg:
+                    "Previous sale products successfully added to current order cart",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Colors.black,
+                textColor: Colors.white,
+                timeInSecForIosWeb: 3,
+              );
+
               Navigator.of(context).pop(); // Close dialog
             },
             style: ElevatedButton.styleFrom(
