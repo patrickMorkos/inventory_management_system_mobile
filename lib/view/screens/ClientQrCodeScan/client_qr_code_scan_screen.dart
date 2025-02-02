@@ -149,7 +149,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   }
 
   // Render client orders listing
-  Widget renderClientOrdersListing() {
+  Widget renderClientOrdersListing(sw) {
     if (clientController.clientInfo["sales"] != null) {
       clientOrders = clientController.clientInfo["sales"];
     }
@@ -204,7 +204,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                                 const SizedBox(width: 5),
                                 Text(
                                   "Issue Date: ${formatDate(order["issue_date"])}",
-                                  style: GoogleFonts.poppins(fontSize: 12),
+                                  style: GoogleFonts.poppins(fontSize: sw * 0.025),
                                 ),
                               ],
                             ),
@@ -215,7 +215,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                                 const SizedBox(width: 5),
                                 Text(
                                   "Due Date: ${order["due_date"] != null ? formatDate(order["due_date"]) : "Pending"}",
-                                  style: GoogleFonts.poppins(fontSize: 12),
+                                  style: GoogleFonts.poppins(fontSize: sw * 0.025),
                                 ),
                               ],
                             ),
@@ -363,7 +363,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               const SizedBox(height: 20),
               renderClientInfo(sw, sh),
               const SizedBox(height: 20),
-              renderClientOrdersListing(),
+              renderClientOrdersListing(sw),
             ],
           ),
         ),
