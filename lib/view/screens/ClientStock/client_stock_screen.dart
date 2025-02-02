@@ -137,7 +137,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
     );
   }
 
-  Widget renderProductList() {
+  Widget renderProductList(sw) {
     if (searchedProductsList.isEmpty) {
       return const Center(child: EmptyScreenWidget());
     }
@@ -155,24 +155,35 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
               ),
               onBackgroundImageError: (_, __) => const Icon(Icons.broken_image),
             ),
-            title: Text(product["Product"]["name"] ?? ""),
+            title: Text(
+              product["Product"]["name"] ?? "",
+              style: TextStyle(fontSize: sw * 0.03),
+            ),
             subtitle: Text(
-                "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}"),
+              "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}",
+              style: TextStyle(fontSize: sw * 0.03),
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
+                  iconSize: sw * 0.05,
                   icon: const Icon(Icons.remove),
                   onPressed: () => updateProductQuantity(
                       product["Product"]["id"], product["quantity"] - 1),
                 ),
-                Text(product["quantity"].toString()),
+                Text(
+                  product["quantity"].toString(),
+                  style: TextStyle(fontSize: sw * 0.025),
+                ),
                 IconButton(
+                  iconSize: sw * 0.05,
                   icon: const Icon(Icons.add),
                   onPressed: () => updateProductQuantity(
                       product["Product"]["id"], product["quantity"] + 1),
                 ),
                 IconButton(
+                  iconSize: sw * 0.05,
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () => deleteProduct(product["Product"]["id"]),
                 ),
@@ -186,6 +197,8 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //This variable is the screen width
+    double sw = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
         backgroundColor: kMainColor,
@@ -203,7 +216,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
               const SizedBox(height: 20.0),
               renderSearchBar(),
               const SizedBox(height: 10.0),
-              Expanded(child: renderProductList()),
+              Expanded(child: renderProductList(sw)),
             ],
           ),
         ),
