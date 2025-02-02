@@ -398,11 +398,11 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     }
 
     //Condition if the scanned barcode is found
-    if (searchedProductsList.any((element) => element["barcode"] == barcode)) {
+    if (searchedProductsList.any((element) => element["Product"]["barcod"] == barcode)) {
       setState(() {
         searchedProductsList =
             vanProductsController.vanProductsList.where((element) {
-          return element["barcode"]
+          return element["Product"]["barcod"]
               .toString()
               .toLowerCase()
               .contains(barcode.toLowerCase());

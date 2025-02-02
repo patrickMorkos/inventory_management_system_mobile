@@ -32,31 +32,15 @@ void openDialog(context, sw, sh, stock, barcode) {
                   ),
                 ),
               ),
-              const Text('Do you want to add it?'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton(
                     onPressed: () {
-                      Get.toNamed('/addProduct', arguments: [
-                        stock,
-                        barcode,
-                      ]);
-                    },
-                    child: const Text(
-                      'Yes',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
                       Navigator.pop(context);
                     },
                     child: const Text(
-                      'No',
+                      'Cancel',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,

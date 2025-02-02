@@ -466,14 +466,14 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         .any((element) => element["Product"]["barcod"] == barcode)) {
       setState(() {
         searchedProductsList = productsList.where((element) {
-          return element["Product"]["name"]
+          return element["Product"]["barcod"]
               .toString()
               .toLowerCase()
               .contains(barcode.toLowerCase());
         }).toList();
       });
     } else {
-      searchedProductsList = productsList;
+        searchedProductsList = productsList;
       openDialog(context, sw, sh, [], barcode);
     }
   }
