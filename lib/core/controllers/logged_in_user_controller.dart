@@ -14,6 +14,7 @@ class LoggedInUserController extends GetxController {
     dateOfJoin: "N/A",
     bloodType: "N/A",
     userTypeId: -1,
+    usdLbpRate: 0,
   ).obs;
 
   RxString accessToken = "".obs;

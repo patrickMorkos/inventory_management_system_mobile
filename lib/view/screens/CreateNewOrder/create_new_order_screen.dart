@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
@@ -376,6 +377,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
 
   //This function renders the total order price
   Widget renderTotalOrderPrice() {
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
+    final formatter = NumberFormat("#,###", "en_US");
+    String formattedPriceUsd = formatter.format(totalOrderPrice);
+    String formattedPriceLbp = formatter.format(totalOrderPrice * usdLbpRate);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -386,7 +393,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             style: GoogleFonts.poppins(fontSize: 16),
           ),
           Text(
-            "\$${totalOrderPrice.toStringAsFixed(2)}",
+            "\$$formattedPriceUsd / LBP $formattedPriceLbp",
             style:
                 GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
           ),

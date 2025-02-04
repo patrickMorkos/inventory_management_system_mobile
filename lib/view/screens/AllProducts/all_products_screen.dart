@@ -6,8 +6,10 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:input_quantity/input_quantity.dart';
+import 'package:intl/intl.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_stock_controller.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -26,6 +28,9 @@ class AllProductsScreen extends StatefulWidget {
 
 class _AllProductsScreenState extends State<AllProductsScreen> {
   //******************************************************************VARIABLES
+  //This variable is for the logged in user data
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
 
   bool isFromClientStock = false;
 
@@ -350,6 +355,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //This function returns the products cards list
   List<Widget> getProductsCards(sw, sh) {
     List<Widget> tmp = [];
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
     if (searchedProductsList.isEmpty) {
       tmp.add(
         const Center(
@@ -361,6 +368,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       );
     } else {
       for (var element in searchedProductsList) {
+        final formatter = NumberFormat("#,###", "en_US");
+        String formattedPriceUsd = formatter.format(element["Product"]["ProductPrice"]["price"]);
+        String formattedPriceLbp = formatter.format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
+
         tmp.add(
           ListTile(
             onTap: () {
@@ -416,7 +427,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
+                      "Price: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
@@ -473,7 +484,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         }).toList();
       });
     } else {
-        searchedProductsList = productsList;
+      searchedProductsList = productsList;
       openDialog(context, sw, sh, [], barcode);
     }
   }

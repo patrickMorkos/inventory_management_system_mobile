@@ -73,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
       dateOfJoin: "",
       bloodType: "",
       userTypeId: 0,
+      usdLbpRate: 0,
     );
     String accessToken = "";
     await postRequest(path: "/api/auth/login", body: body).then((value) {

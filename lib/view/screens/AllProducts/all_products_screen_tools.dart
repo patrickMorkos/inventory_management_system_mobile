@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 
 void openDialog(context, sw, sh, stock, barcode) {

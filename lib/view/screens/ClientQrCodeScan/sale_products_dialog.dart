@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -32,6 +34,10 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
   //This variable is the order controller
   final OrderController orderController = Get.put(OrderController());
 
+  //This variable is for the logged in user data
+  final LoggedInUserController loggedInUserController =
+      Get.put(LoggedInUserController());
+
   //******************************************************************FUNCTIONS
 
   //This function renders the dialog header
@@ -60,6 +66,8 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
 
   //This function renders the products list with total price for each product
   Widget renderProductList() {
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
     return ListView.builder(
       shrinkWrap: true,
       itemCount: widget.products.length,
@@ -67,6 +75,11 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
         final product = widget.products[index];
         final productTotalPrice =
             product['quantity'] * product['product_price'];
+
+        final formatter = NumberFormat("#,###", "en_US");
+        String productTotalPriceUsd = formatter.format(productTotalPrice);
+        String productTotalPriceLbp =
+            formatter.format(productTotalPrice * usdLbpRate);
         return ListTile(
           leading: CircleAvatar(
             backgroundImage:
@@ -82,7 +95,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
             ),
           ),
           subtitle: Text(
-            "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$${productTotalPrice.toStringAsFixed(2)}",
+            "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$$productTotalPriceUsd / LBP $productTotalPriceLbp",
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -208,12 +221,18 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
 
   //This function renders the total sale price at the bottom
   Widget renderTotalSalePrice() {
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
+    final formatter = NumberFormat("#,###", "en_US");
+    String formattedPriceUsd = formatter.format(getTotalSalePrice());
+    String formattedPriceLbp =
+        formatter.format(getTotalSalePrice() * usdLbpRate);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       child: Align(
         alignment: Alignment.centerRight,
         child: Text(
-          "Total Sale Price: \$${getTotalSalePrice().toStringAsFixed(2)}",
+          "Total Sale Price: \$$formattedPriceUsd / LBP $formattedPriceLbp",
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.bold,

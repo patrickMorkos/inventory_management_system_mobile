@@ -150,6 +150,8 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   // Render client orders listing
   Widget renderClientOrdersListing(sw) {
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
     if (clientController.clientInfo["sales"] != null) {
       clientOrders = clientController.clientInfo["sales"];
     }
@@ -163,6 +165,11 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                 )
               : Column(
                   children: clientOrders.map((order) {
+                    final formatter = NumberFormat("#,###", "en_US");
+                    String formattedPriceUsd =
+                        formatter.format(order["total_price_usd"]);
+                    String formattedPriceLbp =
+                        formatter.format(order["total_price_usd"] * usdLbpRate);
                     return Card(
                       elevation: 3,
                       shape: RoundedRectangleBorder(
@@ -185,7 +192,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              "Total: \$${order["total_price_usd"]}",
+                              "Total: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: Colors.grey[700],
@@ -204,7 +211,8 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                                 const SizedBox(width: 5),
                                 Text(
                                   "Issue Date: ${formatDate(order["issue_date"])}",
-                                  style: GoogleFonts.poppins(fontSize: sw * 0.025),
+                                  style:
+                                      GoogleFonts.poppins(fontSize: sw * 0.025),
                                 ),
                               ],
                             ),
@@ -215,7 +223,8 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                                 const SizedBox(width: 5),
                                 Text(
                                   "Due Date: ${order["due_date"] != null ? formatDate(order["due_date"]) : "Pending"}",
-                                  style: GoogleFonts.poppins(fontSize: sw * 0.025),
+                                  style:
+                                      GoogleFonts.poppins(fontSize: sw * 0.025),
                                 ),
                               ],
                             ),
@@ -228,9 +237,10 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                                 const SizedBox(width: 5),
                                 Flexible(
                                   child: Chip(
-                                    backgroundColor: order["SaleType"]["id"] == 1
-                                        ? Colors.green[100]
-                                        : Colors.blue[100],
+                                    backgroundColor:
+                                        order["SaleType"]["id"] == 1
+                                            ? Colors.green[100]
+                                            : Colors.blue[100],
                                     label: Text(
                                       order["SaleType"]["sale_type_name"],
                                       style: GoogleFonts.poppins(

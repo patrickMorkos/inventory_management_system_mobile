@@ -12,6 +12,7 @@ class UserModel {
   final dynamic dateOfJoin;
   final String bloodType;
   final int userTypeId;
+  final double usdLbpRate;
 
   UserModel({
     required this.id,
@@ -24,6 +25,7 @@ class UserModel {
     required this.dateOfJoin,
     required this.bloodType,
     required this.userTypeId,
+    required this.usdLbpRate,
   });
 
   UserModel copyWith({
@@ -37,6 +39,7 @@ class UserModel {
     dynamic dateOfJoin,
     String? bloodType,
     int? userTypeId,
+    double? usdLbpRate,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -49,6 +52,7 @@ class UserModel {
       dateOfJoin: dateOfJoin ?? this.dateOfJoin,
       bloodType: bloodType ?? this.bloodType,
       userTypeId: userTypeId ?? this.userTypeId,
+      usdLbpRate: usdLbpRate ?? this.usdLbpRate,
     );
   }
 
@@ -64,6 +68,7 @@ class UserModel {
       'date_of_join': dateOfJoin,
       'blood_type': bloodType,
       'user_type_id': userTypeId,
+      'usd_lbp_rate': usdLbpRate,
     };
   }
 
@@ -79,6 +84,7 @@ class UserModel {
       dateOfJoin: map['date_of_join'],
       bloodType: map['blood_type'] ?? '',
       userTypeId: map['user_type_id']?.toInt() ?? 0,
+      usdLbpRate: map['usd_lbp_rate']?.toInt() ?? 0,
     );
   }
 
@@ -89,7 +95,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email, password: $password, dateOfBirth: $dateOfBirth, dateOfJoin: $dateOfJoin, bloodType: $bloodType, userTypeId: $userTypeId)';
+    return 'UserModel(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email, password: $password, dateOfBirth: $dateOfBirth, dateOfJoin: $dateOfJoin, bloodType: $bloodType, userTypeId: $userTypeId, usdLbpRate: $usdLbpRate)';
   }
 
   @override
@@ -106,7 +112,8 @@ class UserModel {
         other.dateOfBirth == dateOfBirth &&
         other.dateOfJoin == dateOfJoin &&
         other.bloodType == bloodType &&
-        other.userTypeId == userTypeId;
+        other.userTypeId == userTypeId &&
+        other.usdLbpRate == usdLbpRate;
   }
 
   @override
@@ -120,6 +127,7 @@ class UserModel {
         dateOfBirth.hashCode ^
         dateOfJoin.hashCode ^
         bloodType.hashCode ^
-        userTypeId.hashCode;
+        userTypeId.hashCode ^
+        usdLbpRate.hashCode;
   }
 }

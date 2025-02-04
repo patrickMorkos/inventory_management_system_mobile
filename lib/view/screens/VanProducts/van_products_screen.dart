@@ -16,6 +16,7 @@ import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_
 import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:intl/intl.dart';
 
 class VanProductsScreen extends StatefulWidget {
   const VanProductsScreen({super.key});
@@ -287,6 +288,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   //This function returns the products cards list
   List<Widget> getProductsCards(sw, sh) {
     List<Widget> tmp = [];
+    final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
+
     if (searchedProductsList.isEmpty) {
       tmp.add(
         const Center(
@@ -298,6 +301,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       );
     } else {
       for (var element in searchedProductsList) {
+        final formatter = NumberFormat("#,###", "en_US");
+        String formattedPriceUsd =
+            formatter.format(element["Product"]["ProductPrice"]["price"]);
+        String formattedPriceLbp = formatter
+            .format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
+
         tmp.add(
           ListTile(
             onTap: () {
@@ -352,7 +361,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$${element["Product"]["ProductPrice"]["price"] ?? ""}",
+                      "Price: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
@@ -398,7 +407,8 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     }
 
     //Condition if the scanned barcode is found
-    if (searchedProductsList.any((element) => element["Product"]["barcod"] == barcode)) {
+    if (searchedProductsList
+        .any((element) => element["Product"]["barcod"] == barcode)) {
       setState(() {
         searchedProductsList =
             vanProductsController.vanProductsList.where((element) {
