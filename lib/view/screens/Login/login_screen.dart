@@ -62,20 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
       "email": email,
       "password": password,
     };
-    UserModel user = UserModel(
-      id: 0,
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      email: "",
-      password: "",
-      dateOfBirth: "",
-      dateOfJoin: "",
-      bloodType: "",
-      userTypeId: 0,
-      usdLbpRate: 0,
-    );
-    String accessToken = "";
+
     await postRequest(path: "/api/auth/login", body: body).then((value) {
       if (value['error'] == "Invalid credentials") {
         setState(() {
@@ -85,14 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           isEmailAndPasswordWrong = false;
         });
-        user = UserModel.fromMap(value['user']);
-        accessToken = value['token'];
+        UserModel user = UserModel.fromMap(value['user']);
+        String accessToken = value['token'];
+
+        loggedInUserController.setUserInfo(user, accessToken);
+        Get.offAllNamed('/dashboard');
       }
     });
-    if (!isEmailAndPasswordWrong) {
-      loggedInUserController.setUserInfo(user, accessToken);
-      Get.toNamed('/dashboard');
-    }
   }
 
   //This function shows the alert dialog
@@ -108,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     await Connectivity().checkConnectivity();
                 // ignore: use_build_context_synchronously
                 Navigator.pop(context, 'Cancel');
-                if ((connectivityResult[0].toString() == "ConnectivityResult.none")) {
+                if ((connectivityResult[0].toString() ==
+                    "ConnectivityResult.none")) {
                   showDialogBox();
                 }
               },
