@@ -12,7 +12,7 @@ class UserModel {
   final dynamic dateOfJoin;
   final String bloodType;
   final int userTypeId;
-  final double usdLbpRate;
+  final dynamic usdLbpRate;
 
   UserModel({
     required this.id,
@@ -39,7 +39,7 @@ class UserModel {
     dynamic dateOfJoin,
     String? bloodType,
     int? userTypeId,
-    double? usdLbpRate,
+    dynamic usdLbpRate,
   }) {
     return UserModel(
       id: id ?? this.id,

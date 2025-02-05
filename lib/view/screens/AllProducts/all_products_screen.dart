@@ -427,13 +427,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
+                      textAlign: TextAlign.start,
+                      "Price: \$ $formattedPriceUsd \nLBP $formattedPriceLbp",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
               ],
             ),
+            contentPadding: EdgeInsets.only(right: -200),
           ),
         );
         tmp.add(

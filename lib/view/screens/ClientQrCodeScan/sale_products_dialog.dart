@@ -68,41 +68,50 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
   Widget renderProductList() {
     final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
 
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: widget.products.length,
-      itemBuilder: (context, index) {
-        final product = widget.products[index];
-        final productTotalPrice =
-            product['quantity'] * product['product_price'];
+    return SizedBox(
+      height: 200, // Set a fixed height
+      child: Scrollbar(
+        thumbVisibility: true,
+        controller: _scrollController,
+        child: ListView.builder(
+          controller: _scrollController, // Attach controller
+          physics: AlwaysScrollableScrollPhysics(), // Ensure scrolling
+          itemCount: widget.products.length,
+          itemBuilder: (context, index) {
+            final product = widget.products[index];
+            final productTotalPrice =
+                product['quantity'] * product['product_price'];
 
-        final formatter = NumberFormat("#,###", "en_US");
-        String productTotalPriceUsd = formatter.format(productTotalPrice);
-        String productTotalPriceLbp =
-            formatter.format(productTotalPrice * usdLbpRate);
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundImage:
-                NetworkImage(product['Product']['image_url'] ?? ''),
-            radius: 25,
-            backgroundColor: Colors.grey[200],
-          ),
-          title: Text(
-            product['Product']['name'] ?? "Unknown Product",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-          ),
-          subtitle: Text(
-            "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$$productTotalPriceUsd / LBP $productTotalPriceLbp",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-          ),
-        );
-      },
+            final formatter = NumberFormat("#,###", "en_US");
+            String productTotalPriceUsd = formatter.format(productTotalPrice);
+            String productTotalPriceLbp =
+                formatter.format(productTotalPrice * usdLbpRate);
+
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundImage:
+                    NetworkImage(product['Product']['image_url'] ?? ''),
+                radius: 25,
+                backgroundColor: Colors.grey[200],
+              ),
+              title: Text(
+                product['Product']['name'] ?? "Unknown Product",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              subtitle: Text(
+                "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$$productTotalPriceUsd / LBP $productTotalPriceLbp",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -195,7 +204,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
             ),
             child: Text(
               "Replicate Sale",
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
             ),
           ),
         ),
@@ -211,7 +220,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
             ),
             child: Text(
               "Close",
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
             ),
           ),
         ),
@@ -230,9 +239,9 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       child: Align(
-        alignment: Alignment.centerRight,
+        alignment: Alignment.centerLeft,
         child: Text(
-          "Total Sale Price: \$$formattedPriceUsd / LBP $formattedPriceLbp",
+          "Total Sale Price: \$$formattedPriceUsd \nLBP $formattedPriceLbp",
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -263,28 +272,17 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Scrollbar(
-          thumbVisibility: true,
-          controller: _scrollController,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                renderHeader(),
-                const SizedBox(height: 16),
-                widget.products.isEmpty
-                    ? renderEmptySale()
-                    : renderProductList(),
-                const SizedBox(height: 16),
-                renderPriceSelection(),
-                renderTotalSalePrice(),
-                const SizedBox(height: 16),
-                renderActionButtons(context),
-              ],
-            ),
-          ),
+        height: MediaQuery.of(context).size.height * 0.9,
+        child: Column(
+          children: [
+            renderHeader(),
+            widget.products.isEmpty
+                ? renderEmptySale()
+                : Expanded(child: renderProductList()), // Ensure scrolling
+            renderPriceSelection(),
+            renderTotalSalePrice(),
+            renderActionButtons(context),
+          ],
         ),
       ),
     );

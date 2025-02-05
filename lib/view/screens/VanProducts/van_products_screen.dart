@@ -361,13 +361,14 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      "Price: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
+                      "Price: \$ $formattedPriceUsd \nLBP $formattedPriceLbp",
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
               ],
             ),
+            contentPadding: EdgeInsets.only(right: -200),
           ),
         );
         tmp.add(

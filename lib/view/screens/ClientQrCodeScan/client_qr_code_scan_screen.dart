@@ -194,7 +194,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                             Text(
                               "Total: \$ $formattedPriceUsd /  LBP $formattedPriceLbp",
                               style: GoogleFonts.poppins(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.grey[700],
                               ),
                             ),
