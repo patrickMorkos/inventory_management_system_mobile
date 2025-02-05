@@ -39,10 +39,10 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   @override
   void initState() {
+    super.initState();
     if (clientController.clientInfo["id"] != -1) {
       fetchClientOrders(clientController.clientInfo["id"]);
     }
-    super.initState();
   }
 
   void showSaleProductsDialog(BuildContext context, List<dynamic> products) {
@@ -90,11 +90,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
       ).then((value) {
         setState(() {
           clientOrders.clear();
-          clientController.setClientInfo(
-            {
-              "id": -1,
-            },
-          );
+          clientController.setClientInfo({"id": -1});
         });
       });
     } else {

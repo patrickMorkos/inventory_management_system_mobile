@@ -45,9 +45,14 @@ class LoggedInUserController extends GetxController {
   }
 
   void logout() {
-    box.erase();
+    // Clear stored user and client data
+    box.remove("user");
+    box.remove("token");
+    box.remove("client_check_in");
+
+    // Reset user data in memory
     loggedInUser.value = UserModel(
-      id: 0,
+      id: -1,
       firstName: "",
       lastName: "",
       phoneNumber: "",
@@ -59,6 +64,12 @@ class LoggedInUserController extends GetxController {
       userTypeId: 0,
       usdLbpRate: 0,
     );
+
+    // Clear access token
     accessToken.value = "";
+
+    // Ensure UI updates properly
+    loggedInUser.refresh();
+    accessToken.refresh();
   }
 }

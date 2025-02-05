@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/dashboard_grid_card.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -212,6 +213,52 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  void _logout() async {
+    try {
+      final response = await postRequest(
+        path: "/api/auth/logout",
+        requireToken: true,
+        body: {},
+      );
+
+      if (response != null &&
+          response['message'] == "Logged out successfully") {
+        // Show success snackbar
+        Get.snackbar(
+          "Success",
+          "Successfully logged out!",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 2),
+        );
+
+        // Clear user session and redirect to login screen
+        loggedInUserController.logout();
+        Get.offAllNamed('/login');
+      } else {
+        // Show error snackbar
+        Get.snackbar(
+          "Error",
+          response?['message'] ?? "Failed to logout. Try again!",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Something went wrong!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 2),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -220,11 +267,16 @@ class DashboardScreen extends StatelessWidget {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           backgroundColor: kMainColor,
-          //Salesman Profile picture
           leading: renderProfilePicture(),
-
-          //Salesman first name and last naame
           title: renderFullName(),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                _logout();
+              },
+            ),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 15),
