@@ -6,6 +6,7 @@ import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/view/screens/Splash/splash_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/dashboard/dashboard_screen.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,8 +41,14 @@ class MainApp extends StatelessWidget {
 
   /// Decides the initial screen based on authentication status
   Widget _getInitialScreen() {
-    return loggedInUserController.accessToken.value.isNotEmpty
-        ? DashboardScreen()
-        : SplashScreen();
+    if (loggedInUserController.accessToken.value.isNotEmpty) {
+      // ✅ Check if the token is expired
+      if (JwtDecoder.isExpired(loggedInUserController.accessToken.value)) {
+        loggedInUserController.logout();
+        return SplashScreen();
+      }
+      return DashboardScreen();
+    }
+    return SplashScreen();
   }
 }

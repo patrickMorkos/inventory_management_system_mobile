@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:inventory_management_system_mobile/core/models/user_model.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class LoggedInUserController extends GetxController {
   Rx<UserModel> loggedInUser = UserModel(
@@ -39,18 +40,21 @@ class LoggedInUserController extends GetxController {
     String? token = box.read("token");
 
     if (userData != null && token != null) {
+      // ✅ Check if the token is expired before setting it
+      if (JwtDecoder.isExpired(token)) {
+        logout();
+        return;
+      }
       loggedInUser.value = UserModel.fromJson(userData);
       accessToken.value = token;
     }
   }
 
   void logout() {
-    // Clear stored user and client data
     box.remove("user");
     box.remove("token");
     box.remove("client_check_in");
 
-    // Reset user data in memory
     loggedInUser.value = UserModel(
       id: -1,
       firstName: "",
@@ -65,10 +69,8 @@ class LoggedInUserController extends GetxController {
       usdLbpRate: 0,
     );
 
-    // Clear access token
     accessToken.value = "";
 
-    // Ensure UI updates properly
     loggedInUser.refresh();
     accessToken.refresh();
   }
