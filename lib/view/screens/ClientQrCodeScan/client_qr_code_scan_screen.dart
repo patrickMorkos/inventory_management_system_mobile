@@ -124,7 +124,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   //This function fetches the client orders
   Future<void> fetchClientOrders(int clientId) async {
     await getRequest(
-      path: "/api/sale/get-all-client-sales/1?client_id=$clientId",
+      path: "/api/sale/get-all-client-sales/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       setState(() {

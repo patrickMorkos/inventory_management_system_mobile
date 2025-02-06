@@ -126,6 +126,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     for (var product in orderController.orderInfo["saleProducts"]) {
       tmp.add(
         ListTile(
+          contentPadding: EdgeInsets.only(right: -200),
           leading: Image.network(
             product["product"]["image_url"] ?? "",
             width: 50,
@@ -145,43 +146,52 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             ),
           ),
           subtitle: Text(
-            "Quantity: ${product['quantity']} x \$${product['product_price']} = \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
+            "Quantity: ${product['quantity']} x \$${product['product_price']} \n= \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
             style: const TextStyle(color: Colors.grey),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    // Increase product quantity
-                    product["quantity"] += 1;
-                    updateTotalPrice();
-                  });
-                },
-                icon: const Icon(Icons.add, size: 20),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    // Decrease product quantity
-                    if (product["quantity"] > 1) {
-                      product["quantity"] -= 1;
+              SizedBox(
+                width: 30,
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      // Increase product quantity
+                      product["quantity"] += 1;
                       updateTotalPrice();
-                    }
-                  });
-                },
-                icon: const Icon(Icons.remove, size: 20),
+                    });
+                  },
+                  icon: const Icon(Icons.add, size: 15),
+                ),
               ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    // Remove product from the sale products list
-                    orderController.orderInfo["saleProducts"].remove(product);
-                    updateTotalPrice();
-                  });
-                },
-                icon: const Icon(Icons.delete, size: 20),
+              SizedBox(
+                width: 30,
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      // Decrease product quantity
+                      if (product["quantity"] > 1) {
+                        product["quantity"] -= 1;
+                        updateTotalPrice();
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.remove, size: 15),
+                ),
+              ),
+              SizedBox(
+                width: 30,
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      // Remove product from the sale products list
+                      orderController.orderInfo["saleProducts"].remove(product);
+                      updateTotalPrice();
+                    });
+                  },
+                  icon: const Icon(Icons.delete, size: 15),
+                ),
               ),
             ],
           ),
@@ -278,6 +288,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       for (var product in orderController.orderInfo["products"]) {
         tmp.add(
           ListTile(
+            contentPadding: EdgeInsets.only(right: -200),
             leading: Image.network(
               product["product"]["image_url"] ?? "",
               width: 50,
@@ -295,49 +306,58 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   fontSize: 14, fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
-              "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['price']} = \$${(product['quantity'] * product['product']['ProductPrice']['price']).toStringAsFixed(2)}",
+              "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['price']} \n= \$${(product['quantity'] * product['product']['ProductPrice']['price']).toStringAsFixed(2)}",
               style: const TextStyle(color: Colors.grey),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      orderController
-                          .increaseProductQuantity(product['product']);
-                      vanProductsController.deductQuantity(
-                          product['product']["id"], 1);
-                      updateTotalPrice();
-                    });
-                  },
-                  icon: const Icon(Icons.add, size: 20),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      if (product['quantity'] > 1) {
+                SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
                         orderController
-                            .decreaseProductQuantity(product['product']);
-                        vanProductsController.addQuantity(
+                            .increaseProductQuantity(product['product']);
+                        vanProductsController.deductQuantity(
                             product['product']["id"], 1);
                         updateTotalPrice();
-                      }
-                    });
-                  },
-                  icon: const Icon(Icons.remove, size: 20),
+                      });
+                    },
+                    icon: const Icon(Icons.add, size: 15),
+                  ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      orderController
-                          .removeProductFromOrder(product['product']);
-                      vanProductsController.addQuantity(
-                          product['product']["id"], product['quantity']);
-                      updateTotalPrice();
-                    });
-                  },
-                  icon: const Icon(Icons.delete, size: 20),
+                SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        if (product['quantity'] > 1) {
+                          orderController
+                              .decreaseProductQuantity(product['product']);
+                          vanProductsController.addQuantity(
+                              product['product']["id"], 1);
+                          updateTotalPrice();
+                        }
+                      });
+                    },
+                    icon: const Icon(Icons.remove, size: 15),
+                  ),
+                ),
+                SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        orderController
+                            .removeProductFromOrder(product['product']);
+                        vanProductsController.addQuantity(
+                            product['product']["id"], product['quantity']);
+                        updateTotalPrice();
+                      });
+                    },
+                    icon: const Icon(Icons.delete, size: 15),
+                  ),
                 ),
               ],
             ),
