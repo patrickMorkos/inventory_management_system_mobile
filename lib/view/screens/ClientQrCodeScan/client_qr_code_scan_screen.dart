@@ -138,7 +138,7 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   String formatDate(String dateString) {
     try {
       DateTime dateTime = DateTime.parse(dateString);
-      return DateFormat('dd-MMM-yyyy').format(dateTime);
+      return DateFormat('dd-MMM-yyyy hh:mm a').format(dateTime);
     } catch (e) {
       return dateString;
     }
