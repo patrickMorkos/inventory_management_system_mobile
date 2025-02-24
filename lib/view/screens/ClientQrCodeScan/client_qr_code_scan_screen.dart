@@ -19,6 +19,9 @@ class ClientQrCodeScanScreen extends StatefulWidget {
 }
 
 class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
+  // Define instance variables
+  int clientId = -1; // Default fallback value
+  bool redirectedFromCreateNewClient = false;
   //******************************************************************VARIABLES
 
   //This variable is the client controller
@@ -37,11 +40,105 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
 
   //******************************************************************FUNCTIONS
 
+  Future<void> checkOutClient(int clientId) async {
+    try {
+      await postRequest(
+        path:
+            "/api/salesman-client-visits/client-check-out/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+        body: {},
+        requireToken: true,
+      );
+
+      // Clear client data after check-out
+      setState(() {
+        clientOrders.clear();
+        clientController.setClientInfo({"id": -1});
+      });
+      clientController.newlyCreatedClientCheckedIn.value =
+          false; // Reset flag after check-out
+
+      Fluttertoast.showToast(
+        msg: "Checked out successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Failed to check out. Please try again.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
+
+  Future<void> checkInClient(
+      int clientId, bool redirectedFromCreateNewClient) async {
+    try {
+      // Get client info
+      var clientData = await getRequest(
+        path: "/api/client/get-client/$clientId",
+        requireToken: true,
+      );
+
+      clientController.setClientInfo(clientData);
+      fetchClientOrders(clientId);
+
+      // Perform check-in
+      await postRequest(
+        path:
+            "/api/salesman-client-visits/client-check-in/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+        body: {},
+        requireToken: true,
+      );
+
+      // Fetch van products after check-in
+      var vanProducts = await getRequest(
+        path:
+            "/api/van-products/get-all-van-products/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+        requireToken: true,
+      );
+      vanProductsController.setVanProductsInfo(vanProducts);
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Failed to check in. Please try again.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    if (clientController.clientInfo["id"] != -1) {
-      fetchClientOrders(clientController.clientInfo["id"]);
+
+    final args = Get.arguments;
+
+    if (args != null && args is Map<String, dynamic>) {
+      if (args.containsKey("clientId")) {
+        var tempId = args["clientId"];
+        if (tempId is int) {
+          clientId = tempId;
+        } else if (tempId is String) {
+          clientId = int.tryParse(tempId) ?? -1;
+        }
+      }
+
+      // Check if the user was redirected from CreateNewClientScreen
+      redirectedFromCreateNewClient =
+          args.containsKey("redirected") ? args["redirected"] : false;
+    }
+
+    if (clientId != -1) {
+      checkInClient(clientId, redirectedFromCreateNewClient);
     }
   }
 
@@ -286,24 +383,32 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
             ),
           ),
           onPressed: () async {
-            String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-              "#ff6666",
-              "Cancel",
-              true,
-              ScanMode.BARCODE,
-            );
-            if (barcodeScanRes != "-1") {
-              getClientFromQrCode(barcodeScanRes);
+            if (redirectedFromCreateNewClient ||
+                clientController.newlyCreatedClientCheckedIn.value) {
+              checkOutClient(clientId);
+            } else {
+              // Normal QR scanning behavior
+              String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                "#ff6666",
+                "Cancel",
+                true,
+                ScanMode.BARCODE,
+              );
+              if (barcodeScanRes != "-1") {
+                getClientFromQrCode(barcodeScanRes);
+              }
             }
           },
-          child: Text(
-            clientController.clientInfo["id"] != -1
-                ? "Check-Out"
-                : "Scan QR Code",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-            ),
-          ),
+          child: Obx(() => Text(
+                (clientController.newlyCreatedClientCheckedIn.value
+                    ? "Check-Out"
+                    : (clientController.clientInfo["id"] != -1
+                        ? "Check-Out"
+                        : "Scan QR Code")),
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                ),
+              )),
         ),
       ),
     );

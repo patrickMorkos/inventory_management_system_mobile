@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 
 class ClientController extends GetxController {
   final box = GetStorage();
+  RxBool newlyCreatedClientCheckedIn = false.obs;
 
   RxMap<String, dynamic> clientInfo = RxMap<String, dynamic>(
     {
@@ -22,6 +23,7 @@ class ClientController extends GetxController {
       box.write("client_check_in", newClient);
     } else {
       box.remove("client_check_in");
+      newlyCreatedClientCheckedIn.value = false; // Reset flag on check-out
     }
   }
 

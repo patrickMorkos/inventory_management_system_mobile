@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/button_global.dart';
@@ -163,18 +164,32 @@ class _CreateNewClientScreenState extends State<CreateNewClientScreen> {
           requireToken: true,
         );
         if (response['error'] == null) {
-          // Successfully created the client, show a success toast
+          // Successfully created the client, extract client ID
+          int newClientId = response['id'];
 
-          Fluttertoast.showToast(
-            msg: "Client created successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0,
+          Get.defaultDialog(
+            title: "Check-In",
+            middleText: "Do you want to check in for this client?",
+            textConfirm: "Yes",
+            textCancel: "No",
+            confirmTextColor: Colors.white,
+            onConfirm: () {
+              Get.back(); // Close dialog
+
+              // Enable the global flag for newly created clients
+              ClientController clientController = Get.find<ClientController>();
+              clientController.newlyCreatedClientCheckedIn.value = true;
+
+              Get.toNamed('/client-qr-code-scan',
+                  arguments: {"clientId": newClientId, "redirected": true});
+            },
+            onCancel: () {
+              Get.back(); // Close the dialog first
+              Future.delayed(Duration(milliseconds: 300), () {
+                Get.offAllNamed('/dashboard'); // Ensure full navigation reset
+              });
+            },
           );
-          // Navigate to the next screen if successful
-          Get.toNamed('/dashboard');
         } else {
           // API returned an error, show the error message in a toast
           Fluttertoast.showToast(
