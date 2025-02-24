@@ -399,9 +399,10 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   Widget renderTotalOrderPrice() {
     final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
 
-    final formatter = NumberFormat("#,###", "en_US");
-    String formattedPriceUsd = formatter.format(totalOrderPrice);
-    String formattedPriceLbp = formatter.format(totalOrderPrice * usdLbpRate);
+    final usdFormatter = NumberFormat("#,##0.00", "en_US");
+    final lbpFormatter = NumberFormat("#,###", "en_US");
+    String formattedPriceUsd = usdFormatter.format(totalOrderPrice);
+    String formattedPriceLbp = lbpFormatter.format(totalOrderPrice * usdLbpRate);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

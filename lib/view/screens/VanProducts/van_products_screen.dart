@@ -301,10 +301,11 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       );
     } else {
       for (var element in searchedProductsList) {
-        final formatter = NumberFormat("#,###", "en_US");
+        final usdFormatter = NumberFormat("#,##0.00", "en_US");
+        final lbpFormatter = NumberFormat("#,###", "en_US");
         String formattedPriceUsd =
-            formatter.format(element["Product"]["ProductPrice"]["price"]);
-        String formattedPriceLbp = formatter
+            usdFormatter.format(element["Product"]["ProductPrice"]["price"]);
+        String formattedPriceLbp = lbpFormatter
             .format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
 
         tmp.add(

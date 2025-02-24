@@ -82,10 +82,11 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
             final productTotalPrice =
                 product['quantity'] * product['product_price'];
 
-            final formatter = NumberFormat("#,###", "en_US");
-            String productTotalPriceUsd = formatter.format(productTotalPrice);
+            final usdFormatter = NumberFormat("#,##0.00", "en_US");
+            final lbpFormatter = NumberFormat("#,###", "en_US");
+            String productTotalPriceUsd = usdFormatter.format(productTotalPrice);
             String productTotalPriceLbp =
-                formatter.format(productTotalPrice * usdLbpRate);
+                lbpFormatter.format(productTotalPrice * usdLbpRate);
 
             return ListTile(
               leading: CircleAvatar(
@@ -232,10 +233,11 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
   Widget renderTotalSalePrice() {
     final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
 
-    final formatter = NumberFormat("#,###", "en_US");
-    String formattedPriceUsd = formatter.format(getTotalSalePrice());
+    final usdFormatter = NumberFormat("#,##0.00", "en_US");
+    final lbpFormatter = NumberFormat("#,###", "en_US");
+    String formattedPriceUsd = usdFormatter.format(getTotalSalePrice());
     String formattedPriceLbp =
-        formatter.format(getTotalSalePrice() * usdLbpRate);
+        lbpFormatter.format(getTotalSalePrice() * usdLbpRate);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       child: Align(

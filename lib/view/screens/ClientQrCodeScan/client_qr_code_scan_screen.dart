@@ -161,11 +161,12 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                 )
               : Column(
                   children: clientOrders.map((order) {
-                    final formatter = NumberFormat("#,###", "en_US");
+                    final usdFormatter = NumberFormat("#,##0.00", "en_US");
+                    final lbpFormatter = NumberFormat("#,###", "en_US");
                     String formattedPriceUsd =
-                        formatter.format(order["total_price_usd"]);
+                        usdFormatter.format(order["total_price_usd"]);
                     String formattedPriceLbp =
-                        formatter.format(order["total_price_usd"] * usdLbpRate);
+                        lbpFormatter.format(order["total_price_usd"] * usdLbpRate);
                     return Card(
                       elevation: 3,
                       shape: RoundedRectangleBorder(

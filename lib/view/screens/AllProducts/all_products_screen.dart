@@ -368,10 +368,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       );
     } else {
       for (var element in searchedProductsList) {
-        final formatter = NumberFormat("#,###", "en_US");
-        String formattedPriceUsd = formatter.format(element["Product"]["ProductPrice"]["price"]);
-        String formattedPriceLbp = formatter.format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
-
+        final usdFormatter = NumberFormat("#,##0.00", "en_US");
+        final lbpFormatter = NumberFormat("#,###", "en_US");
+        String formattedPriceUsd = usdFormatter.format(element["Product"]["ProductPrice"]["price"]);
+        String formattedPriceLbp = lbpFormatter.format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
         tmp.add(
           ListTile(
             onTap: () {
