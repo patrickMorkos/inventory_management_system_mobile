@@ -124,7 +124,8 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
   //This function fetches the client orders
   Future<void> fetchClientOrders(int clientId) async {
     await getRequest(
-      path: "/api/sale/get-all-client-sales/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
+      path:
+          "/api/sale/get-all-client-sales/${loggedInUserController.loggedInUser.value.id}?client_id=$clientId",
       requireToken: true,
     ).then((value) {
       setState(() {
@@ -165,8 +166,8 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
                     final lbpFormatter = NumberFormat("#,###", "en_US");
                     String formattedPriceUsd =
                         usdFormatter.format(order["total_price_usd"]);
-                    String formattedPriceLbp =
-                        lbpFormatter.format(order["total_price_usd"] * usdLbpRate);
+                    String formattedPriceLbp = lbpFormatter
+                        .format(order["total_price_usd"] * usdLbpRate);
                     return Card(
                       elevation: 3,
                       shape: RoundedRectangleBorder(
