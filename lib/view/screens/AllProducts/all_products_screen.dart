@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:input_quantity/input_quantity.dart';
@@ -370,8 +369,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       for (var element in searchedProductsList) {
         final usdFormatter = NumberFormat("#,##0.00", "en_US");
         final lbpFormatter = NumberFormat("#,###", "en_US");
-        String formattedPriceUsd = usdFormatter.format(element["Product"]["ProductPrice"]["price"]);
-        String formattedPriceLbp = lbpFormatter.format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
+        String formattedPriceUsd =
+            usdFormatter.format(element["Product"]["ProductPrice"]["price"]);
+        String formattedPriceLbp = lbpFormatter
+            .format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
         tmp.add(
           ListTile(
             onTap: () {
@@ -448,23 +449,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     }
 
     return tmp;
-  }
-
-  // This function open the barcode scanner
-  Future<void> openBarcodeScanner(sw, sh) async {
-    String barcodeScanRes;
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666",
-        "Cancel",
-        true,
-        ScanMode.BARCODE,
-      );
-    } on PlatformException {
-      barcodeScanRes = "Failed to get platform version.";
-    }
-    if (!mounted) return;
-    searchProduct(barcodeScanRes, sw, sh);
   }
 
   //This function search for the product barcode inside the list of products
@@ -549,15 +533,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           suffixIcon: IntrinsicWidth(
             child: Row(
               children: [
-                InkWell(
-                  onTap: () => {
-                    if (isMobile) openBarcodeScanner(sw, sh),
-                  },
-                  child: const ImageIcon(
-                    AssetImage("assets/images/Scanbarcode.png"),
-                    color: kMainColor,
-                  ),
-                ),
                 IconButton(
                   onPressed: () {
                     setState(() {
