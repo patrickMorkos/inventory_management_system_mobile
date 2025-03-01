@@ -129,8 +129,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   }
 
   void openProductDetailsDialog(context, sw, sh, product, clientInfo) {
-    final scrollController = ScrollController();
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -139,87 +137,92 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           insetPadding: EdgeInsets.zero,
           shape: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(
-              color: Colors.white,
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          content: SizedBox(
+            width: sw * 0.8, // Adjusted width for better layout
+            height: sh * 0.45, // Adjusted height
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                renderProductDescriptionHeader(sh),
+
+                SizedBox(height: 10), // Space before content
+
+                // Row: Image (Left) + Details (Right)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Circular Product Image
+                    Container(
+                      width: sw * 0.25, // Adjust size as needed
+                      height: sw * 0.25,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Colors.white, width: 2), // White border
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          product["Product"]["image_url"] ?? "",
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.broken_image,
+                              color: Colors.grey,
+                              size: 40,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: 15), // Space between image and text
+
+                    // Product Details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          renderProductItems(
+                              sw, sh, "Name", product["Product"]["name"] ?? ""),
+                          renderProductItems(sw, sh, "Brand",
+                              product["Product"]["Brand"]["brand_name"] ?? ""),
+                          renderProductItems(
+                              sw,
+                              sh,
+                              "Category",
+                              product["Product"]["Category"]["category_name"] ??
+                                  ""),
+                          renderProductItems(
+                              sw, sh, "Quantity", product["quantity"] ?? ""),
+                          renderProductItems(
+                              sw,
+                              sh,
+                              "Price",
+                              product["Product"]["ProductPrice"]["price"] !=
+                                      null
+                                  ? "\$${product["Product"]["ProductPrice"]["price"]}"
+                                  : ""),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 10), // Space before buttons
+
+                // Add to Cart Section
+                if (clientInfo["id"] != -1) ...[
+                  renderQuantityPickUp(sh, product), // Quantity picker
+                  renderAddProductToCartButton(
+                      context, sw, sh, product, clientInfo), // Button
+                ],
+              ],
             ),
           ),
-          actions: [
-            SizedBox(
-              height: sh * 0.5,
-              child: Scrollbar(
-                thumbVisibility: true,
-                controller: scrollController,
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    children: [
-                      //Alert dialog Header
-                      renderProductDescriptionHeader(sh),
-
-                      //Product Image
-                      renderProductImage(sw, sh, product),
-
-                      //Product Name
-                      renderProductItems(
-                        sw,
-                        sh,
-                        "Name",
-                        product["Product"]["name"] ?? "",
-                      ),
-
-                      //Product Brand
-                      renderProductItems(
-                        sw,
-                        sh,
-                        "Brand",
-                        product["Product"]["Brand"]["brand_name"] ?? "",
-                      ),
-
-                      //Product Category
-                      renderProductItems(
-                        sw,
-                        sh,
-                        "Category",
-                        product["Product"]["Category"]["category_name"] ?? "",
-                      ),
-
-                      //Product Quantity
-                      renderProductItems(
-                        sw,
-                        sh,
-                        "Quantity",
-                        product["quantity"] ?? "",
-                      ),
-
-                      //Product Price
-                      renderProductItems(
-                        sw,
-                        sh,
-                        "Price",
-                        product["Product"]["ProductPrice"]["price"] != null
-                            ? "\$${product["Product"]["ProductPrice"]["price"]}"
-                            : "",
-                      ),
-
-                      //Quantity pick-up
-                      if (clientInfo["id"] != -1)
-                        renderQuantityPickUp(sh, product),
-
-                      //Add product to cart
-                      if (clientInfo["id"] != -1)
-                        renderAddProductToCartButton(
-                          context,
-                          sw,
-                          sh,
-                          product,
-                          clientInfo,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
         );
       },
     );
