@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_stock_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -146,50 +147,79 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
       itemCount: searchedProductsList.length,
       itemBuilder: (context, index) {
         final product = searchedProductsList[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                product["Product"]["image_url"] ?? "",
+
+        return StatefulBuilder(
+          // 👈 Rebuilds only this item in the list
+          builder: (context, setState) {
+            FocusNode qtyFocusNode = FocusNode(); // 👈 Track focus
+            int quantity = product["quantity"]; // 👈 Local state for UI updates
+
+            return Card(
+              margin:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    product["Product"]["image_url"] ?? "",
+                  ),
+                  onBackgroundImageError: (_, __) =>
+                      const Icon(Icons.broken_image),
+                ),
+                title: Text(
+                  product["Product"]["name"] ?? "",
+                  style: TextStyle(fontSize: sw * 0.03),
+                ),
+                subtitle: Text(
+                  "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}",
+                  style: TextStyle(fontSize: sw * 0.03),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Wrap InputQty with Focus to detect when user taps outside
+                    Focus(
+                      focusNode: qtyFocusNode,
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          // 👈 Only call API when user exits text field
+                          print(
+                              "Lost focus, updating API with quantity: $quantity");
+                          updateProductQuantity(
+                              product["Product"]["id"], quantity);
+                        }
+                      },
+                      child: InputQty(
+                        maxVal: product["quantity"] +
+                            100, // Set an appropriate max limit
+                        decoration: QtyDecorationProps(
+                          btnColor: kMainColor, // Match the UI theme
+                          fillColor: Colors.white,
+                        ),
+                        initVal: quantity
+                            .toDouble(), // Initialize with current quantity
+                        onQtyChanged: (value) {
+                          if (value is double || value is int) {
+                            setState(() {
+                              // 👈 UI updates instantly when changing quantity
+                              quantity = value.toInt();
+                            });
+                            print("Quantity updated: $quantity");
+                            updateProductQuantity(product["Product"]["id"],
+                                quantity); // 👈 Ensure API is always called
+                          }
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      iconSize: sw * 0.05,
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => deleteProduct(product["Product"]["id"]),
+                    ),
+                  ],
+                ),
               ),
-              onBackgroundImageError: (_, __) => const Icon(Icons.broken_image),
-            ),
-            title: Text(
-              product["Product"]["name"] ?? "",
-              style: TextStyle(fontSize: sw * 0.03),
-            ),
-            subtitle: Text(
-              "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}",
-              style: TextStyle(fontSize: sw * 0.03),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  iconSize: sw * 0.05,
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => updateProductQuantity(
-                      product["Product"]["id"], product["quantity"] - 1),
-                ),
-                Text(
-                  product["quantity"].toString(),
-                  style: TextStyle(fontSize: sw * 0.025),
-                ),
-                IconButton(
-                  iconSize: sw * 0.05,
-                  icon: const Icon(Icons.add),
-                  onPressed: () => updateProductQuantity(
-                      product["Product"]["id"], product["quantity"] + 1),
-                ),
-                IconButton(
-                  iconSize: sw * 0.05,
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => deleteProduct(product["Product"]["id"]),
-                ),
-              ],
-            ),
-          ),
+            );
+          },
         );
       },
     );
