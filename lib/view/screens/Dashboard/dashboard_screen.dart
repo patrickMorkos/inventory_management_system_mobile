@@ -68,12 +68,6 @@ class DashboardScreen extends StatelessWidget {
         icon: 'assets/images/qr-code-scan-icon.png',
       ),
       GridItems(
-        title: "Clients",
-        route: 'clients',
-        showCard: true,
-        icon: 'assets/images/parties.png',
-      ),
-      GridItems(
         title: "Create New Client",
         route: 'create-new-client',
         showCard: true,

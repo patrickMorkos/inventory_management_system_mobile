@@ -4,7 +4,6 @@ import 'package:inventory_management_system_mobile/view/screens/AllCategories/al
 import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/ClientQrCodeScan/client_qr_code_scan_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/ClientStock/client_stock_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/Clients/clients_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/CreateNewClient/create_new_client_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/CreateNewOrder/create_new_order_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/Dashboard/dashboard_screen.dart';
@@ -42,10 +41,6 @@ class Navigation {
     GetPage(
       name: "/client-qr-code-scan",
       page: () => const ClientQrCodeScanScreen(),
-    ),
-    GetPage(
-      name: "/clients",
-      page: () => const ClientsScreen(),
     ),
     GetPage(
       name: "/create-new-client",
