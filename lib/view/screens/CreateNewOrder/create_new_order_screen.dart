@@ -473,7 +473,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   color: Colors.white,
                 ),
               ),
-              child: const Text("Create Order"),
+              child: const Text("Submit"),
             ),
           ),
         ],
