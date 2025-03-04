@@ -8,6 +8,7 @@ import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 import 'package:inventory_management_system_mobile/view/widgets/dashboard_grid_card.dart';
+import 'package:inventory_management_system_mobile/core/controllers/order_controller.dart';
 
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});
@@ -15,6 +16,8 @@ class DashboardScreen extends StatelessWidget {
   //This variable is for the logged in user data
   final LoggedInUserController loggedInUserController =
       Get.put(LoggedInUserController());
+
+  final OrderController orderController = Get.put(OrderController());
 
   //This variable is for each grid button color
   final List<Color> color = [
@@ -270,6 +273,43 @@ class DashboardScreen extends StatelessWidget {
           leading: renderProfilePicture(),
           title: renderFullName(),
           actions: [
+            Stack(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.shopping_cart, color: Colors.white),
+                  onPressed: () {
+                    Get.toNamed("/create-new-order");
+                  },
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Obx(() {
+                    int totalProducts =
+                        orderController.orderInfo["products"].length +
+                            orderController.orderInfo["saleProducts"].length;
+
+                    return totalProducts > 0
+                        ? Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              totalProducts.toString(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : SizedBox(); // If cart is empty, hide the badge
+                  }),
+                ),
+              ],
+            ),
             IconButton(
               icon: Icon(Icons.logout, color: Colors.white),
               onPressed: () async {
