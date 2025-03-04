@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
@@ -231,8 +232,15 @@ class DashboardScreen extends StatelessWidget {
         );
 
         // Clear user session and redirect to login screen
+        final LoggedInUserController loggedInUserController = Get.find();
+        final ClientController clientController = Get.find();
+        final OrderController orderController = Get.find();
+
         loggedInUserController.logout();
-        Get.offAllNamed('/login');
+        clientController.setClientInfo({"id": -1}); // Reset client info
+        orderController.clearOrderController(); // Reset order info
+
+        Get.offAllNamed('/login'); // Navigate to login screen
       } else {
         // Show error snackbar
         Get.snackbar(
