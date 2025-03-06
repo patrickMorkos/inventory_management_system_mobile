@@ -8,6 +8,7 @@ import 'package:inventory_management_system_mobile/view/screens/CreateNewClient/
 import 'package:inventory_management_system_mobile/view/screens/CreateNewOrder/create_new_order_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/Dashboard/dashboard_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/Login/login_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/OrderHistory/orders_history_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/ReturnProduct/return_product_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/VanCategories/van_categories_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen.dart';
@@ -57,6 +58,10 @@ class Navigation {
     GetPage(
       name: "/return-product",
       page: () => const ReturnProductScreen(),
+    ),
+    GetPage(
+      name: '/orders-history',
+      page: () => const OrdersHistoryScreen(),
     ),
   ];
   List<GetPage<dynamic>> getNavigationList() {

@@ -92,6 +92,12 @@ class DashboardScreen extends StatelessWidget {
         showCard: true,
         icon: 'assets/images/return-product-icon.png',
       ),
+      GridItems(
+        title: "Orders History",
+        route: 'orders-history',
+        showCard: true,
+        icon: 'assets/images/orders-history.png',
+      ),
     ];
   }
 

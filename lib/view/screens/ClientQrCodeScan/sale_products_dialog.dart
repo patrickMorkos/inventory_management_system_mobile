@@ -84,16 +84,26 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
 
             final usdFormatter = NumberFormat("#,##0.00", "en_US");
             final lbpFormatter = NumberFormat("#,###", "en_US");
-            String productTotalPriceUsd = usdFormatter.format(productTotalPrice);
+            String productTotalPriceUsd =
+                usdFormatter.format(productTotalPrice);
             String productTotalPriceLbp =
                 lbpFormatter.format(productTotalPrice * usdLbpRate);
 
             return ListTile(
               leading: CircleAvatar(
-                backgroundImage:
-                    NetworkImage(product['Product']['image_url'] ?? ''),
                 radius: 25,
                 backgroundColor: Colors.grey[200],
+                child: Image.network(
+                  product['Product']['image_url'] ?? '',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 30,
+                    );
+                  },
+                ),
               ),
               title: Text(
                 product['Product']['name'] ?? "Unknown Product",
