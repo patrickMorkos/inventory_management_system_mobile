@@ -82,10 +82,18 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     if (orderController.orderInfo["saleType"] == "Cash Van") {
       Get.toNamed("/van-products", arguments: {
         "isFromCreateOrderScreen": true,
+      })?.then((_) {
+        // Step 1: Refresh order data when user comes back
+        updateTotalPrice();
+        setState(() {}); // Step 2: Force UI to rebuild
       });
     } else {
       Get.toNamed("/all-products", arguments: {
         "isFromCreateOrderScreen": true,
+      })?.then((_) {
+        // Step 1: Refresh order data when user comes back
+        updateTotalPrice();
+        setState(() {}); // Step 2: Force UI to rebuild
       });
     }
   }
@@ -402,7 +410,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     final usdFormatter = NumberFormat("#,##0.00", "en_US");
     final lbpFormatter = NumberFormat("#,###", "en_US");
     String formattedPriceUsd = usdFormatter.format(totalOrderPrice);
-    String formattedPriceLbp = lbpFormatter.format(totalOrderPrice * usdLbpRate);
+    String formattedPriceLbp =
+        lbpFormatter.format(totalOrderPrice * usdLbpRate);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
