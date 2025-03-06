@@ -11,7 +11,7 @@ class OrderController extends GetxController {
     {
       "products": [],
       "saleProducts": [],
-      "saleType" : "Cash Van",
+      "saleType": "Cash Van",
     },
   );
 
@@ -20,7 +20,7 @@ class OrderController extends GetxController {
     orderInfo.addAll({
       "products": [],
       "saleProducts": [],
-      "saleType" : "Cash Van",
+      "saleType": "Cash Van",
     });
     update();
   }
