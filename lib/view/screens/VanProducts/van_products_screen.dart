@@ -74,12 +74,23 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          orderController.addProductToOrder(product["Product"], quantity);
-          vanProductsController.deductQuantity(
-            product["Product"]["id"],
-            quantity,
-          );
-          Navigator.of(context).pop();
+          if (quantity > product["quantity"] || quantity == 0) {
+            Get.snackbar(
+              "Error",
+              "Cannot add more than quantity",
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.TOP,
+              duration: Duration(seconds: 2),
+            );
+          } else {
+            orderController.addProductToOrder(product["Product"], quantity);
+            vanProductsController.deductQuantity(
+              product["Product"]["id"],
+              quantity,
+            );
+            Navigator.of(context).pop();
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
@@ -105,7 +116,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         top: sh / 50,
       ),
       child: InputQty(
-        maxVal: product["quantity"],
         decoration: QtyDecorationProps(
           btnColor: kMainColor,
           fillColor: Colors.white,
