@@ -25,7 +25,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
   // Calculate the total price of the sale
   double getTotalSalePrice() {
     return widget.products.fold(0.0, (total, product) {
-      return total + (product['quantity'] * product['product_price']);
+      return total + (product['box_quantity'] * product['box_price']);
     });
   }
 
@@ -79,15 +79,15 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
           itemCount: widget.products.length,
           itemBuilder: (context, index) {
             final product = widget.products[index];
-            final productTotalPrice =
-                product['quantity'] * product['product_price'];
+            final productTotalBoxPrice =
+                product['box_quantity'] * product['box_price'];
 
             final usdFormatter = NumberFormat("#,##0.00", "en_US");
             final lbpFormatter = NumberFormat("#,###", "en_US");
-            String productTotalPriceUsd =
-                usdFormatter.format(productTotalPrice);
-            String productTotalPriceLbp =
-                lbpFormatter.format(productTotalPrice * usdLbpRate);
+            String productTotalBoxPriceUsd =
+                usdFormatter.format(productTotalBoxPrice);
+            String productTotalBoxPriceLbp =
+                lbpFormatter.format(productTotalBoxPrice * usdLbpRate);
 
             return ListTile(
               leading: CircleAvatar(
@@ -113,7 +113,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
                 ),
               ),
               subtitle: Text(
-                "Quantity: ${product['quantity']}\nPrice: \$${product['product_price']}\nTotal: \$$productTotalPriceUsd / LBP $productTotalPriceLbp",
+                "Box Quantity: ${product['box_quantity']}\nBox Price: \$${product['box_price']}\nTotal: \$$productTotalBoxPriceUsd / LBP $productTotalBoxPriceLbp",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

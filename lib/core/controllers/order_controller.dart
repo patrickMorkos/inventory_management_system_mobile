@@ -25,18 +25,18 @@ class OrderController extends GetxController {
     update();
   }
 
-  void addProductToOrder(Map<dynamic, dynamic> productObj, int quantity) {
+  void addProductToOrder(Map<dynamic, dynamic> productObj, int boxQuantity) {
     var existingProduct = orderInfo["products"].firstWhere(
       (product) => product["product"] == productObj,
       orElse: () => null,
     );
 
     if (existingProduct != null) {
-      existingProduct["quantity"] += quantity;
+      existingProduct["box_quantity"] += boxQuantity;
     } else {
       Map<String, dynamic> product = {
         "product": productObj,
-        "quantity": quantity,
+        "box_quantity": boxQuantity,
       };
       orderInfo["products"].add(product);
     }
@@ -59,10 +59,10 @@ class OrderController extends GetxController {
           orElse: () => null,
         );
 
-        // Update product_price with the new price if vanProduct exists
+        // Update product box price with the new box price if vanProduct exists
         if (vanProduct != null) {
-          saleProduct["product_price"] =
-              vanProduct["Product"]["ProductPrice"]["price"];
+          saleProduct["box_price"] =
+              vanProduct["Product"]["ProductPrice"]["box_price"];
         }
       }
 
@@ -73,12 +73,12 @@ class OrderController extends GetxController {
       );
 
       if (existingProduct != null) {
-        existingProduct["quantity"] += saleProduct["quantity"];
+        existingProduct["box_quantity"] += saleProduct["box_quantity"];
       } else {
         Map<String, dynamic> newProduct = {
           "product": saleProduct["Product"],
-          "quantity": saleProduct["quantity"],
-          "product_price": saleProduct["product_price"],
+          "box_quantity": saleProduct["box_quantity"],
+          "box_price": saleProduct["box_price"],
         };
         orderInfo["saleProducts"].add(newProduct);
       }
@@ -90,14 +90,14 @@ class OrderController extends GetxController {
         .removeWhere((product) => product["product"] == productObj);
   }
 
-  void increaseProductQuantity(Map<dynamic, dynamic> productObj) {
+  void increaseProductBoxQuantity(Map<dynamic, dynamic> productObj) {
     orderInfo["products"].firstWhere(
-        (product) => product["product"] == productObj)["quantity"] += 1;
+        (product) => product["product"] == productObj)["box_quantity"] += 1;
   }
 
-  void decreaseProductQuantity(Map<dynamic, dynamic> productObj) {
+  void decreaseProductBoxQuantity(Map<dynamic, dynamic> productObj) {
     orderInfo["products"].firstWhere(
-        (product) => product["product"] == productObj)["quantity"] -= 1;
+        (product) => product["product"] == productObj)["box_quantity"] -= 1;
   }
 
   void resetOrder() {
@@ -113,9 +113,9 @@ class OrderController extends GetxController {
       for (var element in orderInfo["products"]) {
         orderProducts.add({
           "product_id": element["product"]["id"],
-          "quantity": element["quantity"],
-          "product_price": double.parse(
-            (element["product"]["ProductPrice"]["price"]).toString(),
+          "box_quantity": element["box_quantity"],
+          "box_price": double.parse(
+            (element["product"]["ProductPrice"]["box_price"]).toString(),
           ),
         });
       }
@@ -127,9 +127,9 @@ class OrderController extends GetxController {
       for (var element in orderInfo["saleProducts"]) {
         orderProducts.add({
           "product_id": element["product"]["id"],
-          "quantity": element["quantity"],
-          "product_price":
-              element["product_price"], // Assuming it's already a number
+          "box_quantity": element["box_quantity"],
+          "box_price":
+              element["box_price"], // Assuming it's already a number
         });
       }
     }

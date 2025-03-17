@@ -19,26 +19,26 @@ class ClientStockController extends GetxController {
     }
   }
 
-  // Update product quantity
-  Future<void> updateProductQuantity(
-      int clientId, int productId, int quantity) async {
+  // Update product box quantity
+  Future<void> updateProductBoxQuantity(
+      int clientId, int productId, int boxQuantity) async {
     try {
       await putRequest(
         path: "/api/client-stock/update-products-quantities/$clientId",
         body: {
           "product_id": productId,
-          "quantity": quantity,
+          "box_quantity": boxQuantity,
         },
         requireToken: true,
       );
 
       for (int i = 0; i < clientStockProducts.length; i++) {
         if (clientStockProducts[i]["Product"]["id"] == productId) {
-          clientStockProducts[i]["quantity"] = quantity;
+          clientStockProducts[i]["box_quantity"] = boxQuantity;
         }
       }
     } catch (e) {
-      debugPrint("Error updating product quantity: $e");
+      debugPrint("Error updating product box quantity: $e");
     }
   }
 
@@ -67,13 +67,13 @@ class ClientStockController extends GetxController {
   }
 
   Future<void> addProductToClientStock(
-      int clientId, int productId, int quantity) async {
+      int clientId, int productId, int boxQuantity) async {
     try {
       await postRequest(
         path: "/api/client-stock/add-products/$clientId",
         body: {
           "product_id": productId,
-          "quantity": quantity,
+          "box_quantity": boxQuantity,
         },
         requireToken: true,
       ).then((value) => {

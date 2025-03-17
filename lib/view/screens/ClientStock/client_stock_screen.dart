@@ -44,9 +44,9 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
     });
   }
 
-  Future<void> updateProductQuantity(int productId, int quantity) async {
-    await clientStockController.updateProductQuantity(
-        clientController.clientInfo["id"], productId, quantity);
+  Future<void> updateProductBoxQuantity(int productId, int boxQuantity) async {
+    await clientStockController.updateProductBoxQuantity(
+        clientController.clientInfo["id"], productId, boxQuantity);
     getClientStockProducts();
   }
 
@@ -152,7 +152,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
           // 👈 Rebuilds only this item in the list
           builder: (context, setState) {
             FocusNode qtyFocusNode = FocusNode(); // 👈 Track focus
-            int quantity = product["quantity"]; // 👈 Local state for UI updates
+            int boxQuantity = product["box_quantity"]; // 👈 Local state for UI updates
 
             return Card(
               margin:
@@ -182,30 +182,27 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                       onFocusChange: (hasFocus) {
                         if (!hasFocus) {
                           // 👈 Only call API when user exits text field
-                          print(
-                              "Lost focus, updating API with quantity: $quantity");
-                          updateProductQuantity(
-                              product["Product"]["id"], quantity);
+                          updateProductBoxQuantity(
+                              product["Product"]["id"], boxQuantity);
                         }
                       },
                       child: InputQty(
-                        maxVal: product["quantity"] +
+                        maxVal: product["box_quantity"] +
                             100, // Set an appropriate max limit
                         decoration: QtyDecorationProps(
                           btnColor: kMainColor, // Match the UI theme
                           fillColor: Colors.white,
                         ),
-                        initVal: quantity
-                            .toDouble(), // Initialize with current quantity
+                        initVal: boxQuantity
+                            .toDouble(), // Initialize with current box quantity
                         onQtyChanged: (value) {
                           if (value is double || value is int) {
                             setState(() {
-                              // 👈 UI updates instantly when changing quantity
-                              quantity = value.toInt();
+                              // 👈 UI updates instantly when changing box quantity
+                              boxQuantity = value.toInt();
                             });
-                            print("Quantity updated: $quantity");
-                            updateProductQuantity(product["Product"]["id"],
-                                quantity); // 👈 Ensure API is always called
+                            updateProductBoxQuantity(product["Product"]["id"],
+                                boxQuantity); // 👈 Ensure API is always called
                           }
                         },
                       ),

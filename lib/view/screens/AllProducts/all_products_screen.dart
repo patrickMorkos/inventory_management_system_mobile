@@ -64,13 +64,13 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   final ClientStockController clientStockController =
       Get.put(ClientStockController());
 
-  //This variable is the quantity of the product
-  int quantity = 1;
+  //This variable is the box_quantity of the product
+  int boxQuantity = 1;
 
   //******************************************************************FUNCTIONS
 
-  //This function renders the product quantity
-  Widget renderQuantityPickUp(sh, product) {
+  //This function renders the product box quantity
+  Widget renderBoxQuantityPickUp(sh, product) {
     return Container(
       padding: EdgeInsets.only(
         top: sh / 50,
@@ -85,12 +85,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             final parsedValue = double.tryParse(value);
             if (parsedValue != null) {
               setState(() {
-                quantity = parsedValue.toInt();
+                boxQuantity = parsedValue.toInt();
               });
             }
           } else if (value is double || value is int) {
             setState(() {
-              quantity = value.toInt();
+              boxQuantity = value.toInt();
             });
           }
         },
@@ -98,8 +98,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 
-  void showQuantityDialog(BuildContext context, dynamic product) {
-    int quantity = 1; // Default quantity value
+  void showBoxQuantityDialog(BuildContext context, dynamic product) {
+    int boxQuantity = 1; // Default box quantity value
 
     showDialog(
       context: context,
@@ -109,8 +109,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Enter quantity:"),
-              renderQuantityPickUp(MediaQuery.of(context).size.height, product),
+              Text("Enter box quantity:"),
+              renderBoxQuantityPickUp(
+                  MediaQuery.of(context).size.height, product),
             ],
           ),
           actions: [
@@ -124,7 +125,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               onPressed: () {
                 addProductToClientStock(
                   product["Product"]["id"],
-                  quantity,
+                  boxQuantity,
                 );
                 Get.back(); // Close dialog
               },
@@ -136,11 +137,11 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 
-  void addProductToClientStock(int productId, int quantity) async {
+  void addProductToClientStock(int productId, int boxQuantity) async {
     final clientId = clientController.clientInfo["id"];
     if (clientId != -1) {
       await clientStockController.addProductToClientStock(
-          clientId, productId, quantity);
+          clientId, productId, boxQuantity);
       Get.snackbar(
         "Success",
         "Product added to client stock successfully!",
@@ -283,15 +284,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                               "Category",
                               product["Product"]["Category"]["category_name"] ??
                                   ""),
-                          renderProductItems(
-                              sw, sh, "Quantity", product["quantity"] ?? ""),
+                          renderProductItems(sw, sh, "Box Quantity",
+                              product["box_quantity"] ?? ""),
                           renderProductItems(
                               sw,
                               sh,
-                              "Price",
-                              product["Product"]["ProductPrice"]["price"] !=
+                              "Box Price",
+                              product["Product"]["ProductPrice"]["box_price"] !=
                                       null
-                                  ? "\$${product["Product"]["ProductPrice"]["price"]}"
+                                  ? "\$${product["Product"]["ProductPrice"]["box_price"]}"
                                   : ""),
                         ],
                       ),
@@ -303,7 +304,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
                 // Add to Cart Section
                 if (clientInfo["id"] != -1) ...[
-                  renderQuantityPickUp(sh, product), // Quantity picker
+                  renderBoxQuantityPickUp(sh, product), // Box Quantity picker
                   renderAddProductToCartButton(
                       context, sw, sh, product, clientInfo), // Button
                 ],
@@ -329,20 +330,20 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       ),
       child: ElevatedButton(
         onPressed: () {
-          if (quantity > product["quantity"] || quantity == 0) {
+          if (boxQuantity > product["box_quantity"] || boxQuantity == 0) {
             Get.snackbar(
               "Error",
-              "Cannot add more than quantity",
+              "Cannot add more than box quantity",
               backgroundColor: Colors.red,
               colorText: Colors.white,
               snackPosition: SnackPosition.TOP,
               duration: Duration(seconds: 2),
             );
           } else {
-            orderController.addProductToOrder(product["Product"], quantity);
-            vanProductsController.deductQuantity(
+            orderController.addProductToOrder(product["Product"], boxQuantity);
+            vanProductsController.deductBoxQuantity(
               product["Product"]["id"],
-              quantity,
+              boxQuantity,
             );
             Navigator.of(context).pop();
           }
@@ -382,86 +383,162 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       for (var element in searchedProductsList) {
         final usdFormatter = NumberFormat("#,##0.00", "en_US");
         final lbpFormatter = NumberFormat("#,###", "en_US");
-        String formattedPriceUsd =
-            usdFormatter.format(element["Product"]["ProductPrice"]["price"]);
-        String formattedPriceLbp = lbpFormatter
-            .format(element["Product"]["ProductPrice"]["price"] * usdLbpRate);
+
+        // Extract values with fallback to 0
+        int boxQuantity = element["box_quantity"] ?? 0;
+        int itemsQuantity = element["items_quantity"] ?? 0;
+        double boxPrice =
+            element["Product"]["ProductPrice"]?["box_price"] ?? 0.0;
+        double itemPrice =
+            element["Product"]["ProductPrice"]?["item_price"] ?? 0.0;
+
+        String formattedBoxPriceUsd = usdFormatter.format(boxPrice);
+        String formattedBoxPriceLbp =
+            lbpFormatter.format(boxPrice * usdLbpRate);
+        String formattedItemPriceUsd = usdFormatter.format(itemPrice);
+        String formattedItemPriceLbp =
+            lbpFormatter.format(itemPrice * usdLbpRate);
+
         tmp.add(
-          ListTile(
-            onTap: () {
-              if (isFromClientStock) {
-                showQuantityDialog(context, element);
-              } else if (isFromCreateOrderScreen) {
-                openProductDetailsDialog(
-                  context,
-                  sw,
-                  sh,
-                  element,
-                  clientController.clientInfo,
-                );
-              }
-            },
-            leading: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: kBorderColorTextField),
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  element["Product"]["image_url"] ?? "",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.broken_image,
-                      color: Colors.grey,
-                      size: 30,
-                    );
-                  },
-                ),
-              ),
-            ),
-            title: Text(
-              element["Product"]["name"] ?? "",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-                "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}"),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Quantity: ${element["quantity"] ?? ""}",
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    Text(
-                      textAlign: TextAlign.start,
-                      "Price: \$ $formattedPriceUsd \nLBP $formattedPriceLbp",
-                      style: const TextStyle(fontSize: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+            child: GestureDetector(
+              onTap: () {
+                if (isFromClientStock) {
+                  showBoxQuantityDialog(context, element);
+                } else if (isFromCreateOrderScreen) {
+                  openProductDetailsDialog(
+                    context,
+                    sw,
+                    sh,
+                    element,
+                    clientController.clientInfo,
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
-              ],
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Product Image
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: kBorderColorTextField),
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          element["Product"]["image_url"] ?? "",
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.broken_image,
+                              color: Colors.grey,
+                              size: 30,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+
+                    // Product Name & Brand
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            element["Product"]["name"] ?? "",
+                            style: TextStyle(
+                              fontSize: sw * 0.03,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}",
+                            style: TextStyle(
+                              fontSize: sw * 0.025,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Product Details in Structured Order
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildDetailRow("Box Quantity:", "$boxQuantity", sw),
+                        buildDetailRow(
+                            "Box Price (USD):", "\$ $formattedBoxPriceUsd", sw),
+                        buildDetailRow("Box Price (LBP):",
+                            "LBP $formattedBoxPriceLbp", sw),
+                        buildDetailRow("Items Quantity:", "$itemsQuantity", sw),
+                        buildDetailRow("Item Price (USD):",
+                            "\$ $formattedItemPriceUsd", sw),
+                        buildDetailRow("Item Price (LBP):",
+                            "LBP $formattedItemPriceLbp", sw),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            contentPadding: EdgeInsets.only(right: -200),
-          ),
-        );
-        tmp.add(
-          const SizedBox(
-            height: 20,
-            child: Divider(),
           ),
         );
       }
     }
 
     return tmp;
+  }
+
+// Function to build a properly aligned detail row with responsive fonts
+  Widget buildDetailRow(String title, String value, double sw) {
+    double fontSize = sw * 0.0225; // Adjust font size relative to screen width
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: fontSize.clamp(10, 16), // Ensure minimum and max size
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(width: 5),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: fontSize.clamp(10, 16),
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.end,
+          ),
+        ],
+      ),
+    );
   }
 
   //This function search for the product barcode inside the list of products

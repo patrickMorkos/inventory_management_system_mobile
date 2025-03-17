@@ -62,8 +62,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
         totalOrderPrice +=
             orderController.orderInfo["products"].fold(0.0, (sum, product) {
           return sum +
-              (product['quantity'] *
-                  product['product']['ProductPrice']['price']);
+              (product['box_quantity'] *
+                  product['product']['ProductPrice']['box_price']);
         });
       }
 
@@ -71,7 +71,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       if (orderController.orderInfo["saleProducts"] != null) {
         totalOrderPrice +=
             orderController.orderInfo["saleProducts"].fold(0.0, (sum, product) {
-          return sum + (product['quantity'] * product['product_price']);
+          return sum + (product['box_quantity'] * product['box_price']);
         });
       }
     });
@@ -154,7 +154,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             ),
           ),
           subtitle: Text(
-            "Quantity: ${product['quantity']} x \$${product['product_price']} \n= \$${(product['quantity'] * product['product_price']).toStringAsFixed(2)}",
+            "Box Quantity: ${product['box_quantity']} x \$${product['box_price']} \n= \$${(product['box_quantity'] * product['box_price']).toStringAsFixed(2)}",
             style: const TextStyle(color: Colors.grey),
           ),
           trailing: Row(
@@ -165,8 +165,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      // Increase product quantity
-                      product["quantity"] += 1;
+                      // Increase product box quantity
+                      product["box_quantity"] += 1;
                       updateTotalPrice();
                     });
                   },
@@ -178,9 +178,9 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      // Decrease product quantity
-                      if (product["quantity"] > 1) {
-                        product["quantity"] -= 1;
+                      // Decrease product box quantity
+                      if (product["box_quantity"] > 1) {
+                        product["box_quantity"] -= 1;
                         updateTotalPrice();
                       }
                     });
@@ -314,7 +314,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   fontSize: 14, fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
-              "Quantity: ${product['quantity']} x \$${product['product']['ProductPrice']['price']} \n= \$${(product['quantity'] * product['product']['ProductPrice']['price']).toStringAsFixed(2)}",
+              "Box Quantity: ${product['box_quantity']} x \$${product['product']['ProductPrice']['box_price']} \n= \$${(product['box_quantity'] * product['product']['ProductPrice']['box_price']).toStringAsFixed(2)}",
               style: const TextStyle(color: Colors.grey),
             ),
             trailing: Row(
@@ -326,8 +326,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                     onPressed: () {
                       setState(() {
                         orderController
-                            .increaseProductQuantity(product['product']);
-                        vanProductsController.deductQuantity(
+                            .increaseProductBoxQuantity(product['product']);
+                        vanProductsController.deductBoxQuantity(
                             product['product']["id"], 1);
                         updateTotalPrice();
                       });
@@ -340,10 +340,10 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   child: IconButton(
                     onPressed: () {
                       setState(() {
-                        if (product['quantity'] > 1) {
+                        if (product['box_quantity'] > 1) {
                           orderController
-                              .decreaseProductQuantity(product['product']);
-                          vanProductsController.addQuantity(
+                              .decreaseProductBoxQuantity(product['product']);
+                          vanProductsController.addBoxQuantity(
                               product['product']["id"], 1);
                           updateTotalPrice();
                         }
@@ -359,8 +359,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       setState(() {
                         orderController
                             .removeProductFromOrder(product['product']);
-                        vanProductsController.addQuantity(
-                            product['product']["id"], product['quantity']);
+                        vanProductsController.addBoxQuantity(
+                            product['product']["id"], product['box_quantity']);
                         updateTotalPrice();
                       });
                     },

@@ -23,9 +23,9 @@ const String appName = 'Inventory Management System';
 
 //The host
 //TODO change the host on deployment
-// const String ip = "172.20.10.4";
-// const String host = 'http://$ip:3000';
-const String host = 'https://api.yallalift.com';
+const String ip = "192.168.0.101";
+const String host = 'http://$ip:3000';
+// const String host = 'https://api.yallalift.com';
 
 //A button decoration
 const kButtonDecoration = BoxDecoration(

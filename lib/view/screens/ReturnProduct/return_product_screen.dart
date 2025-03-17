@@ -24,7 +24,7 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
   List<dynamic> returnReasons = [];
 
   dynamic selectedProduct;
-  int quantity = 1;
+  int boxQuantity = 1;
   dynamic selectedReason;
 
   @override
@@ -59,12 +59,12 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
     });
   }
 
-  Widget renderQuantityPickUp(sh) {
+  Widget renderBoxQuantityPickUp(sh) {
     return Container(
       width: double.infinity,
       color: Colors.red,
       child: InputQty(
-        maxVal: selectedProduct?["quantity"] ?? 1,
+        maxVal: selectedProduct?["box_quantity"] ?? 1,
         decoration: QtyDecorationProps(
           btnColor: kMainColor,
           fillColor: Colors.white,
@@ -72,7 +72,7 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
         onQtyChanged: (value) {
           if (value is num) {
             setState(() {
-              quantity = value.toInt();
+              boxQuantity = value.toInt();
             });
           }
         },
@@ -81,7 +81,7 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
   }
 
   void submitReturn() async {
-    if (selectedProduct == null || selectedReason == null || quantity <= 0) {
+    if (selectedProduct == null || selectedReason == null || boxQuantity <= 0) {
       Fluttertoast.showToast(
           msg: "Please fill in all fields", gravity: ToastGravity.BOTTOM);
       return;
@@ -93,7 +93,7 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
       body: {
         "client_id": clientController.clientInfo["id"],
         "product_id": selectedProduct["Product"]["id"],
-        "quantity": quantity,
+        "box_quantity": boxQuantity,
         "returned_product_reason_id": selectedReason["id"]
       },
       requireToken: true,
@@ -219,7 +219,7 @@ class _ReturnProductScreenState extends State<ReturnProductScreen> {
                 const SizedBox(height: 20),
                 renderReturnReason(),
                 const SizedBox(height: 20),
-                renderQuantityPickUp(sh),
+                renderBoxQuantityPickUp(sh),
                 const SizedBox(height: 30),
                 renderSaveButton(),
               ],

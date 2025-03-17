@@ -8,20 +8,20 @@ class VanProductsController extends GetxController {
     this.vanProductsList.value = vanProductsList;
   }
 
-  void deductQuantity(int productId, int quantity) {
+  void deductBoxQuantity(int productId, int boxQuantity) {
     for (int i = 0; i < vanProductsList.length; i++) {
       if (vanProductsList[i]["Product"]["id"] == productId) {
-        vanProductsList[i]["quantity"] =
-            vanProductsList[i]["quantity"] - quantity;
+        vanProductsList[i]["box_quantity"] =
+            vanProductsList[i]["box_quantity"] - boxQuantity;
       }
     }
   }
 
-  void addQuantity(int productId, int quantity) {
+  void addBoxQuantity(int productId, int boxQuantity) {
     for (int i = 0; i < vanProductsList.length; i++) {
       if (vanProductsList[i]["Product"]["id"] == productId) {
-        vanProductsList[i]["quantity"] =
-            vanProductsList[i]["quantity"] + quantity;
+        vanProductsList[i]["box_quantity"] =
+            vanProductsList[i]["box_quantity"] + boxQuantity;
       }
     }
   }
