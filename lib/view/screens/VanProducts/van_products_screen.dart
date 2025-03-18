@@ -434,27 +434,23 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                   onPressed: () {
                     // Validation: check if quantities exceed the available quantities
                     if (selectedBoxQuantity > product["box_quantity"]) {
-                      setState(() {
-                        boxQuantityError =
-                            "Cannot exceed available box quantity.";
-                      });
+                      Get.snackbar(
+                        "Error",
+                        "Cannot exceed available box quantity.",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                      );
                       return;
-                    } else {
-                      setState(() {
-                        boxQuantityError = null;
-                      });
                     }
 
                     if (selectedItemsQuantity > product["items_quantity"]) {
-                      setState(() {
-                        itemQuantityError =
-                            "Cannot exceed available item quantity.";
-                      });
+                      Get.snackbar(
+                        "Error",
+                        "Cannot exceed available item quantity.",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                      );
                       return;
-                    } else {
-                      setState(() {
-                        itemQuantityError = null;
-                      });
                     }
 
                     // If valid, add to cart
@@ -475,9 +471,11 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                   ),
-                  child: const Text("Add to Cart",
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Add to Cart",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
