@@ -223,6 +223,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     boxQuantityController.text = selectedBoxQuantity.toString();
     itemQuantityController.text = selectedItemsQuantity.toString();
 
+    String? boxQuantityError;
+    String? itemQuantityError;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -332,6 +335,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8)),
                           contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          errorText: boxQuantityError,
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -398,6 +402,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8)),
                           contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          errorText: itemQuantityError,
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -427,6 +432,32 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                 // Add to Cart Button
                 ElevatedButton(
                   onPressed: () {
+                    // Validation: check if quantities exceed the available quantities
+                    if (selectedBoxQuantity > product["box_quantity"]) {
+                      setState(() {
+                        boxQuantityError =
+                            "Cannot exceed available box quantity.";
+                      });
+                      return;
+                    } else {
+                      setState(() {
+                        boxQuantityError = null;
+                      });
+                    }
+
+                    if (selectedItemsQuantity > product["items_quantity"]) {
+                      setState(() {
+                        itemQuantityError =
+                            "Cannot exceed available item quantity.";
+                      });
+                      return;
+                    } else {
+                      setState(() {
+                        itemQuantityError = null;
+                      });
+                    }
+
+                    // If valid, add to cart
                     if (selectedBoxQuantity > 0 || selectedItemsQuantity > 0) {
                       addToCart(product);
                       Navigator.of(context).pop();
