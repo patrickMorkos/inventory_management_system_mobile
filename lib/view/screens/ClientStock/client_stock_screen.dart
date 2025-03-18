@@ -187,76 +187,108 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                   "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}",
                   style: TextStyle(fontSize: sw * 0.03),
                 ),
-                trailing: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Box Quantity Field
-                    Focus(
-                      focusNode: boxQtyFocusNode,
-                      onFocusChange: (hasFocus) {
-                        if (!hasFocus) {
-                          updateProductQuantities(product["Product"]["id"],
-                              boxQuantity, itemQuantity);
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Text("Box: ", style: TextStyle(fontSize: sw * 0.03)),
-                          SizedBox(
-                            width: 50,
-                            child: TextFormField(
-                              initialValue: boxQuantity.toString(),
-                              textAlign: TextAlign.center,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.all(5),
+                trailing: SizedBox(
+                  width: sw * 0.5, // Adjust width as needed to fit your layout
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Box Quantity Field
+                      Focus(
+                        focusNode: boxQtyFocusNode,
+                        onFocusChange: (hasFocus) {
+                          if (!hasFocus) {
+                            updateProductQuantities(product["Product"]["id"],
+                                boxQuantity, itemQuantity);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .end, // Align row content to the right
+                            children: [
+                              Text("Box: ",
+                                  style: TextStyle(fontSize: sw * 0.03)),
+                              SizedBox(
+                                width: sw * 0.08,
+                                child: TextFormField(
+                                  style: TextStyle(fontSize: sw * 0.03),
+                                  initialValue: boxQuantity.toString(),
+                                  textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(8),
+                                    border: OutlineInputBorder(),
+                                    isDense:
+                                        true, // Makes the text field more compact
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      boxQuantity = int.tryParse(value) ?? 0;
+                                    });
+                                  },
+                                ),
                               ),
-                              onChanged: (value) {
-                                setState(() {
-                                  boxQuantity = int.tryParse(value) ?? 0;
-                                });
-                              },
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 5), // Spacer
 
-                    // Item Quantity Field
-                    Focus(
-                      focusNode: itemQtyFocusNode,
-                      onFocusChange: (hasFocus) {
-                        if (!hasFocus) {
-                          updateProductQuantities(product["Product"]["id"],
-                              boxQuantity, itemQuantity);
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Text("Item: ", style: TextStyle(fontSize: sw * 0.03)),
-                          SizedBox(
-                            width: 50,
-                            child: TextFormField(
-                              initialValue: itemQuantity.toString(),
-                              textAlign: TextAlign.center,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.all(5),
+                      SizedBox(width: sw * 0.02), // Add some spacing
+
+                      // Item Quantity Field
+                      Focus(
+                        focusNode: itemQtyFocusNode,
+                        onFocusChange: (hasFocus) {
+                          if (!hasFocus) {
+                            updateProductQuantities(product["Product"]["id"],
+                                boxQuantity, itemQuantity);
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .end, // Align row content to the right
+                            children: [
+                              Text("Item: ",
+                                  style: TextStyle(fontSize: sw * 0.03)),
+                              SizedBox(
+                                width: sw * 0.08,
+                                child: TextFormField(
+                                  style: TextStyle(fontSize: sw * 0.03),
+                                  initialValue: itemQuantity.toString(),
+                                  textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(8),
+                                    border: OutlineInputBorder(),
+                                    isDense:
+                                        true, // Makes the text field more compact
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      itemQuantity = int.tryParse(value) ?? 0;
+                                    });
+                                  },
+                                ),
                               ),
-                              onChanged: (value) {
-                                setState(() {
-                                  itemQuantity = int.tryParse(value) ?? 0;
-                                });
-                              },
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+
+                      SizedBox(width: sw * 0.02), // Add some spacing
+
+                      IconButton(
+                        iconSize: sw * 0.05,
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () =>
+                            deleteProduct(product["Product"]["id"]),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
