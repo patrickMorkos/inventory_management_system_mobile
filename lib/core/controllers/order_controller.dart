@@ -42,6 +42,31 @@ class OrderController extends GetxController {
     }
   }
 
+  void addProductToOrderWithItems(
+      Map<dynamic, dynamic> productObj, int boxQuantity, int itemQuantity) {
+    if (itemQuantity <= 0) {
+      return;
+    }
+
+    var existingProduct = orderInfo["products"].firstWhere(
+      (product) => product["product"] == productObj,
+      orElse: () => null,
+    );
+
+    if (existingProduct != null) {
+      existingProduct["items_quantity"] =
+          (existingProduct["items_quantity"] ?? 0) + itemQuantity;
+    } else {
+      Map<String, dynamic> product = {
+        "product": productObj,
+        "items_quantity": itemQuantity,
+      };
+      orderInfo["products"].add(product);
+    }
+
+    // print("Product Added: ${productObj["id"]}, Item Quantity: ${itemQuantity}");
+  }
+
   void addSaleProductsToOrder(
       List<dynamic> saleProductsList, String priceSelection) {
     // This variable is the vanProductsController
@@ -97,6 +122,28 @@ class OrderController extends GetxController {
         .removeWhere((product) => product["product"] == productObj);
   }
 
+  void increaseProductItemQuantity(Map<dynamic, dynamic> productObj) {
+    var product = orderInfo["products"].firstWhere(
+      (product) => product["product"]["id"] == productObj["id"],
+      orElse: () => null,
+    );
+
+    if (product != null) {
+      product["items_quantity"] = (product["items_quantity"] ?? 0) + 1;
+    }
+  }
+
+  void decreaseProductItemQuantity(Map<dynamic, dynamic> productObj) {
+    var product = orderInfo["products"].firstWhere(
+      (product) => product["product"]["id"] == productObj["id"],
+      orElse: () => null,
+    );
+
+    if (product != null && (product["items_quantity"] ?? 0) > 0) {
+      product["items_quantity"] -= 1;
+    }
+  }
+
   void increaseProductBoxQuantity(Map<dynamic, dynamic> productObj) {
     orderInfo["products"].firstWhere(
         (product) => product["product"] == productObj)["box_quantity"] += 1;
@@ -111,31 +158,6 @@ class OrderController extends GetxController {
     orderInfo["products"] = [];
   }
 
-  void addProductToOrderWithItems(
-      Map<dynamic, dynamic> productObj, int boxQuantity, int itemQuantity) {
-    if (itemQuantity <= 0) {
-      return;
-    }
-
-    var existingProduct = orderInfo["products"].firstWhere(
-      (product) => product["product"] == productObj,
-      orElse: () => null,
-    );
-
-    if (existingProduct != null) {
-      existingProduct["items_quantity"] =
-          (existingProduct["items_quantity"] ?? 0) + itemQuantity;
-    } else {
-      Map<String, dynamic> product = {
-        "product": productObj,
-        "items_quantity": itemQuantity,
-      };
-      orderInfo["products"].add(product);
-    }
-
-    // print("Product Added: ${productObj["id"]}, Item Quantity: ${itemQuantity}");
-  }
-
   void createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
@@ -143,13 +165,19 @@ class OrderController extends GetxController {
     // Check if orderInfo exists and contains products
     if (orderInfo["products"] != null && orderInfo["products"].isNotEmpty) {
       for (var element in orderInfo["products"]) {
-        orderProducts.add({
+        Map<String, dynamic> productData = {
           "product_id": element["product"]["id"],
-          "box_quantity": element["box_quantity"],
+          "box_quantity": element["box_quantity"] ?? 0,
           "box_price": double.parse(
             (element["product"]["ProductPrice"]["box_price"]).toString(),
           ),
-        });
+          "items_quantity": element["items_quantity"] ?? 0,
+          "item_price": double.parse(
+            (element["product"]["ProductPrice"]["item_price"]).toString(),
+          ),
+        };
+
+        orderProducts.add(productData);
       }
     }
 
@@ -157,11 +185,15 @@ class OrderController extends GetxController {
     if (orderInfo["saleProducts"] != null &&
         orderInfo["saleProducts"].isNotEmpty) {
       for (var element in orderInfo["saleProducts"]) {
-        orderProducts.add({
+        Map<String, dynamic> saleProductData = {
           "product_id": element["product"]["id"],
-          "box_quantity": element["box_quantity"],
+          "box_quantity": element["box_quantity"] ?? 0,
           "box_price": element["box_price"], // Assuming it's already a number
-        });
+          "items_quantity": element["items_quantity"] ?? 0,
+          "item_price": element["item_price"] ?? 0,
+        };
+
+        orderProducts.add(saleProductData);
       }
     }
 

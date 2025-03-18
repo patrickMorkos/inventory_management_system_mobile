@@ -61,9 +61,15 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       if (orderController.orderInfo["products"] != null) {
         totalOrderPrice +=
             orderController.orderInfo["products"].fold(0.0, (sum, product) {
-          return sum +
-              (product['box_quantity'] *
-                  product['product']['ProductPrice']['box_price']);
+          double boxTotal = (product['box_quantity'] ?? 0) *
+              (product['product']['ProductPrice']['box_price']?.toDouble() ??
+                  0.0);
+
+          double itemTotal = (product['items_quantity'] ?? 0) *
+              (product['product']['ProductPrice']['item_price']?.toDouble() ??
+                  0.0);
+
+          return sum + boxTotal + itemTotal;
         });
       }
 
@@ -71,7 +77,13 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       if (orderController.orderInfo["saleProducts"] != null) {
         totalOrderPrice +=
             orderController.orderInfo["saleProducts"].fold(0.0, (sum, product) {
-          return sum + (product['box_quantity'] * product['box_price']);
+          double boxTotal = (product['box_quantity'] ?? 0) *
+              (product['box_price']?.toDouble() ?? 0.0);
+
+          double itemTotal = (product['items_quantity'] ?? 0) *
+              (product['item_price']?.toDouble() ?? 0.0);
+
+          return sum + boxTotal + itemTotal;
         });
       }
     });
@@ -132,6 +144,31 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     }
 
     for (var product in orderController.orderInfo["saleProducts"]) {
+      // Extract values safely
+      int boxQuantity = product['box_quantity'] ?? 0;
+      double boxPrice = product['box_price']?.toDouble() ?? 0.0;
+
+      int itemQuantity = product['items_quantity'] ?? 0;
+      double itemPrice = product['item_price']?.toDouble() ?? 0.0;
+
+      double totalBoxPrice = boxQuantity * boxPrice;
+      double totalItemPrice = itemQuantity * itemPrice;
+      double totalPrice = totalBoxPrice + totalItemPrice;
+
+      // Generate subtitle dynamically
+      List<String> subtitleLines = [];
+      if (boxQuantity > 0) {
+        subtitleLines.add(
+            "Box Quantity: $boxQuantity x \$${boxPrice.toStringAsFixed(2)}");
+        subtitleLines.add("= \$${totalBoxPrice.toStringAsFixed(2)}");
+      }
+      if (itemQuantity > 0) {
+        subtitleLines.add(
+            "Item Quantity: $itemQuantity x \$${itemPrice.toStringAsFixed(2)}");
+        subtitleLines.add("= \$${totalItemPrice.toStringAsFixed(2)}");
+      }
+      subtitleLines.add("Total: \$${totalPrice.toStringAsFixed(2)}");
+
       tmp.add(
         ListTile(
           contentPadding: EdgeInsets.only(right: -200),
@@ -154,18 +191,18 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             ),
           ),
           subtitle: Text(
-            "Box Quantity: ${product['box_quantity']} x \$${product['box_price']} \n= \$${(product['box_quantity'] * product['box_price']).toStringAsFixed(2)}",
+            subtitleLines.join("\n"),
             style: const TextStyle(color: Colors.grey),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Increase Box Quantity
               SizedBox(
                 width: 30,
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      // Increase product box quantity
                       product["box_quantity"] += 1;
                       updateTotalPrice();
                     });
@@ -173,12 +210,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   icon: const Icon(Icons.add, size: 15),
                 ),
               ),
+              // Decrease Box Quantity
               SizedBox(
                 width: 30,
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      // Decrease product box quantity
                       if (product["box_quantity"] > 1) {
                         product["box_quantity"] -= 1;
                         updateTotalPrice();
@@ -188,12 +225,40 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   icon: const Icon(Icons.remove, size: 15),
                 ),
               ),
+              // Increase Item Quantity
               SizedBox(
                 width: 30,
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      // Remove product from the sale products list
+                      product["items_quantity"] += 1;
+                      updateTotalPrice();
+                    });
+                  },
+                  icon: const Icon(Icons.add, size: 15),
+                ),
+              ),
+              // Decrease Item Quantity
+              SizedBox(
+                width: 30,
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      if (product["items_quantity"] > 1) {
+                        product["items_quantity"] -= 1;
+                        updateTotalPrice();
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.remove, size: 15),
+                ),
+              ),
+              // Delete Product
+              SizedBox(
+                width: 30,
+                child: IconButton(
+                  onPressed: () {
+                    setState(() {
                       orderController.orderInfo["saleProducts"].remove(product);
                       updateTotalPrice();
                     });
@@ -294,6 +359,33 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       );
     } else {
       for (var product in orderController.orderInfo["products"]) {
+        // Extract values safely
+        int boxQuantity = product['box_quantity'] ?? 0;
+        double boxPrice =
+            product['product']['ProductPrice']['box_price']?.toDouble() ?? 0.0;
+
+        int itemQuantity = product['items_quantity'] ?? 0;
+        double itemPrice =
+            product['product']['ProductPrice']['item_price']?.toDouble() ?? 0.0;
+
+        double totalBoxPrice = boxQuantity * boxPrice;
+        double totalItemPrice = itemQuantity * itemPrice;
+        double totalPrice = totalBoxPrice + totalItemPrice;
+
+        // Generate subtitle dynamically
+        List<String> subtitleLines = [];
+        if (boxQuantity > 0) {
+          subtitleLines.add(
+              "Box Quantity: $boxQuantity x \$${boxPrice.toStringAsFixed(2)}");
+          subtitleLines.add("= \$${totalBoxPrice.toStringAsFixed(2)}");
+        }
+        if (itemQuantity > 0) {
+          subtitleLines.add(
+              "Item Quantity: $itemQuantity x \$${itemPrice.toStringAsFixed(2)}");
+          subtitleLines.add("= \$${totalItemPrice.toStringAsFixed(2)}");
+        }
+        subtitleLines.add("Total: \$${totalPrice.toStringAsFixed(2)}");
+
         tmp.add(
           ListTile(
             contentPadding: EdgeInsets.only(right: -200),
@@ -314,12 +406,13 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   fontSize: 14, fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
-              "Box Quantity: ${product['box_quantity']} x \$${product['product']['ProductPrice']['box_price']} \n= \$${(product['box_quantity'] * product['product']['ProductPrice']['box_price']).toStringAsFixed(2)}",
+              subtitleLines.join("\n"),
               style: const TextStyle(color: Colors.grey),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Increase Box Quantity
                 SizedBox(
                   width: 30,
                   child: IconButton(
@@ -335,12 +428,13 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                     icon: const Icon(Icons.add, size: 15),
                   ),
                 ),
+                // Decrease Box Quantity
                 SizedBox(
                   width: 30,
                   child: IconButton(
                     onPressed: () {
                       setState(() {
-                        if (product['box_quantity'] > 1) {
+                        if (boxQuantity > 1) {
                           orderController
                               .decreaseProductBoxQuantity(product['product']);
                           vanProductsController.addBoxQuantity(
@@ -352,6 +446,41 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                     icon: const Icon(Icons.remove, size: 15),
                   ),
                 ),
+                // Increase Item Quantity
+                SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        orderController
+                            .increaseProductItemQuantity(product['product']);
+                        vanProductsController.deductItemQuantity(
+                            product['product']["id"], 1);
+                        updateTotalPrice();
+                      });
+                    },
+                    icon: const Icon(Icons.add, size: 15),
+                  ),
+                ),
+                // Decrease Item Quantity
+                SizedBox(
+                  width: 30,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        if (itemQuantity > 1) {
+                          orderController
+                              .decreaseProductItemQuantity(product['product']);
+                          vanProductsController.addItemQuantity(
+                              product['product']["id"], 1);
+                          updateTotalPrice();
+                        }
+                      });
+                    },
+                    icon: const Icon(Icons.remove, size: 15),
+                  ),
+                ),
+                // Delete Product
                 SizedBox(
                   width: 30,
                   child: IconButton(
@@ -361,6 +490,9 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                             .removeProductFromOrder(product['product']);
                         vanProductsController.addBoxQuantity(
                             product['product']["id"], product['box_quantity']);
+                        vanProductsController.addItemQuantity(
+                            product['product']["id"],
+                            product['items_quantity']);
                         updateTotalPrice();
                       });
                     },

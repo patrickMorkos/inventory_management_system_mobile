@@ -26,6 +26,18 @@ class VanProductsController extends GetxController {
     }
   }
 
+  void addItemQuantity(int productId, int itemQuantity) {
+    var vanProduct = vanProductsList.firstWhere(
+      (vp) => vp["Product"]["id"] == productId,
+      orElse: () => null,
+    );
+
+    if (vanProduct != null) {
+      vanProduct["items_quantity"] =
+          (vanProduct["items_quantity"] ?? 0) + itemQuantity;
+    }
+  }
+
   void addBoxQuantity(int productId, int boxQuantity) {
     for (int i = 0; i < vanProductsList.length; i++) {
       if (vanProductsList[i]["Product"]["id"] == productId) {

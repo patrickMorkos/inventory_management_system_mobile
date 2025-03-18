@@ -19,26 +19,30 @@ class ClientStockController extends GetxController {
     }
   }
 
-  // Update product box quantity
-  Future<void> updateProductBoxQuantity(
-      int clientId, int productId, int boxQuantity) async {
+  Future<void> updateProductQuantities(
+      int clientId, int productId, int boxQuantity, int itemQuantity) async {
     try {
       await putRequest(
         path: "/api/client-stock/update-products-quantities/$clientId",
         body: {
           "product_id": productId,
           "box_quantity": boxQuantity,
+          "item_quantity": itemQuantity,
         },
         requireToken: true,
       );
 
-      for (int i = 0; i < clientStockProducts.length; i++) {
-        if (clientStockProducts[i]["Product"]["id"] == productId) {
-          clientStockProducts[i]["box_quantity"] = boxQuantity;
-        }
+      // Update only the affected product in the list
+      final productIndex = clientStockProducts
+          .indexWhere((product) => product["Product"]["id"] == productId);
+      if (productIndex != -1) {
+        clientStockProducts[productIndex]["box_quantity"] = boxQuantity;
+        clientStockProducts[productIndex]["items_quantity"] = itemQuantity;
       }
+
+      update(); // Notify UI of changes
     } catch (e) {
-      debugPrint("Error updating product box quantity: $e");
+      debugPrint("Error updating product quantities: $e");
     }
   }
 
@@ -67,13 +71,14 @@ class ClientStockController extends GetxController {
   }
 
   Future<void> addProductToClientStock(
-      int clientId, int productId, int boxQuantity) async {
+      int clientId, int productId, int boxQuantity, int itemQuantity) async {
     try {
       await postRequest(
         path: "/api/client-stock/add-products/$clientId",
         body: {
           "product_id": productId,
           "box_quantity": boxQuantity,
+          "item_quantity": itemQuantity, // Added item quantity field
         },
         requireToken: true,
       ).then((value) => {
@@ -90,9 +95,9 @@ class ClientStockController extends GetxController {
                     "Failed to add product to client stock ${value["error"]}"),
               }
           });
-      await fetchClientStockProducts(clientId); // Refresh the client stock
+      await fetchClientStockProducts(clientId); // Refresh the client stock list
     } catch (e) {
-      throw Exception("Failed to add product to client stock");
+      throw Exception("Failed to add product to client stock: $e");
     }
   }
 }

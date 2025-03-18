@@ -44,10 +44,22 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
     });
   }
 
-  Future<void> updateProductBoxQuantity(int productId, int boxQuantity) async {
-    await clientStockController.updateProductBoxQuantity(
-        clientController.clientInfo["id"], productId, boxQuantity);
-    getClientStockProducts();
+  Future<void> updateProductQuantities(
+      int productId, int boxQuantity, int itemQuantity) async {
+    await clientStockController.updateProductQuantities(
+        clientController.clientInfo["id"],
+        productId,
+        boxQuantity,
+        itemQuantity);
+    setState(() {
+      // Find the product in the local list and update its values
+      for (var product in searchedProductsList) {
+        if (product["Product"]["id"] == productId) {
+          product["box_quantity"] = boxQuantity;
+          product["items_quantity"] = itemQuantity;
+        }
+      }
+    });
   }
 
   Future<void> deleteProduct(int productId) async {
@@ -149,10 +161,12 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
         final product = searchedProductsList[index];
 
         return StatefulBuilder(
-          // 👈 Rebuilds only this item in the list
           builder: (context, setState) {
-            FocusNode qtyFocusNode = FocusNode(); // 👈 Track focus
-            int boxQuantity = product["box_quantity"]; // 👈 Local state for UI updates
+            FocusNode boxQtyFocusNode = FocusNode();
+            FocusNode itemQtyFocusNode = FocusNode();
+
+            int boxQuantity = product["box_quantity"] ?? 0;
+            int itemQuantity = product["items_quantity"] ?? 0;
 
             return Card(
               margin:
@@ -173,44 +187,74 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                   "Brand: ${product["Product"]["Brand"]["brand_name"] ?? ""}",
                   style: TextStyle(fontSize: sw * 0.03),
                 ),
-                trailing: Row(
+                trailing: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Wrap InputQty with Focus to detect when user taps outside
+                    // Box Quantity Field
                     Focus(
-                      focusNode: qtyFocusNode,
+                      focusNode: boxQtyFocusNode,
                       onFocusChange: (hasFocus) {
                         if (!hasFocus) {
-                          // 👈 Only call API when user exits text field
-                          updateProductBoxQuantity(
-                              product["Product"]["id"], boxQuantity);
+                          updateProductQuantities(product["Product"]["id"],
+                              boxQuantity, itemQuantity);
                         }
                       },
-                      child: InputQty(
-                        maxVal: product["box_quantity"] +
-                            100, // Set an appropriate max limit
-                        decoration: QtyDecorationProps(
-                          btnColor: kMainColor, // Match the UI theme
-                          fillColor: Colors.white,
-                        ),
-                        initVal: boxQuantity
-                            .toDouble(), // Initialize with current box quantity
-                        onQtyChanged: (value) {
-                          if (value is double || value is int) {
-                            setState(() {
-                              // 👈 UI updates instantly when changing box quantity
-                              boxQuantity = value.toInt();
-                            });
-                            updateProductBoxQuantity(product["Product"]["id"],
-                                boxQuantity); // 👈 Ensure API is always called
-                          }
-                        },
+                      child: Row(
+                        children: [
+                          Text("Box: ", style: TextStyle(fontSize: sw * 0.03)),
+                          SizedBox(
+                            width: 50,
+                            child: TextFormField(
+                              initialValue: boxQuantity.toString(),
+                              textAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.all(5),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  boxQuantity = int.tryParse(value) ?? 0;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      iconSize: sw * 0.05,
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => deleteProduct(product["Product"]["id"]),
+                    const SizedBox(height: 5), // Spacer
+
+                    // Item Quantity Field
+                    Focus(
+                      focusNode: itemQtyFocusNode,
+                      onFocusChange: (hasFocus) {
+                        if (!hasFocus) {
+                          updateProductQuantities(product["Product"]["id"],
+                              boxQuantity, itemQuantity);
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Text("Item: ", style: TextStyle(fontSize: sw * 0.03)),
+                          SizedBox(
+                            width: 50,
+                            child: TextFormField(
+                              initialValue: itemQuantity.toString(),
+                              textAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.all(5),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  itemQuantity = int.tryParse(value) ?? 0;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

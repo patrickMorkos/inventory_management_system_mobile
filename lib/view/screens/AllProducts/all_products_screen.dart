@@ -104,7 +104,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   }
 
   void updateClientStockDialog(BuildContext context, dynamic product) {
-    int boxQuantity = 1; // Default box quantity value
+    int boxQuantity = 0; // Default box quantity
+    int itemQuantity = 0; // Default item quantity
 
     showDialog(
       context: context,
@@ -114,9 +115,31 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Enter box quantity:"),
-              renderBoxQuantityPickUp(
-                  MediaQuery.of(context).size.height, product),
+              Text("Enter Box Quantity:"),
+              SizedBox(
+                width: 100,
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  onChanged: (value) {
+                    boxQuantity = int.tryParse(value) ?? 0;
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text("Enter Items Quantity:"),
+              SizedBox(
+                width: 100,
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                  onChanged: (value) {
+                    itemQuantity = int.tryParse(value) ?? 0;
+                  },
+                ),
+              ),
             ],
           ),
           actions: [
@@ -128,11 +151,21 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             ),
             TextButton(
               onPressed: () {
-                addProductToClientStock(
-                  product["Product"]["id"],
-                  boxQuantity,
-                );
-                Get.back(); // Close dialog
+                if (boxQuantity > 0 || itemQuantity > 0) {
+                  addProductToClientStock(
+                    product["Product"]["id"],
+                    boxQuantity,
+                    itemQuantity, // ✅ Pass item quantity
+                  );
+                  Get.back(); // Close dialog
+                } else {
+                  Get.snackbar(
+                    "Error",
+                    "Enter at least one quantity",
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
               },
               child: const Text("Confirm"),
             ),
@@ -142,11 +175,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 
-  void addProductToClientStock(int productId, int boxQuantity) async {
+  void addProductToClientStock(
+      int productId, int boxQuantity, int itemQuantity) async {
     final clientId = clientController.clientInfo["id"];
     if (clientId != -1) {
       await clientStockController.addProductToClientStock(
-          clientId, productId, boxQuantity);
+          clientId, productId, boxQuantity, itemQuantity);
       Get.snackbar(
         "Success",
         "Product added to client stock successfully!",
@@ -589,54 +623,54 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     Navigator.of(context).pop();
   }
 
-  //This function renders the add product to cart button
-  Widget renderAddProductToCartButton(
-    context,
-    sw,
-    sh,
-    product,
-    clientInfo,
-  ) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: sh / 50,
-      ),
-      child: ElevatedButton(
-        onPressed: () {
-          if (boxQuantity > product["box_quantity"] || boxQuantity == 0) {
-            Get.snackbar(
-              "Error",
-              "Cannot add more than box quantity",
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              snackPosition: SnackPosition.TOP,
-              duration: Duration(seconds: 2),
-            );
-          } else {
-            orderController.addProductToOrder(product["Product"], boxQuantity);
-            vanProductsController.deductBoxQuantity(
-              product["Product"]["id"],
-              boxQuantity,
-            );
-            Navigator.of(context).pop();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        child: const Text(
-          'Add to Cart',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
+  // //This function renders the add product to cart button
+  // Widget renderAddProductToCartButton(
+  //   context,
+  //   sw,
+  //   sh,
+  //   product,
+  //   clientInfo,
+  // ) {
+  //   return Container(
+  //     padding: EdgeInsets.only(
+  //       top: sh / 50,
+  //     ),
+  //     child: ElevatedButton(
+  //       onPressed: () {
+  //         if (boxQuantity > product["box_quantity"] || boxQuantity == 0) {
+  //           Get.snackbar(
+  //             "Error",
+  //             "Cannot add more than box quantity",
+  //             backgroundColor: Colors.red,
+  //             colorText: Colors.white,
+  //             snackPosition: SnackPosition.TOP,
+  //             duration: Duration(seconds: 2),
+  //           );
+  //         } else {
+  //           orderController.addProductToOrder(product["Product"], boxQuantity);
+  //           vanProductsController.deductBoxQuantity(
+  //             product["Product"]["id"],
+  //             boxQuantity,
+  //           );
+  //           Navigator.of(context).pop();
+  //         }
+  //       },
+  //       style: ElevatedButton.styleFrom(
+  //         backgroundColor: Colors.white,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(15),
+  //         ),
+  //       ),
+  //       child: const Text(
+  //         'Add to Cart',
+  //         style: TextStyle(
+  //           color: Colors.black,
+  //           fontWeight: FontWeight.bold,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   //This function returns the products cards list
   List<Widget> getProductsCards(sw, sh) {
