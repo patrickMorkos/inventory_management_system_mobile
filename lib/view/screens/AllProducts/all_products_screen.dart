@@ -98,7 +98,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 
-  void showBoxQuantityDialog(BuildContext context, dynamic product) {
+  void updateClientStockDialog(BuildContext context, dynamic product) {
     int boxQuantity = 1; // Default box quantity value
 
     showDialog(
@@ -405,7 +405,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             child: GestureDetector(
               onTap: () {
                 if (isFromClientStock) {
-                  showBoxQuantityDialog(context, element);
+                  updateClientStockDialog(context, element);
                 } else if (isFromCreateOrderScreen) {
                   openProductDetailsDialog(
                     context,
