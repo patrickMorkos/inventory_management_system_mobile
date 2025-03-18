@@ -22,10 +22,21 @@ class SaleProductsDialog extends StatefulWidget {
 class _SaleProductsDialogState extends State<SaleProductsDialog> {
   String priceSelection = "Old Prices"; // Default to "Old Prices"
 
-  // Calculate the total price of the sale
+  // Calculate the total price of the sale (including both box and item prices)
   double getTotalSalePrice() {
     return widget.products.fold(0.0, (total, product) {
-      return total + (product['box_quantity'] * product['box_price']);
+      // Ensure safe extraction of values (defaults to 0 if null)
+      int boxQuantity = product['box_quantity'] ?? 0;
+      double boxPrice = product['box_price']?.toDouble() ?? 0.0;
+
+      int itemQuantity = product['items_quantity'] ?? 0;
+      double itemPrice = product['item_price']?.toDouble() ?? 0.0;
+
+      // Calculate total price considering both boxes and items
+      double productTotal =
+          (boxQuantity * boxPrice) + (itemQuantity * itemPrice);
+
+      return total + productTotal;
     });
   }
 
@@ -79,15 +90,48 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
           itemCount: widget.products.length,
           itemBuilder: (context, index) {
             final product = widget.products[index];
-            final productTotalBoxPrice =
-                product['box_quantity'] * product['box_price'];
+
+            // Extract quantities and prices safely
+            final int boxQuantity = product['box_quantity'] ?? 0;
+            final double boxPrice = product['box_price']?.toDouble() ?? 0.0;
+
+            final int itemQuantity = product['items_quantity'] ?? 0;
+            final double itemPrice = product['item_price']?.toDouble() ?? 0.0;
+
+            // Calculate total prices
+            final double productTotalBoxPrice = boxQuantity * boxPrice;
+            final double productTotalItemPrice = itemQuantity * itemPrice;
 
             final usdFormatter = NumberFormat("#,##0.00", "en_US");
             final lbpFormatter = NumberFormat("#,###", "en_US");
+
             String productTotalBoxPriceUsd =
                 usdFormatter.format(productTotalBoxPrice);
             String productTotalBoxPriceLbp =
                 lbpFormatter.format(productTotalBoxPrice * usdLbpRate);
+
+            String productTotalItemPriceUsd =
+                usdFormatter.format(productTotalItemPrice);
+            String productTotalItemPriceLbp =
+                lbpFormatter.format(productTotalItemPrice * usdLbpRate);
+
+            // Constructing the subtitle dynamically
+            List<String> subtitleLines = [];
+
+            if (boxQuantity > 0) {
+              subtitleLines.add("Box Quantity: $boxQuantity");
+              subtitleLines.add("Box Price: \$${boxPrice.toStringAsFixed(2)}");
+              subtitleLines.add(
+                  "Total (Box): \$$productTotalBoxPriceUsd / LBP $productTotalBoxPriceLbp");
+            }
+
+            if (itemQuantity > 0) {
+              subtitleLines.add("Item Quantity: $itemQuantity");
+              subtitleLines
+                  .add("Item Price: \$${itemPrice.toStringAsFixed(2)}");
+              subtitleLines.add(
+                  "Total (Items): \$$productTotalItemPriceUsd / LBP $productTotalItemPriceLbp");
+            }
 
             return ListTile(
               leading: CircleAvatar(
@@ -113,7 +157,7 @@ class _SaleProductsDialogState extends State<SaleProductsDialog> {
                 ),
               ),
               subtitle: Text(
-                "Box Quantity: ${product['box_quantity']}\nBox Price: \$${product['box_price']}\nTotal: \$$productTotalBoxPriceUsd / LBP $productTotalBoxPriceLbp",
+                subtitleLines.join("\n"), // Joins only the non-empty values
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

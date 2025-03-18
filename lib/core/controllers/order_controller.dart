@@ -61,24 +61,31 @@ class OrderController extends GetxController {
 
         // Update product box price with the new box price if vanProduct exists
         if (vanProduct != null) {
-          saleProduct["box_price"] =
-              vanProduct["Product"]["ProductPrice"]["box_price"];
+          saleProduct["box_price"] = vanProduct["Product"]["ProductPrice"]
+                  ["box_price"] ??
+              saleProduct["box_price"];
+          saleProduct["item_price"] = vanProduct["Product"]["ProductPrice"]
+                  ["item_price"] ??
+              saleProduct["item_price"];
         }
       }
 
       // Check if the product already exists in orderInfo["saleProducts"]
       var existingProduct = orderInfo["saleProducts"].firstWhere(
-        (product) => product["product"] == saleProduct["Product"],
+        (product) => product["product"]["id"] == saleProduct["Product"]["id"],
         orElse: () => null,
       );
 
       if (existingProduct != null) {
-        existingProduct["box_quantity"] += saleProduct["box_quantity"];
+        existingProduct["box_quantity"] += saleProduct["box_quantity"] ?? 0;
+        existingProduct["items_quantity"] += saleProduct["items_quantity"] ?? 0;
       } else {
         Map<String, dynamic> newProduct = {
           "product": saleProduct["Product"],
-          "box_quantity": saleProduct["box_quantity"],
-          "box_price": saleProduct["box_price"],
+          "box_quantity": saleProduct["box_quantity"] ?? 0,
+          "box_price": saleProduct["box_price"] ?? 0.0,
+          "items_quantity": saleProduct["items_quantity"] ?? 0,
+          "item_price": saleProduct["item_price"] ?? 0.0,
         };
         orderInfo["saleProducts"].add(newProduct);
       }
