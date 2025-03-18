@@ -17,6 +17,15 @@ class VanProductsController extends GetxController {
     }
   }
 
+  void deductItemQuantity(int productId, int itemQuantity) {
+    for (int i = 0; i < vanProductsList.length; i++) {
+      if (vanProductsList[i]["Product"]["id"] == productId) {
+        vanProductsList[i]["items_quantity"] =
+            vanProductsList[i]["items_quantity"] - itemQuantity;
+      }
+    }
+  }
+
   void addBoxQuantity(int productId, int boxQuantity) {
     for (int i = 0; i < vanProductsList.length; i++) {
       if (vanProductsList[i]["Product"]["id"] == productId) {

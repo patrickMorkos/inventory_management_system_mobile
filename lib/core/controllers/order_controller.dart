@@ -104,6 +104,31 @@ class OrderController extends GetxController {
     orderInfo["products"] = [];
   }
 
+  void addProductToOrderWithItems(
+      Map<dynamic, dynamic> productObj, int itemQuantity) {
+    if (itemQuantity <= 0) {
+      return;
+    }
+
+    var existingProduct = orderInfo["products"].firstWhere(
+      (product) => product["product"] == productObj,
+      orElse: () => null,
+    );
+
+    if (existingProduct != null) {
+      existingProduct["items_quantity"] =
+          (existingProduct["items_quantity"] ?? 0) + itemQuantity;
+    } else {
+      Map<String, dynamic> product = {
+        "product": productObj,
+        "items_quantity": itemQuantity,
+      };
+      orderInfo["products"].add(product);
+    }
+
+    // print("Product Added: ${productObj["id"]}, Item Quantity: ${itemQuantity}");
+  }
+
   void createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
@@ -128,8 +153,7 @@ class OrderController extends GetxController {
         orderProducts.add({
           "product_id": element["product"]["id"],
           "box_quantity": element["box_quantity"],
-          "box_price":
-              element["box_price"], // Assuming it's already a number
+          "box_price": element["box_price"], // Assuming it's already a number
         });
       }
     }
