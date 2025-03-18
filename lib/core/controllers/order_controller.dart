@@ -105,7 +105,7 @@ class OrderController extends GetxController {
   }
 
   void addProductToOrderWithItems(
-      Map<dynamic, dynamic> productObj, int itemQuantity) {
+      Map<dynamic, dynamic> productObj, int boxQuantity, int itemQuantity) {
     if (itemQuantity <= 0) {
       return;
     }
