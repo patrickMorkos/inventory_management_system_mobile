@@ -184,9 +184,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
         // print("ERROR: Trying to add a negative quantity of items!");
         return;
       }
-
       orderController.addProductToOrderWithItems(
-          product["Product"], selectedItemsQuantity);
+        product["Product"],
+        selectedBoxQuantity, // Pass Box Quantity
+        selectedItemsQuantity, // Pass Items Quantity
+      );
+
       vanProductsController.deductItemQuantity(
           product["Product"]["id"], selectedItemsQuantity);
     }
