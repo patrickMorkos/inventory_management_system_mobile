@@ -21,13 +21,14 @@ class ClientStockController extends GetxController {
 
   Future<void> updateProductQuantities(
       int clientId, int productId, int boxQuantity, int itemQuantity) async {
+    print("Sending boxQuantity: $boxQuantity, itemQuantity: $itemQuantity");
     try {
       await putRequest(
         path: "/api/client-stock/update-products-quantities/$clientId",
         body: {
           "product_id": productId,
           "box_quantity": boxQuantity,
-          "item_quantity": itemQuantity,
+          "items_quantity": itemQuantity,
         },
         requireToken: true,
       );

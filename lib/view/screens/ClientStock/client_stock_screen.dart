@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:input_quantity/input_quantity.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_controller.dart';
 import 'package:inventory_management_system_mobile/core/controllers/client_stock_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -24,6 +23,8 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
   final ClientStockController clientStockController =
       Get.put(ClientStockController());
   List<dynamic> searchedProductsList = [];
+  TextEditingController boxQuantityController = TextEditingController();
+  TextEditingController itemQuantityController = TextEditingController();
 
   //This variable is the client controller
   final ClientController clientController = Get.put(ClientController());
@@ -168,6 +169,8 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
             int boxQuantity = product["box_quantity"] ?? 0;
             int itemQuantity = product["items_quantity"] ?? 0;
 
+            boxQuantityController.text = boxQuantity.toString();
+            itemQuantityController.text = itemQuantity.toString();
             return Card(
               margin:
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -198,6 +201,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                         focusNode: boxQtyFocusNode,
                         onFocusChange: (hasFocus) {
                           if (!hasFocus) {
+                            // 👈 Only call API when user exits text field
                             updateProductQuantities(product["Product"]["id"],
                                 boxQuantity, itemQuantity);
                           }
@@ -220,13 +224,18 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                                   decoration: InputDecoration(
                                     contentPadding: EdgeInsets.all(8),
                                     border: OutlineInputBorder(),
-                                    isDense:
-                                        true, // Makes the text field more compact
+                                    isDense: true,
                                   ),
                                   onChanged: (value) {
+                                    print("value: $value");
                                     setState(() {
                                       boxQuantity = int.tryParse(value) ?? 0;
                                     });
+                                    // Ensure both boxQuantity and itemQuantity are always sent to the API
+                                    updateProductQuantities(
+                                        product["Product"]["id"],
+                                        boxQuantity,
+                                        itemQuantity);
                                   },
                                 ),
                               ),
@@ -242,6 +251,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                         focusNode: itemQtyFocusNode,
                         onFocusChange: (hasFocus) {
                           if (!hasFocus) {
+                            // 👈 Only call API when user exits text field
                             updateProductQuantities(product["Product"]["id"],
                                 boxQuantity, itemQuantity);
                           }
@@ -268,9 +278,15 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                                         true, // Makes the text field more compact
                                   ),
                                   onChanged: (value) {
+                                    print("value: $value");
                                     setState(() {
                                       itemQuantity = int.tryParse(value) ?? 0;
                                     });
+                                    // Ensure both boxQuantity and itemQuantity are always sent to the API
+                                    updateProductQuantities(
+                                        product["Product"]["id"],
+                                        boxQuantity,
+                                        itemQuantity);
                                   },
                                 ),
                               ),
