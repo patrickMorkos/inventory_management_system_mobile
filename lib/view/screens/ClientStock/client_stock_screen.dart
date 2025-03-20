@@ -317,9 +317,6 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (clientController.clientInfo["id"] != -1) {
-      getClientStockProducts();
-    }
     //This variable is the screen width
     double sw = MediaQuery.of(context).size.width;
     return SafeArea(
