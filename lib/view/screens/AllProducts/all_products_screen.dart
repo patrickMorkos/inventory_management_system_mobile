@@ -245,7 +245,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(5),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: getProductsCards(sw, sh),

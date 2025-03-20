@@ -111,7 +111,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   }
 
   // This function renders the sale products list
-  Widget renderSaleProductsList() {
+  Widget renderSaleProductsList(sw) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,13 +125,13 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             ),
           ),
         ),
-        ...getSaleProductsCards(),
+        ...getSaleProductsCards(sw),
       ],
     );
   }
 
   // This function returns the sale products cards list
-  List<Widget> getSaleProductsCards() {
+  List<Widget> getSaleProductsCards(sw) {
     List<Widget> tmp = [];
     if (orderController.orderInfo["saleProducts"] == null ||
         orderController.orderInfo["saleProducts"].isEmpty) {
@@ -174,8 +174,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           contentPadding: EdgeInsets.only(right: -200),
           leading: Image.network(
             product["product"]["image_url"] ?? "",
-            width: 50,
-            height: 50,
+            width: sw * 0.1,
+            height: sw * 0.1,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return const Icon(Icons.broken_image);
@@ -192,7 +192,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           ),
           subtitle: Text(
             subtitleLines.join("\n"),
-            style: const TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.grey, fontSize: sw * 0.03),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -281,7 +281,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   }
 
   //This function renders the order products list
-  Widget renderOrderProductsList() {
+  Widget renderOrderProductsList(sw) {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
@@ -310,7 +310,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   ),
                 )
               else
-                ...getOrderProductsCards(),
+                ...getOrderProductsCards(sw),
               const Divider(
                 thickness: 2,
                 color: Colors.grey,
@@ -336,7 +336,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   ),
                 )
               else
-                ...getSaleProductsCards(),
+                ...getSaleProductsCards(sw),
             ],
           ),
         ),
@@ -345,7 +345,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   }
 
   //This function returns the order product cards list
-  List<Widget> getOrderProductsCards() {
+  List<Widget> getOrderProductsCards(sw) {
     List<Widget> tmp = [];
     if (orderController.orderInfo["products"] == null ||
         orderController.orderInfo["products"].isEmpty) {
@@ -391,8 +391,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             contentPadding: EdgeInsets.only(right: -200),
             leading: Image.network(
               product["product"]["image_url"] ?? "",
-              width: 50,
-              height: 50,
+              width: sw * 0.1,
+              height: sw * 0.1,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(Icons.broken_image);
@@ -407,7 +407,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             ),
             subtitle: Text(
               subtitleLines.join("\n"),
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey, fontSize: sw * 0.03),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -731,6 +731,9 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //This variable is the screen width
+    double sw = MediaQuery.of(context).size.width;
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: kMainColor,
@@ -748,7 +751,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 20.0),
-              renderOrderProductsList(),
+              renderOrderProductsList(sw),
               renderTotalOrderPrice(),
               renderPaymentAndSaleTypeOptions(),
               renderButtonsRow(),

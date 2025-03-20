@@ -176,6 +176,7 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               child: ListTile(
                 leading: CircleAvatar(
+                  radius: sw * 0.03,
                   backgroundImage: NetworkImage(
                     product["Product"]["image_url"] ?? "",
                   ),
@@ -316,6 +317,9 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (clientController.clientInfo["id"] != -1) {
+      getClientStockProducts();
+    }
     //This variable is the screen width
     double sw = MediaQuery.of(context).size.width;
     return SafeArea(

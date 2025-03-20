@@ -535,7 +535,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     return Expanded(
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(5),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: getProductsCards(sw, sh),
@@ -677,12 +677,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                 ),
               ),
             ),
-          ),
-        );
-        tmp.add(
-          const SizedBox(
-            height: 20,
-            child: Divider(),
           ),
         );
       }
