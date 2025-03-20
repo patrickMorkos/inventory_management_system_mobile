@@ -79,7 +79,7 @@ class ClientStockController extends GetxController {
         body: {
           "product_id": productId,
           "box_quantity": boxQuantity,
-          "item_quantity": itemQuantity, // Added item quantity field
+          "items_quantity": itemQuantity, // Added item quantity field
         },
         requireToken: true,
       ).then((value) => {
