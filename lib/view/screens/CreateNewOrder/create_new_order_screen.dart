@@ -120,7 +120,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           child: Text(
             "Products from Previous Sale",
             style: GoogleFonts.poppins(
-              fontSize: 16,
+              fontSize: getResponsiveSize(30),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -136,8 +136,11 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     if (orderController.orderInfo["saleProducts"] == null ||
         orderController.orderInfo["saleProducts"].isEmpty) {
       tmp.add(
-        const Center(
-          child: Text("No products from previous sales available."),
+        Center(
+          child: Text(
+            "No products from previous sales available.",
+            style: TextStyle(fontSize: getResponsiveSize(30)),
+          ),
         ),
       );
       return tmp;
@@ -174,8 +177,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           contentPadding: EdgeInsets.only(right: -200),
           leading: Image.network(
             product["product"]["image_url"] ?? "",
-            width: sw * 0.1,
-            height: sw * 0.1,
+            width: getResponsiveSize(90),
+            height: getResponsiveSize(90),
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return const Icon(Icons.broken_image);
@@ -186,7 +189,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
-              fontSize: 14,
+              fontSize: getResponsiveSize(30),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -207,7 +210,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       updateTotalPrice();
                     });
                   },
-                  icon: const Icon(Icons.add, size: 15),
+                  icon: Icon(Icons.add, size: getResponsiveSize(35)),
                 ),
               ),
               // Decrease Box Quantity
@@ -222,7 +225,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       }
                     });
                   },
-                  icon: const Icon(Icons.remove, size: 15),
+                  icon: Icon(Icons.remove, size: getResponsiveSize(35)),
                 ),
               ),
               // Increase Item Quantity
@@ -235,7 +238,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       updateTotalPrice();
                     });
                   },
-                  icon: const Icon(Icons.add, size: 15),
+                  icon: Icon(Icons.add, size: getResponsiveSize(35)),
                 ),
               ),
               // Decrease Item Quantity
@@ -250,7 +253,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       }
                     });
                   },
-                  icon: const Icon(Icons.remove, size: 15),
+                  icon: Icon(Icons.remove, size: getResponsiveSize(35)),
                 ),
               ),
               // Delete Product
@@ -263,7 +266,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       updateTotalPrice();
                     });
                   },
-                  icon: const Icon(Icons.delete, size: 15),
+                  icon: Icon(Icons.delete, size: getResponsiveSize(35)),
                 ),
               ),
             ],
@@ -295,18 +298,21 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 child: Text(
                   "Products from Current Sale",
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
+                    fontSize: getResponsiveSize(30),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               if (orderController.orderInfo["products"] == null ||
                   orderController.orderInfo["products"].isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 20),
                   child: Text(
                     "No products added to the current order yet.",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: getResponsiveSize(30),
+                    ),
                   ),
                 )
               else
@@ -321,18 +327,21 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 child: Text(
                   "Products from Previous Sale",
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
+                    fontSize: getResponsiveSize(30),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               if (orderController.orderInfo["saleProducts"] == null ||
                   orderController.orderInfo["saleProducts"].isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 20),
                   child: Text(
                     "No products from previous sales available.",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: getResponsiveSize(30),
+                    ),
                   ),
                 )
               else
@@ -391,8 +400,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
             contentPadding: EdgeInsets.only(right: -200),
             leading: Image.network(
               product["product"]["image_url"] ?? "",
-              width: sw * 0.1,
-              height: sw * 0.1,
+              width: getResponsiveSize(90),
+              height: getResponsiveSize(90),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(Icons.broken_image);
@@ -403,7 +412,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
-                  fontSize: 14, fontWeight: FontWeight.w600),
+                  fontSize: getResponsiveSize(30), fontWeight: FontWeight.w600),
             ),
             subtitle: Text(
               subtitleLines.join("\n"),
@@ -425,7 +434,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         updateTotalPrice();
                       });
                     },
-                    icon: const Icon(Icons.add, size: 15),
+                    icon: Icon(Icons.add, size: getResponsiveSize(35)),
                   ),
                 ),
                 // Decrease Box Quantity
@@ -443,7 +452,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         }
                       });
                     },
-                    icon: const Icon(Icons.remove, size: 15),
+                    icon: Icon(Icons.remove, size: getResponsiveSize(35)),
                   ),
                 ),
                 // Increase Item Quantity
@@ -459,7 +468,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         updateTotalPrice();
                       });
                     },
-                    icon: const Icon(Icons.add, size: 15),
+                    icon: Icon(Icons.add, size: getResponsiveSize(35)),
                   ),
                 ),
                 // Decrease Item Quantity
@@ -477,7 +486,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         }
                       });
                     },
-                    icon: const Icon(Icons.remove, size: 15),
+                    icon: Icon(Icons.remove, size: getResponsiveSize(35)),
                   ),
                 ),
                 // Delete Product
@@ -496,7 +505,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                         updateTotalPrice();
                       });
                     },
-                    icon: const Icon(Icons.delete, size: 15),
+                    icon: Icon(Icons.delete, size: getResponsiveSize(35)),
                   ),
                 ),
               ],
@@ -552,12 +561,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
         children: [
           Text(
             "Total Price:",
-            style: GoogleFonts.poppins(fontSize: 16),
+            style: GoogleFonts.poppins(fontSize: getResponsiveSize(30)),
           ),
           Text(
             "\$$formattedPriceUsd / LBP $formattedPriceLbp",
-            style:
-                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(
+                fontSize: getResponsiveSize(30), fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -581,11 +590,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 15.0),
                 textStyle: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: getResponsiveSize(30),
                   color: Colors.white,
                 ),
               ),
-              child: const Text("Add More Products"),
+              child: Text("Add More Products",
+                  style: TextStyle(fontSize: getResponsiveSize(30))),
             ),
           ),
           const SizedBox(width: 10.0),
@@ -610,11 +620,12 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 15.0),
                 textStyle: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: getResponsiveSize(30),
                   color: Colors.white,
                 ),
               ),
-              child: const Text("Submit"),
+              child: Text("Submit",
+                  style: TextStyle(fontSize: getResponsiveSize(30))),
             ),
           ),
         ],
@@ -673,8 +684,8 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           // Sale type radio buttons
           Text(
             "Sale Type:",
-            style:
-                GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+            style: GoogleFonts.poppins(
+                fontSize: getResponsiveSize(30), fontWeight: FontWeight.bold),
           ),
           Obx(
             () => Row(
@@ -694,7 +705,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       Text(
                         "Cash Van",
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: getResponsiveSize(30),
                           color: userTypeId == 3 ? Colors.grey : Colors.black,
                         ),
                       ),
@@ -714,7 +725,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                       Text(
                         "Presale",
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: getResponsiveSize(30),
                           color: Colors.black,
                         ),
                       ),
