@@ -295,6 +295,10 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       "Item Price",
                       "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
                       sw),
+                  buildProductDetailRow(
+                      "Items Per Box",
+                      "${product["Product"]["number_of_items_per_box"] ?? 0.0}",
+                      sw),
               
                   SizedBox(height: getResponsiveSize(20)),
               
@@ -676,7 +680,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                           Text(
                             element["Product"]["name"] ?? "",
                             style: TextStyle(
-                                fontSize: sw * 0.03,
+                                fontSize: getResponsiveSize(30),
                                 fontWeight: FontWeight.bold),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -684,7 +688,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                           Text(
                             "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}",
                             style: TextStyle(
-                                fontSize: sw * 0.025, color: Colors.grey[600]),
+                                fontSize: getResponsiveSize(30), color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -720,7 +724,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
 
   // Function to build a properly aligned detail row with responsive fonts
   Widget buildDetailRow(String title, String value, double sw) {
-    double fontSize = sw * 0.0225; // Adjust font size relative to screen width
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -730,7 +733,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           Text(
             title,
             style: TextStyle(
-              fontSize: fontSize.clamp(10, 16), // Ensure minimum and max size
+              fontSize: getResponsiveSize(30), // Ensure minimum and max size
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -739,7 +742,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           Text(
             value,
             style: TextStyle(
-              fontSize: fontSize.clamp(10, 16),
+              fontSize: getResponsiveSize(30),
               color: Colors.black,
             ),
             textAlign: TextAlign.end,

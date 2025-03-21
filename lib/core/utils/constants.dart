@@ -1,5 +1,6 @@
 //! These are constants globaly used
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 //The main color of the app
@@ -33,3 +34,7 @@ const kButtonDecoration = BoxDecoration(
     Radius.circular(5),
   ),
 );
+
+double getResponsiveSize(size) {
+  return (size * Get.context!.mediaQueryShortestSide) / 1080;
+}

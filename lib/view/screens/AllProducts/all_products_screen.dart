@@ -401,6 +401,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       "Item Price",
                       "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
                       sw),
+                  buildProductDetailRow(
+                      "Items Per Box",
+                      "${product["Product"]["number_of_items_per_box"] ?? 0.0}",
+                      sw),
               
                   SizedBox(height: getResponsiveSize(20)),
               
@@ -810,7 +814,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           Text(
                             element["Product"]["name"] ?? "",
                             style: TextStyle(
-                              fontSize: sw * 0.03,
+                              fontSize: getResponsiveSize(30),
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 2,
@@ -819,7 +823,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           Text(
                             "Brand: ${element["Product"]["Brand"]["brand_name"] ?? ""}",
                             style: TextStyle(
-                              fontSize: sw * 0.025,
+                              fontSize: getResponsiveSize(30),
                               color: Colors.grey[600],
                             ),
                           ),
@@ -857,7 +861,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
 // Function to build a properly aligned detail row with responsive fonts
   Widget buildDetailRow(String title, String value, double sw) {
-    double fontSize = sw * 0.0225; // Adjust font size relative to screen width
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -867,7 +870,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           Text(
             title,
             style: TextStyle(
-              fontSize: fontSize.clamp(10, 16), // Ensure minimum and max size
+              fontSize: getResponsiveSize(30), // Ensure minimum and max size
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -876,7 +879,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           Text(
             value,
             style: TextStyle(
-              fontSize: fontSize.clamp(10, 16),
+              fontSize: getResponsiveSize(30),
               color: Colors.black,
             ),
             textAlign: TextAlign.end,
