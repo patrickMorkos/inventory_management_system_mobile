@@ -388,15 +388,15 @@ class _ClientQrCodeScanScreenState extends State<ClientQrCodeScanScreen> {
               checkOutClient(clientId);
             } else {
               // Normal QR scanning behavior
-              // String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-              //   "#ff6666",
-              //   "Cancel",
-              //   true,
-              //   ScanMode.BARCODE,
-              // );
-              // if (barcodeScanRes != "-1") {
-              getClientFromQrCode(4.toString());
-              // }
+              String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                "#ff6666",
+                "Cancel",
+                true,
+                ScanMode.BARCODE,
+              );
+              if (barcodeScanRes != "-1") {
+                getClientFromQrCode(barcodeScanRes);
+              }
             }
           },
           child: Obx(() => Text(
