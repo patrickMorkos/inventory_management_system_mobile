@@ -255,55 +255,55 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     );
   }
 
-  Widget renderQuantityPicker(double sw, double sh, Function setState,
-      String label, dynamic product, bool isBox) {
-    TextEditingController controller = TextEditingController(text: "0");
+  // Widget renderQuantityPicker(double sw, double sh, Function setState,
+  //     String label, dynamic product, bool isBox) {
+  //   TextEditingController controller = TextEditingController(text: "0");
 
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: sw * 0.035, color: Colors.white),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: Icon(Icons.remove, color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  int currentValue = int.tryParse(controller.text) ?? 0;
-                  if (currentValue > 0) {
-                    controller.text = (currentValue - 1).toString();
-                  }
-                });
-              },
-            ),
-            SizedBox(
-              width: sw * 0.12,
-              child: TextField(
-                controller: controller,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: TextStyle(fontSize: sw * 0.035, color: Colors.white),
-                decoration: InputDecoration(border: InputBorder.none),
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.add, color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  int currentValue = int.tryParse(controller.text) ?? 0;
-                  controller.text = (currentValue + 1).toString();
-                });
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  //   return Column(
+  //     children: [
+  //       Text(
+  //         label,
+  //         style: TextStyle(fontSize: getResponsiveSize(30), color: Colors.white),
+  //       ),
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           IconButton(
+  //             icon: Icon(Icons.remove, color: Colors.white),
+  //             onPressed: () {
+  //               setState(() {
+  //                 int currentValue = int.tryParse(controller.text) ?? 0;
+  //                 if (currentValue > 0) {
+  //                   controller.text = (currentValue - 1).toString();
+  //                 }
+  //               });
+  //             },
+  //           ),
+  //           SizedBox(
+  //             width: sw * 0.12,
+  //             child: TextField(
+  //               controller: controller,
+  //               textAlign: TextAlign.center,
+  //               keyboardType: TextInputType.number,
+  //               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+  //               style: TextStyle(fontSize: getResponsiveSize(30), color: Colors.white),
+  //               decoration: InputDecoration(border: InputBorder.none),
+  //             ),
+  //           ),
+  //           IconButton(
+  //             icon: Icon(Icons.add, color: Colors.white),
+  //             onPressed: () {
+  //               setState(() {
+  //                 int currentValue = int.tryParse(controller.text) ?? 0;
+  //                 controller.text = (currentValue + 1).toString();
+  //               });
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget buildProductDetailRow(String title, String value, double sw) {
     return Padding(
@@ -313,11 +313,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         children: [
           Text("$title:",
               style: TextStyle(
-                  fontSize: sw * 0.035,
+                  fontSize: getResponsiveSize(30),
                   fontWeight: FontWeight.bold,
                   color: Colors.white)),
           Text(value,
-              style: TextStyle(fontSize: sw * 0.035, color: Colors.white)),
+              style: TextStyle(
+                  fontSize: getResponsiveSize(30), color: Colors.white)),
         ],
       ),
     );
@@ -343,219 +344,250 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             borderSide: BorderSide(color: Colors.white),
           ),
           content: SizedBox(
-            width: sw * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Product Details",
-                  style: TextStyle(
-                    fontSize: sw * 0.045,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Product Image
-                Container(
-                  width: sw * 0.25,
-                  height: sw * 0.25,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: ClipOval(
-                    child: Image.network(
-                      product["Product"]["image_url"] ?? "",
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.broken_image,
-                            color: Colors.grey, size: 40);
-                      },
+            width: getResponsiveSize(600),
+            height: getResponsiveSize(1600),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Product Details",
+                    style: TextStyle(
+                      fontSize: getResponsiveSize(50),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Product Info
-                buildProductDetailRow(
-                    "Name", product["Product"]["name"] ?? "", sw),
-                buildProductDetailRow("Brand",
-                    product["Product"]["Brand"]["brand_name"] ?? "", sw),
-                buildProductDetailRow("Category",
-                    product["Product"]["Category"]["category_name"] ?? "", sw),
-                buildProductDetailRow(
-                    "Box Quantity", "${product["box_quantity"] ?? 0}", sw),
-                buildProductDetailRow(
-                    "Box Price",
-                    "\$${product["Product"]["ProductPrice"]["box_price"] ?? 0.0}",
-                    sw),
-                buildProductDetailRow(
-                    "Items Quantity", "${product["items_quantity"] ?? 0}", sw),
-                buildProductDetailRow(
-                    "Item Price",
-                    "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
-                    sw),
-
-                SizedBox(height: 10),
-
-                // Box Quantity Selector
-                Text("Select Box Quantity",
-                    style:
-                        TextStyle(color: Colors.white, fontSize: sw * 0.035)),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.remove, color: Colors.white),
-                      onPressed: () {
-                        if (selectedBoxQuantity > 0) {
+                  const SizedBox(height: 10),
+              
+                  // Product Image
+                  Container(
+                    width: getResponsiveSize(150),
+                    height: getResponsiveSize(150),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        product["Product"]["image_url"] ?? "",
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.broken_image,
+                              color: Colors.grey, size: 40);
+                        },
+                      ),
+                    ),
+                  ),
+              
+                  const SizedBox(height: 10),
+              
+                  // Product Info
+                  buildProductDetailRow(
+                      "Name", product["Product"]["name"] ?? "", sw),
+                  buildProductDetailRow("Brand",
+                      product["Product"]["Brand"]["brand_name"] ?? "", sw),
+                  buildProductDetailRow("Category",
+                      product["Product"]["Category"]["category_name"] ?? "", sw),
+                  buildProductDetailRow(
+                      "Box Quantity", "${product["box_quantity"] ?? 0}", sw),
+                  buildProductDetailRow(
+                      "Box Price",
+                      "\$${product["Product"]["ProductPrice"]["box_price"] ?? 0.0}",
+                      sw),
+                  buildProductDetailRow(
+                      "Items Quantity", "${product["items_quantity"] ?? 0}", sw),
+                  buildProductDetailRow(
+                      "Item Price",
+                      "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
+                      sw),
+              
+                  SizedBox(height: getResponsiveSize(20)),
+              
+                  // Box Quantity Selector
+                  Text("Select Box Quantity",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: getResponsiveSize(30),
+                      )),
+              
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.remove,
+                          color: Colors.white,
+                          size: getResponsiveSize(50),
+                        ),
+                        onPressed: () {
+                          if (selectedBoxQuantity > 0) {
+                            setState(() {
+                              selectedBoxQuantity--;
+                              boxQuantityController.text =
+                                  selectedBoxQuantity.toString();
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(
+                        width: getResponsiveSize(
+                          300,
+                        ), // Increased width for better spacing
+                        child: TextField(
+                          controller: boxQuantityController,
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
+                          ],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedBoxQuantity =
+                                  double.tryParse(value)?.toInt() ?? 0;
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: getResponsiveSize(50),
+                        ),
+                        onPressed: () {
                           setState(() {
-                            selectedBoxQuantity--;
+                            selectedBoxQuantity++;
                             boxQuantityController.text =
                                 selectedBoxQuantity.toString();
                           });
-                        }
-                      },
-                    ),
-                    SizedBox(
-                      width: sw * 0.4, // Increased width for better spacing
-                      child: TextField(
-                        controller: boxQuantityController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
-                        ],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedBoxQuantity =
-                                double.tryParse(value)?.toInt() ?? 0;
-                          });
                         },
                       ),
+                    ],
+                  ),
+              
+                  // Item Quantity Selector
+                  Text(
+                    "Select Items Quantity",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: getResponsiveSize(30),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.add, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          selectedBoxQuantity++;
-                          boxQuantityController.text =
-                              selectedBoxQuantity.toString();
-                        });
-                      },
-                    ),
-                  ],
-                ),
-
-                // Item Quantity Selector
-                Text("Select Items Quantity",
-                    style:
-                        TextStyle(color: Colors.white, fontSize: sw * 0.035)),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Decrease Button
-                    IconButton(
-                      icon: Icon(Icons.remove, color: Colors.white),
-                      onPressed: () {
-                        if (selectedItemsQuantity > 0) {
+                  ),
+              
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Decrease Button
+                      IconButton(
+                        icon: Icon(
+                          Icons.remove,
+                          color: Colors.white,
+                          size: getResponsiveSize(50),
+                        ),
+                        onPressed: () {
+                          if (selectedItemsQuantity > 0) {
+                            setState(() {
+                              selectedItemsQuantity--;
+                              itemQuantityController.text =
+                                  selectedItemsQuantity.toString();
+                            });
+                          }
+                        },
+                      ),
+              
+                      // Input Field for Items Quantity
+                      SizedBox(
+                        width: getResponsiveSize(
+                          300,
+                        ), // Ensure a larger width for better spacing
+                        child: TextField(
+                          controller: itemQuantityController,
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
+                          ],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedItemsQuantity =
+                                  double.tryParse(value)?.toInt() ?? 0;
+                            });
+                          },
+                        ),
+                      ),
+              
+                      // Increase Button
+                      IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: getResponsiveSize(50),
+                        ),
+                        onPressed: () {
                           setState(() {
-                            selectedItemsQuantity--;
+                            selectedItemsQuantity++;
                             itemQuantityController.text =
                                 selectedItemsQuantity.toString();
                           });
-                        }
-                      },
-                    ),
-
-                    // Input Field for Items Quantity
-                    SizedBox(
-                      width:
-                          sw * 0.4, // Ensure a larger width for better spacing
-                      child: TextField(
-                        controller: itemQuantityController,
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
-                        ],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedItemsQuantity =
-                                double.tryParse(value)?.toInt() ?? 0;
-                          });
                         },
                       ),
-                    ),
-
-                    // Increase Button
-                    IconButton(
-                      icon: Icon(Icons.add, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          selectedItemsQuantity++;
-                          itemQuantityController.text =
-                              selectedItemsQuantity.toString();
-                        });
-                      },
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 10),
-
-                // Add to Cart Button
-                ElevatedButton(
-                  onPressed: () {
-                    if (selectedBoxQuantity > 0 || selectedItemsQuantity > 0) {
-                      addToCart(product);
-                    } else {
-                      Get.snackbar(
-                        "Error",
-                        "Please select at least one quantity",
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+                    ],
                   ),
-                  child: const Text(
-                    "Add to Cart",
-                    style: TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
+              
+                  SizedBox(height: 10),
+              
+                  // Add to Cart Button
+                  ElevatedButton(
+                    onPressed: () {
+                      if (selectedBoxQuantity > 0 || selectedItemsQuantity > 0) {
+                        addToCart(product);
+                      } else {
+                        Get.snackbar(
+                          "Error",
+                          "Please select at least one quantity",
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      "Add to Cart",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: getResponsiveSize(30),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         );
