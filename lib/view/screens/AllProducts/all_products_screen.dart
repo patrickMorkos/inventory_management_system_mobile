@@ -730,9 +730,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         // Extract values with fallback to 0
         int boxQuantity = element["box_quantity"] ?? 0;
         int itemsQuantity = element["items_quantity"] ?? 0;
-        double boxPrice =
+        dynamic boxPrice =
             element["Product"]["ProductPrice"]?["box_price"] ?? 0.0;
-        double itemPrice =
+        dynamic itemPrice =
             element["Product"]["ProductPrice"]?["item_price"] ?? 0.0;
 
         String formattedBoxPriceUsd = usdFormatter.format(boxPrice);
