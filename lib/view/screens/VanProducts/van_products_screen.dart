@@ -829,7 +829,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
           setState(() {
             searchedProductsList =
                 vanProductsController.vanProductsList.where((element) {
-              return element["product_name"]
+              return element["Product"]["name"]
                   .toString()
                   .toLowerCase()
                   .contains(value.toLowerCase());
