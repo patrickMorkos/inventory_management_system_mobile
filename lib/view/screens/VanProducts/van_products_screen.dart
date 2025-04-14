@@ -284,7 +284,7 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                   buildProductDetailRow("Category",
                       product["Product"]["Category"]["category_name"] ?? "", sw),
                   buildProductDetailRow(
-                      "Box Quantity", "${product["box_quantity"] ?? 0}", sw),
+                      "Available QTY", "${product["box_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
                       "Box Price",
                       "\$${product["Product"]["ProductPrice"]["box_price"] ?? 0.0}",
@@ -698,15 +698,15 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildDetailRow("Box Quantity:", "$boxQuantity", sw),
+                        buildDetailRow("Available QTY:", "$boxQuantity", sw),
                         buildDetailRow(
-                            "Box Price (USD):", "\$ $formattedBoxPriceUsd", sw),
-                        buildDetailRow("Box Price (LBP):",
+                            "Box Price:", "\$ $formattedBoxPriceUsd", sw),
+                        buildDetailRow("Box Price:",
                             "LBP $formattedBoxPriceLbp", sw),
                         buildDetailRow("Items Quantity:", "$itemsQuantity", sw),
-                        buildDetailRow("Item Price (USD):",
+                        buildDetailRow("Item Price:",
                             "\$ $formattedItemPriceUsd", sw),
-                        buildDetailRow("Item Price (LBP):",
+                        buildDetailRow("Item Price:",
                             "LBP $formattedItemPriceLbp", sw),
                       ],
                     ),
