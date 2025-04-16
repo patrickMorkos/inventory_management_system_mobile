@@ -359,7 +359,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-              
+
                   // Product Image
                   Container(
                     width: getResponsiveSize(150),
@@ -379,42 +379,44 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       ),
                     ),
                   ),
-              
+
                   const SizedBox(height: 10),
-              
+
                   // Product Info
                   buildProductDetailRow(
                       "Name", product["Product"]["name"] ?? "", sw),
                   buildProductDetailRow("Brand",
                       product["Product"]["Brand"]["brand_name"] ?? "", sw),
-                  buildProductDetailRow("Category",
-                      product["Product"]["Category"]["category_name"] ?? "", sw),
+                  buildProductDetailRow(
+                      "Category",
+                      product["Product"]["Category"]["category_name"] ?? "",
+                      sw),
                   buildProductDetailRow(
                       "Available QTY", "${product["box_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
                       "Box Price",
                       "\$${product["Product"]["ProductPrice"]["box_price"] ?? 0.0}",
                       sw),
-                  buildProductDetailRow(
-                      "Items Quantity", "${product["items_quantity"] ?? 0}", sw),
+                  buildProductDetailRow("Items Quantity",
+                      "${product["items_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
                       "Item Price",
                       "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
                       sw),
                   buildProductDetailRow(
-                      "Items Per Box",
+                      "Pack",
                       "${product["Product"]["number_of_items_per_box"] ?? 0.0}",
                       sw),
-              
+
                   SizedBox(height: getResponsiveSize(20)),
-              
+
                   // Box Quantity Selector
                   Text("Select Box Quantity",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: getResponsiveSize(30),
                       )),
-              
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -443,8 +445,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
+                            FilteringTextInputFormatter.allow(RegExp(
+                                r'^\d*\.?\d*$')), // Allow only numbers & .
                           ],
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black),
@@ -479,7 +481,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       ),
                     ],
                   ),
-              
+
                   // Item Quantity Selector
                   Text(
                     "Select Items Quantity",
@@ -488,7 +490,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       fontSize: getResponsiveSize(30),
                     ),
                   ),
-              
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -509,7 +511,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           }
                         },
                       ),
-              
+
                       // Input Field for Items Quantity
                       SizedBox(
                         width: getResponsiveSize(
@@ -520,8 +522,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d*\.?\d*$')), // Allow only numbers & .
+                            FilteringTextInputFormatter.allow(RegExp(
+                                r'^\d*\.?\d*$')), // Allow only numbers & .
                           ],
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black),
@@ -540,7 +542,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           },
                         ),
                       ),
-              
+
                       // Increase Button
                       IconButton(
                         icon: Icon(
@@ -558,13 +560,14 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       ),
                     ],
                   ),
-              
+
                   SizedBox(height: 10),
-              
+
                   // Add to Cart Button
                   ElevatedButton(
                     onPressed: () {
-                      if (selectedBoxQuantity > 0 || selectedItemsQuantity > 0) {
+                      if (selectedBoxQuantity > 0 ||
+                          selectedItemsQuantity > 0) {
                         addToCart(product);
                       } else {
                         Get.snackbar(
@@ -729,18 +732,18 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
         // Extract values with fallback to 0
         int boxQuantity = element["box_quantity"] ?? 0;
-        int itemsQuantity = element["items_quantity"] ?? 0;
+        // int itemsQuantity = element["items_quantity"] ?? 0;
         dynamic boxPrice =
             element["Product"]["ProductPrice"]?["box_price"] ?? 0.0;
-        dynamic itemPrice =
-            element["Product"]["ProductPrice"]?["item_price"] ?? 0.0;
+        // dynamic itemPrice =
+        //     element["Product"]["ProductPrice"]?["item_price"] ?? 0.0;
 
         String formattedBoxPriceUsd = usdFormatter.format(boxPrice);
         String formattedBoxPriceLbp =
             lbpFormatter.format(boxPrice * usdLbpRate);
-        String formattedItemPriceUsd = usdFormatter.format(itemPrice);
-        String formattedItemPriceLbp =
-            lbpFormatter.format(itemPrice * usdLbpRate);
+        // String formattedItemPriceUsd = usdFormatter.format(itemPrice);
+        // String formattedItemPriceLbp =
+        //     lbpFormatter.format(itemPrice * usdLbpRate);
 
         tmp.add(
           Padding(
@@ -838,13 +841,22 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                         buildDetailRow("Available QTY:", "$boxQuantity", sw),
                         buildDetailRow(
                             "Box Price:", "\$ $formattedBoxPriceUsd", sw),
-                        buildDetailRow("Box Price:",
-                            "LBP $formattedBoxPriceLbp", sw),
-                        buildDetailRow("Items Quantity:", "$itemsQuantity", sw),
-                        buildDetailRow("Item Price:",
-                            "\$ $formattedItemPriceUsd", sw),
-                        buildDetailRow("Item Price:",
-                            "LBP $formattedItemPriceLbp", sw),
+                        buildDetailRow(
+                            "Box Price:", "LBP $formattedBoxPriceLbp", sw),
+                        // buildDetailRow("Items Quantity:", "$itemsQuantity", sw),
+                        // buildDetailRow("Item Price:",
+                        //     "\$ $formattedItemPriceUsd", sw),
+                        // buildDetailRow("Item Price:",
+                        //     "LBP $formattedItemPriceLbp", sw),
+                        buildDetailRow(
+                            "Pack:",
+                            "${element["Product"]["number_of_items_per_box"] ?? 0.0}",
+                            sw),
+                        buildDetailRow(
+                            "Unit:", "${element["Product"]["unit"] ?? ""}", sw),
+                        if (element["Product"]["unit"] == "شوال")
+                          buildDetailRow("Weight:",
+                              "${element["Product"]["weight"] ?? ""}", sw),
                       ],
                     ),
                   ],
@@ -861,7 +873,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
 // Function to build a properly aligned detail row with responsive fonts
   Widget buildDetailRow(String title, String value, double sw) {
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
