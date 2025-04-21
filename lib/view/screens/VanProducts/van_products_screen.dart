@@ -163,9 +163,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
   }
 
   void addToCart(product) {
-    // print(
-    //     "Final Box Quantity: $selectedBoxQuantity, Final Item Quantity: $selectedItemsQuantity");
-
     bool isBoxSelected = selectedBoxQuantity > 0;
     bool isItemSelected = selectedItemsQuantity > 0;
 
@@ -173,32 +170,40 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       return;
     }
 
-    if (isBoxSelected) {
-      orderController.addProductToOrder(
-          product["Product"], selectedBoxQuantity);
-      vanProductsController.deductBoxQuantity(
-          product["Product"]["id"], selectedBoxQuantity);
+    final int itemsPerBox = product["Product"]["number_of_items_per_box"] ?? 1;
+
+    int totalBoxQty = selectedBoxQuantity;
+    int totalItemQty = selectedItemsQuantity;
+
+    // Auto-convert item quantity to boxes
+    if (totalItemQty >= itemsPerBox) {
+      int extraBoxes = totalItemQty ~/ itemsPerBox;
+      int remainingItems = totalItemQty % itemsPerBox;
+
+      totalBoxQty += extraBoxes;
+      totalItemQty = remainingItems;
     }
 
-    if (isItemSelected) {
-      if (selectedItemsQuantity < 0) {
-        // print("ERROR: Trying to add a negative quantity of items!");
-        return;
-      }
+    if (totalBoxQty > 0) {
+      orderController.addProductToOrder(product["Product"], totalBoxQty);
+      vanProductsController.deductBoxQuantity(
+          product["Product"]["id"], totalBoxQty);
+    }
+
+    if (totalItemQty > 0) {
       orderController.addProductToOrderWithItems(
         product["Product"],
-        selectedBoxQuantity, // Pass Box Quantity
-        selectedItemsQuantity, // Pass Items Quantity
+        totalBoxQty,
+        totalItemQty,
       );
-
       vanProductsController.deductItemQuantity(
-          product["Product"]["id"], selectedItemsQuantity);
+          product["Product"]["id"], totalItemQty);
     }
 
     String successMessage = "";
-    if (isBoxSelected && isItemSelected) {
+    if (totalBoxQty > 0 && totalItemQty > 0) {
       successMessage = "Box and Item quantities added";
-    } else if (isBoxSelected) {
+    } else if (totalBoxQty > 0) {
       successMessage = "Box quantity added";
     } else {
       successMessage = "Item quantity added";
@@ -213,7 +218,6 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
       );
     });
 
-    // Reset values after adding to cart
     setState(() {
       selectedBoxQuantity = 0;
       selectedItemsQuantity = 0;
