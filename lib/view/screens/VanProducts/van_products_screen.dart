@@ -291,6 +291,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       "Box Price",
                       "\$${product["Product"]["ProductPrice"]["box_price"] ?? 0.0}",
                       sw),
+                  if (product["Product"]["is_taxable"])
+                    buildProductDetailRow(
+                      "Price after TVA",
+                      "\$${((product["Product"]["ProductPrice"]["box_price"] ?? 0) * 1.11).toStringAsFixed(2)}",
+                      sw,
+                    ),
                   buildProductDetailRow("Items Quantity",
                       "${product["items_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
@@ -705,6 +711,12 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                         buildDetailRow("Available QTY:", "$boxQuantity", sw),
                         buildDetailRow(
                             "Box Price:", "\$ $formattedBoxPriceUsd", sw),
+                        if (element["Product"]["is_taxable"])
+                          buildDetailRow(
+                            "Price after TVA:",
+                            "\$${((element["Product"]["ProductPrice"]["box_price"] ?? 0) * 1.11).toStringAsFixed(2)}",
+                            sw,
+                          ),
                         buildDetailRow(
                             "Box Price:", "LBP $formattedBoxPriceLbp", sw),
                         // buildDetailRow("Items Quantity:", "$itemsQuantity", sw),

@@ -35,6 +35,10 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
 
   //******************************************************************FUNCTIONS
 
+  double applyTaxIfNeeded(double price, bool isTaxable) {
+    return isTaxable ? price * 1.11 : price;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,13 +65,20 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       if (orderController.orderInfo["products"] != null) {
         totalOrderPrice +=
             orderController.orderInfo["products"].fold(0.0, (sum, product) {
-          double boxTotal = (product['box_quantity'] ?? 0) *
-              (product['product']['ProductPrice']['box_price']?.toDouble() ??
-                  0.0);
+          bool isTaxable = product['product']['is_taxable'] ?? false;
 
-          double itemTotal = (product['items_quantity'] ?? 0) *
-              (product['product']['ProductPrice']['item_price']?.toDouble() ??
-                  0.0);
+          double boxPrice = applyTaxIfNeeded(
+              product['product']['ProductPrice']['box_price']?.toDouble() ??
+                  0.0,
+              isTaxable);
+
+          double itemPrice = applyTaxIfNeeded(
+              product['product']['ProductPrice']['item_price']?.toDouble() ??
+                  0.0,
+              isTaxable);
+
+          double boxTotal = (product['box_quantity'] ?? 0) * boxPrice;
+          double itemTotal = (product['items_quantity'] ?? 0) * itemPrice;
 
           return sum + boxTotal + itemTotal;
         });
@@ -77,11 +88,16 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       if (orderController.orderInfo["saleProducts"] != null) {
         totalOrderPrice +=
             orderController.orderInfo["saleProducts"].fold(0.0, (sum, product) {
-          double boxTotal = (product['box_quantity'] ?? 0) *
-              (product['box_price']?.toDouble() ?? 0.0);
+          bool isTaxable = product['product']['is_taxable'] ?? false;
 
-          double itemTotal = (product['items_quantity'] ?? 0) *
-              (product['item_price']?.toDouble() ?? 0.0);
+          double boxPrice = applyTaxIfNeeded(
+              product['box_price']?.toDouble() ?? 0.0, isTaxable);
+
+          double itemPrice = applyTaxIfNeeded(
+              product['item_price']?.toDouble() ?? 0.0, isTaxable);
+
+          double boxTotal = (product['box_quantity'] ?? 0) * boxPrice;
+          double itemTotal = (product['items_quantity'] ?? 0) * itemPrice;
 
           return sum + boxTotal + itemTotal;
         });
@@ -149,10 +165,15 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     for (var product in orderController.orderInfo["saleProducts"]) {
       // Extract values safely
       int boxQuantity = product['box_quantity'] ?? 0;
-      double boxPrice = product['box_price']?.toDouble() ?? 0.0;
+      bool isTaxable = product['product']['is_taxable'] ?? false;
+
+      double boxPrice =
+          applyTaxIfNeeded(product['box_price']?.toDouble() ?? 0.0, isTaxable);
+
+      double itemPrice =
+          applyTaxIfNeeded(product['item_price']?.toDouble() ?? 0.0, isTaxable);
 
       int itemQuantity = product['items_quantity'] ?? 0;
-      double itemPrice = product['item_price']?.toDouble() ?? 0.0;
 
       double totalBoxPrice = boxQuantity * boxPrice;
       double totalItemPrice = itemQuantity * itemPrice;
@@ -370,12 +391,17 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
       for (var product in orderController.orderInfo["products"]) {
         // Extract values safely
         int boxQuantity = product['box_quantity'] ?? 0;
-        double boxPrice =
-            product['product']['ProductPrice']['box_price']?.toDouble() ?? 0.0;
+        bool isTaxable = product['product']['is_taxable'] ?? false;
+
+        double boxPrice = applyTaxIfNeeded(
+            product['product']['ProductPrice']['box_price']?.toDouble() ?? 0.0,
+            isTaxable);
+
+        double itemPrice = applyTaxIfNeeded(
+            product['product']['ProductPrice']['item_price']?.toDouble() ?? 0.0,
+            isTaxable);
 
         int itemQuantity = product['items_quantity'] ?? 0;
-        double itemPrice =
-            product['product']['ProductPrice']['item_price']?.toDouble() ?? 0.0;
 
         double totalBoxPrice = boxQuantity * boxPrice;
         double totalItemPrice = itemQuantity * itemPrice;

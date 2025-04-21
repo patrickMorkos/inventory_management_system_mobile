@@ -169,11 +169,15 @@ class OrderController extends GetxController {
           "product_id": element["product"]["id"],
           "box_quantity": element["box_quantity"] ?? 0,
           "box_price": double.parse(
-            (element["product"]["ProductPrice"]["box_price"]).toString(),
+            ((element["product"]["ProductPrice"]["box_price"]) *
+                    (element["product"]["is_taxable"] == true ? 1.11 : 1.0))
+                .toStringAsFixed(2),
           ),
           "items_quantity": element["items_quantity"] ?? 0,
           "item_price": double.parse(
-            (element["product"]["ProductPrice"]["item_price"]).toString(),
+            ((element["product"]["ProductPrice"]["item_price"]) *
+                    (element["product"]["is_taxable"] == true ? 1.11 : 1.0))
+                .toStringAsFixed(2),
           ),
         };
 
@@ -188,9 +192,17 @@ class OrderController extends GetxController {
         Map<String, dynamic> saleProductData = {
           "product_id": element["product"]["id"],
           "box_quantity": element["box_quantity"] ?? 0,
-          "box_price": element["box_price"], // Assuming it's already a number
+          "box_price": double.parse(
+            ((element["box_price"] ?? 0) *
+                    (element["product"]["is_taxable"] == true ? 1.11 : 1.0))
+                .toStringAsFixed(2),
+          ),
           "items_quantity": element["items_quantity"] ?? 0,
-          "item_price": element["item_price"] ?? 0,
+          "item_price": double.parse(
+            ((element["item_price"] ?? 0) *
+                    (element["product"]["is_taxable"] == true ? 1.11 : 1.0))
+                .toStringAsFixed(2),
+          ),
         };
 
         orderProducts.add(saleProductData);
