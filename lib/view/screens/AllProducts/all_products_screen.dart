@@ -991,10 +991,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         onChanged: (value) {
           setState(() {
             searchedProductsList = productsList.where((element) {
-              return element["Product"]["name"]
-                  .toString()
-                  .toLowerCase()
-                  .contains(value.toLowerCase());
+              final name =
+                  element["Product"]["name"]?.toString().toLowerCase() ?? "";
+              final brand = element["Product"]["Brand"]["brand_name"]
+                      ?.toString()
+                      .toLowerCase() ??
+                  "";
+              final query = value.toLowerCase();
+
+              return name.contains(query) || brand.contains(query);
             }).toList();
           });
           if (value.isEmpty) {
