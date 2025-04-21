@@ -521,14 +521,21 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                   child: IconButton(
                     onPressed: () {
                       setState(() {
-                        orderController
-                            .removeProductFromOrder(product['product']);
-                        vanProductsController.addBoxQuantity(
-                            product['product']["id"], product['box_quantity']);
-                        vanProductsController.addItemQuantity(
-                            product['product']["id"],
-                            product['items_quantity']);
-                        updateTotalPrice();
+                        final productId = product['product']?["id"];
+                        final boxQty = product['box_quantity'] ?? 0;
+                        final itemQty = product['items_quantity'] ?? 0;
+
+                        if (productId != null) {
+                          orderController
+                              .removeProductFromOrder(product['product']);
+                          vanProductsController.addBoxQuantity(
+                              productId, boxQty);
+                          vanProductsController.addItemQuantity(
+                              productId, itemQty);
+                          updateTotalPrice();
+                        } else {
+                          print("Product ID is null. Cannot delete.");
+                        }
                       });
                     },
                     icon: Icon(Icons.delete, size: getResponsiveSize(35)),

@@ -118,8 +118,8 @@ class OrderController extends GetxController {
   }
 
   void removeProductFromOrder(Map<dynamic, dynamic> productObj) {
-    orderInfo["products"]
-        .removeWhere((product) => product["product"] == productObj);
+    orderInfo["products"]?.removeWhere(
+        (product) => product["product"]["id"] == productObj["id"]);
   }
 
   void increaseProductItemQuantity(Map<dynamic, dynamic> productObj) {
