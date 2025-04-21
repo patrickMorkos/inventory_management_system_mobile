@@ -625,6 +625,27 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       return;
     }
 
+    // ✅ Validation against available quantities
+    if (boxQty > (product["box_quantity"] ?? 0)) {
+      Get.snackbar(
+        "Error",
+        "Cannot exceed available box quantity.",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (itemQty > (product["items_quantity"] ?? 0)) {
+      Get.snackbar(
+        "Error",
+        "Cannot exceed available item quantity.",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     if (isBoxSelected) {
       orderController.addProductToOrder(
         product["Product"],
@@ -657,7 +678,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       );
     });
 
-    // Reset values after adding to cart
+    // Reset values
     setState(() {
       selectedBoxQuantity = 0;
       selectedItemsQuantity = 0;
