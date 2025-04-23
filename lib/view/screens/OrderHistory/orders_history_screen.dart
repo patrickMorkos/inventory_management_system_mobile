@@ -26,7 +26,21 @@ class _OrdersHistoryScreenState extends State<OrdersHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    fetchOrdersHistory();
+    fetchOrdersHistory().then((_) {
+      final args = Get.arguments;
+      if (args != null && args["newOrderId"] != null) {
+        final int newOrderId = args["newOrderId"];
+        final newOrder = previousOrders.firstWhere(
+          (order) => order["id"] == newOrderId,
+          orElse: () => null,
+        );
+        if (newOrder != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showSaleProductsDialog(context, newOrder["products"]);
+          });
+        }
+      }
+    });
   }
 
   Future<void> fetchOrdersHistory() async {

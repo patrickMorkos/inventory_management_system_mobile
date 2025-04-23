@@ -609,14 +609,17 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
   void submitOrder() async {
     final newOrder = await orderController.createOrder(
       totalOrderPrice,
-      orderController.orderInfo["saleType"] == "Cash Van" ? false : true,
+      orderController.orderInfo["saleType"] != "Cash Van",
       orderController.orderInfo["saleType"],
       clientController.clientInfo['id'],
       loggedInUserController.loggedInUser.value.id,
     );
 
     if (newOrder != null) {
-      Get.toNamed("/orders-history", arguments: {"newOrder": newOrder});
+      Get.offNamed("/orders-history", arguments: {
+        "newOrderId": newOrder['id'],
+        "products": newOrder['products'],
+      });
     }
   }
 

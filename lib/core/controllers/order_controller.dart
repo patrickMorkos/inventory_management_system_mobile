@@ -23,6 +23,7 @@ class OrderController extends GetxController {
       "saleType": "Cash Van",
     });
     update();
+    resetOrder();
   }
 
   void addProductToOrder(Map<dynamic, dynamic> productObj, int boxQuantity) {
@@ -158,7 +159,7 @@ class OrderController extends GetxController {
     orderInfo["products"] = [];
   }
 
-Future<Map<String, dynamic>?> createOrder(
+  Future<Map<String, dynamic>?> createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
 
@@ -226,34 +227,33 @@ Future<Map<String, dynamic>?> createOrder(
       "products": orderProducts,
     };
 
-    await postRequest(
+    final response = await postRequest(
       path: "/api/sale/create-sale/$salesmanId",
       body: orderData,
       requireToken: true,
-    ).then((response) {
-      if (response['id'] != null) {
-        Fluttertoast.showToast(
-          msg: "Order created successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        Get.toNamed("/dashboard");
-        resetOrder();
-      } else {
-        Fluttertoast.showToast(
-          msg: "Error: ${response['error']}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
-    });
-    // Reset the orderInfo after creating the order
-    clearOrderController();
+    );
+
+    if (response['id'] != null) {
+      Fluttertoast.showToast(
+        msg: "Order created successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      clearOrderController(); // Clear after success
+      return response; // Return the created order
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error: ${response['error']}",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return null;
+    }
   }
 }
