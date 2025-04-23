@@ -158,7 +158,7 @@ class OrderController extends GetxController {
     orderInfo["products"] = [];
   }
 
-  void createOrder(
+Future<Map<String, dynamic>?> createOrder(
       totalPriceUsd, isPendingPayment, saleType, clientId, salesmanId) async {
     List<Map<String, dynamic>> orderProducts = [];
 

@@ -606,6 +606,20 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
     );
   }
 
+  void submitOrder() async {
+    final newOrder = await orderController.createOrder(
+      totalOrderPrice,
+      orderController.orderInfo["saleType"] == "Cash Van" ? false : true,
+      orderController.orderInfo["saleType"],
+      clientController.clientInfo['id'],
+      loggedInUserController.loggedInUser.value.id,
+    );
+
+    if (newOrder != null) {
+      Get.toNamed("/orders-history", arguments: {"newOrder": newOrder});
+    }
+  }
+
   // Render buttons row
   Widget renderButtonsRow() {
     return Padding(
@@ -634,18 +648,7 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
           const SizedBox(width: 10.0),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {
-                // Add functionality for creating an order here
-                orderController.createOrder(
-                  totalOrderPrice,
-                  orderController.orderInfo["saleType"] == "Cash Van"
-                      ? false
-                      : true,
-                  orderController.orderInfo["saleType"],
-                  clientController.clientInfo['id'],
-                  loggedInUserController.loggedInUser.value.id,
-                );
-              },
+              onPressed: submitOrder,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
