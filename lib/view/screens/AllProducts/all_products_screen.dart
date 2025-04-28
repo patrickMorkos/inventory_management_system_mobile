@@ -72,6 +72,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   int selectedBoxQuantity = 0;
   int selectedItemsQuantity = 0;
 
+  int currentPage = 1;
+  int pageSize = 10;
+  int totalProducts = 0;
+
+  List<dynamic> paginatedProductsList = [];
+
   //******************************************************************FUNCTIONS
 
   //This function renders the product box quantity
@@ -204,6 +210,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       setState(() {
         productsList = value;
         searchedProductsList = productsList;
+        totalProducts = searchedProductsList.length; // ✅
+        paginateProducts(); // ✅
       });
     });
     if (Get.arguments != null) {
@@ -211,6 +219,20 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
       categoryId = arguments["category_id"] ?? -1;
       if (categoryId != -1) filterProductsList(categoryId);
     }
+  }
+
+  void paginateProducts() {
+    int startIndex = (currentPage - 1) * pageSize;
+    int endIndex = startIndex + pageSize;
+
+    if (endIndex > searchedProductsList.length) {
+      endIndex = searchedProductsList.length;
+    }
+
+    setState(() {
+      paginatedProductsList =
+          searchedProductsList.sublist(startIndex, endIndex);
+    });
   }
 
   @override
@@ -243,14 +265,21 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   //This function renders the products list
   Widget renderProductsListing(sw, sh) {
     return Expanded(
-      child: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: getProductsCards(sw, sh),
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: getProductsCards(sw, sh),
+                ),
+              ),
+            ),
           ),
-        ),
+          renderPaginationControls(), // ✅ ADD THIS
+        ],
       ),
     );
   }
@@ -743,7 +772,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     List<Widget> tmp = [];
     final usdLbpRate = loggedInUserController.loggedInUser.value.usdLbpRate;
 
-    if (searchedProductsList.isEmpty) {
+    if (paginatedProductsList.isEmpty) {
       tmp.add(
         const Center(
           child: Padding(
@@ -753,7 +782,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         ),
       );
     } else {
-      for (var element in searchedProductsList) {
+      for (var element in paginatedProductsList) {
         final usdFormatter = NumberFormat("#,##0.00", "en_US");
         final lbpFormatter = NumberFormat("#,###", "en_US");
 
@@ -904,6 +933,45 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     return tmp;
   }
 
+  Widget renderPaginationControls() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: currentPage > 1
+                ? () {
+                    setState(() {
+                      currentPage--;
+                      paginateProducts();
+                    });
+                  }
+                : null, // Disable if on first page
+          ),
+          SizedBox(width: 20),
+          Text(
+            'Page $currentPage of ${((totalProducts - 1) ~/ pageSize) + 1}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(width: 20),
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: (currentPage * pageSize) < totalProducts
+                ? () {
+                    setState(() {
+                      currentPage++;
+                      paginateProducts();
+                    });
+                  }
+                : null, // Disable if on last page
+          ),
+        ],
+      ),
+    );
+  }
+
 // Function to build a properly aligned detail row with responsive fonts
   Widget buildDetailRow(String title, String value, double sw) {
     return Padding(
@@ -1001,10 +1069,16 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
               return name.contains(query) || brand.contains(query);
             }).toList();
+            currentPage = 1;
+            totalProducts = searchedProductsList.length;
+            paginateProducts();
           });
           if (value.isEmpty) {
             setState(() {
               searchedProductsList = productsList;
+              currentPage = 1;
+              totalProducts = searchedProductsList.length;
+              paginateProducts();
             });
           }
           setState(() {
