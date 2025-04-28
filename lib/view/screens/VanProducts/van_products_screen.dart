@@ -197,13 +197,24 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
     }
 
     if (totalItemQty > 0) {
+      if (product["Product"]["unit"] == "كرتون") {
+        double boxPrice =
+            (product["Product"]["ProductPrice"]["box_price"] ?? 0).toDouble();
+        int pack = (product["Product"]["number_of_items_per_box"] ?? 1);
+        double newItemPrice = (boxPrice / pack) * 1.075;
+        product["Product"]["ProductPrice"]["item_price"] =
+            double.parse(newItemPrice.toStringAsFixed(2));
+      }
+
       orderController.addProductToOrderWithItems(
         product["Product"],
         totalBoxQty,
         totalItemQty,
       );
       vanProductsController.deductItemQuantity(
-          product["Product"]["id"], totalItemQty);
+        product["Product"]["id"],
+        totalItemQty,
+      );
     }
 
     String successMessage = "";
@@ -311,7 +322,9 @@ class _VanProductsScreenState extends State<VanProductsScreen> {
                       "${product["items_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
                       "Item Price",
-                      "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
+                      product["Product"]["unit"] == "كرتون"
+                          ? "\$${(((product["Product"]["ProductPrice"]["box_price"] ?? 0) / (product["Product"]["number_of_items_per_box"] ?? 1)) * 1.075).toStringAsFixed(2)}"
+                          : "\$${(product["Product"]["ProductPrice"]["item_price"] ?? 0.0).toStringAsFixed(2)}",
                       sw),
                   buildProductDetailRow(
                       "Pack",

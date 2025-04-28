@@ -436,7 +436,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                       "${product["items_quantity"] ?? 0}", sw),
                   buildProductDetailRow(
                       "Item Price",
-                      "\$${product["Product"]["ProductPrice"]["item_price"] ?? 0.0}",
+                      product["Product"]["unit"] == "كرتون"
+                          ? "\$${(((product["Product"]["ProductPrice"]["box_price"] ?? 0) / (product["Product"]["number_of_items_per_box"] ?? 1)) * 1.075).toStringAsFixed(2)}"
+                          : "\$${(product["Product"]["ProductPrice"]["item_price"] ?? 0.0).toStringAsFixed(2)}",
                       sw),
                   buildProductDetailRow(
                       "Pack",
@@ -687,6 +689,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     }
 
     if (isItemSelected) {
+      if (product["Product"]["unit"] == "كرتون") {
+        double boxPrice =
+            (product["Product"]["ProductPrice"]["box_price"] ?? 0).toDouble();
+        int pack = (product["Product"]["number_of_items_per_box"] ?? 1);
+        double newItemPrice = (boxPrice / pack) * 1.075;
+        product["Product"]["ProductPrice"]["item_price"] =
+            double.parse(newItemPrice.toStringAsFixed(2));
+      }
+
       orderController.addProductToOrderWithItems(
         product["Product"],
         boxQty,
@@ -718,55 +729,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
     Navigator.of(context).pop();
   }
 
-  // //This function renders the add product to cart button
-  // Widget renderAddProductToCartButton(
-  //   context,
-  //   sw,
-  //   sh,
-  //   product,
-  //   clientInfo,
-  // ) {
-  //   return Container(
-  //     padding: EdgeInsets.only(
-  //       top: sh / 50,
-  //     ),
-  //     child: ElevatedButton(
-  //       onPressed: () {
-  //         if (boxQuantity > product["box_quantity"] || boxQuantity == 0) {
-  //           Get.snackbar(
-  //             "Error",
-  //             "Cannot add more than box quantity",
-  //             backgroundColor: Colors.red,
-  //             colorText: Colors.white,
-  //             snackPosition: SnackPosition.TOP,
-  //             duration: Duration(seconds: 2),
-  //           );
-  //         } else {
-  //           orderController.addProductToOrder(product["Product"], boxQuantity);
-  //           vanProductsController.deductBoxQuantity(
-  //             product["Product"]["id"],
-  //             boxQuantity,
-  //           );
-  //           Navigator.of(context).pop();
-  //         }
-  //       },
-  //       style: ElevatedButton.styleFrom(
-  //         backgroundColor: Colors.white,
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(15),
-  //         ),
-  //       ),
-  //       child: const Text(
-  //         'Add to Cart',
-  //         style: TextStyle(
-  //           color: Colors.black,
-  //           fontWeight: FontWeight.bold,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   //This function returns the products cards list
   List<Widget> getProductsCards(sw, sh) {
     List<Widget> tmp = [];
@@ -788,18 +750,12 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
 
         // Extract values with fallback to 0
         int boxQuantity = element["box_quantity"] ?? 0;
-        // int itemsQuantity = element["items_quantity"] ?? 0;
         dynamic boxPrice =
             element["Product"]["ProductPrice"]?["box_price"] ?? 0.0;
-        // dynamic itemPrice =
-        //     element["Product"]["ProductPrice"]?["item_price"] ?? 0.0;
 
         String formattedBoxPriceUsd = usdFormatter.format(boxPrice);
         String formattedBoxPriceLbp =
             lbpFormatter.format(boxPrice * usdLbpRate);
-        // String formattedItemPriceUsd = usdFormatter.format(itemPrice);
-        // String formattedItemPriceLbp =
-        //     lbpFormatter.format(itemPrice * usdLbpRate);
 
         tmp.add(
           Padding(
@@ -809,7 +765,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                 if (isFromClientStock) {
                   updateClientStockDialog(context, element);
                 } else if (isFromCreateOrderScreen) {
-                  // print("DEBUG: Product Data Before Dialog -> $element");
                   if (element != null && element.containsKey('Product')) {
                     openProductDetailsDialog(
                       context,
@@ -905,11 +860,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                           ),
                         buildDetailRow(
                             "Box Price:", "LBP $formattedBoxPriceLbp", sw),
-                        // buildDetailRow("Items Quantity:", "$itemsQuantity", sw),
-                        // buildDetailRow("Item Price:",
-                        //     "\$ $formattedItemPriceUsd", sw),
-                        // buildDetailRow("Item Price:",
-                        //     "LBP $formattedItemPriceLbp", sw),
                         buildDetailRow(
                             "Pack:",
                             "${element["Product"]["number_of_items_per_box"] ?? 0.0}",
