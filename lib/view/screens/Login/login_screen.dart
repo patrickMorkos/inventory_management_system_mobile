@@ -76,7 +76,11 @@ class _LoginScreenState extends State<LoginScreen> {
         String accessToken = value['token'];
 
         loggedInUserController.setUserInfo(user, accessToken);
-        Get.offAllNamed('/dashboard');
+        if (user.userTypeId == 1 && kIsWeb) {
+          Get.offAllNamed('/web-dashboard');
+        } else {
+          Get.offAllNamed('/dashboard');
+        }
       }
     });
   }
@@ -148,8 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   //Login form
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
+                  Container(
+                    width: getResponsiveSize(700),
+                    padding: EdgeInsets.only(bottom: getResponsiveSize(30)),
                     child: Form(
                       key: globalKey,
                       child: Column(
@@ -213,17 +218,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   //Login button
-                  ButtonGlobal(
-                    buttontext: "Login",
-                    buttonDecoration:
-                        kButtonDecoration.copyWith(color: kMainColor),
-                    onPressed: () {
-                      if (validateAndSave()) {
-                        login();
-                      }
-                    },
-                    iconWidget: null,
-                    iconColor: Colors.white,
+                  SizedBox(
+                    width: getResponsiveSize(300),
+                    child: ButtonGlobal(
+                      buttontext: "Login",
+                      buttonDecoration:
+                          kButtonDecoration.copyWith(color: kMainColor),
+                      onPressed: () {
+                        if (validateAndSave()) {
+                          login();
+                        }
+                      },
+                      iconWidget: null,
+                      iconColor: Colors.white,
+                    ),
                   ),
 
                   //Error message

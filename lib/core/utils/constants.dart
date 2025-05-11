@@ -38,3 +38,12 @@ const kButtonDecoration = BoxDecoration(
 double getResponsiveSize(size) {
   return (size * Get.context!.mediaQueryShortestSide) / 1080;
 }
+
+final List<Color> accentColors = const [
+  Color(0xFFDEF3F6),
+  Color(0xFFFADADD),
+  Color(0xFFE8EAF6),
+  Color(0xFFE1F5FE),
+  Color(0xFFF1F8E9),
+  Color(0xFFFFF8E1),
+];

@@ -12,6 +12,7 @@ import 'package:inventory_management_system_mobile/view/screens/OrderHistory/ord
 import 'package:inventory_management_system_mobile/view/screens/ReturnProduct/return_product_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/VanCategories/van_categories_screen.dart';
 import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/Web/WebDashboard/web_dashboard_screen.dart';
 
 class Navigation {
   List<GetPage<dynamic>> routes = [
@@ -22,6 +23,10 @@ class Navigation {
     GetPage(
       name: "/dashboard",
       page: () => DashboardScreen(),
+    ),
+    GetPage(
+      name: "/web-dashboard",
+      page: () => WebDashboardScreen(),
     ),
     GetPage(
       name: "/all-categories",
