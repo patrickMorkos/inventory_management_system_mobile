@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
@@ -30,7 +31,7 @@ Future<dynamic> postRequest({
     );
     return jsonDecode(response.body);
   } catch (e) {
-    Get.snackbar("Error", e.toString());
+    // Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN postRequest url: $url -------------");
     debugPrint("error in post request: $e");
   }
@@ -53,7 +54,7 @@ Future<dynamic> getRequest({
     );
     return jsonDecode(response.body);
   } catch (e) {
-    Get.snackbar("Error", e.toString());
+    // Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN getRequest url: $url -------------");
     debugPrint("error in get request: $e");
   }
@@ -78,7 +79,7 @@ Future<dynamic> putRequest({
     );
     return jsonDecode(response.body);
   } catch (e) {
-    Get.snackbar("Error", e.toString());
+    // Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN putRequest url: $url -------------");
     debugPrint("error in put request: $e");
   }
@@ -103,7 +104,7 @@ Future<dynamic> deleteRequest({
     );
     return jsonDecode(response.body);
   } catch (e) {
-    Get.snackbar("Error", e.toString());
+    // Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN deleteRequest url: $url -------------");
     debugPrint("error in delete request: $e");
   }
@@ -112,9 +113,10 @@ Future<dynamic> deleteRequest({
 Future<dynamic> postRequestWithFiles({
   required String path,
   required Map<String, dynamic> data,
-  required Map<String, File?> files,
+  required Map<String, dynamic> files,
   bool requireToken = false,
 }) async {
+  print("postRequestWithFiles called");
   final String url = host + path;
   final request = http.MultipartRequest('POST', Uri.parse(url));
 
@@ -125,16 +127,28 @@ Future<dynamic> postRequestWithFiles({
     });
 
     // Add file fields
-    files.forEach((key, file) {
-      if (file != null) {
-        request.files.add(http.MultipartFile(
+    for (final entry in files.entries) {
+      final key = entry.key;
+      final file = entry.value;
+
+      if (file == null) continue;
+
+      if (kIsWeb && file is Uint8List) {
+        request.files.add(http.MultipartFile.fromBytes(
           key,
-          file.readAsBytes().asStream(),
-          file.lengthSync(),
-          filename: file.path.split('/').last,
+          file,
+          filename: "web_image.png", // you can use another name if needed
         ));
+      } else if (file is File) {
+        request.files.add(await http.MultipartFile.fromPath(
+          key,
+          file.path,
+        ));
+      } else {
+        throw Exception(
+            "Unsupported file type for key '$key': ${file.runtimeType}");
       }
-    });
+    }
 
     // Add headers
     request.headers.addAll({
@@ -151,14 +165,80 @@ Future<dynamic> postRequestWithFiles({
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
-      throw Exception(
-        'Failed to upload files. Status code: ${response.statusCode}. Response: ${response.body}',
-      );
+      return {
+        'error': jsonDecode(response.body)['error'] ??
+            'Upload failed with status ${response.statusCode}',
+      };
     }
   } catch (e) {
-    Get.snackbar("Error", e.toString());
+    // Get.snackbar("Error", e.toString());
     debugPrint(
         "------------- ERROR IN postRequestWithFiles url: $url -------------");
     debugPrint("error in post request with files: $e");
+  }
+}
+
+Future<dynamic> putRequestWithFiles({
+  required String path,
+  required Map<String, dynamic> data,
+  required Map<String, dynamic> files,
+  bool requireToken = false,
+}) async {
+  final String url = host + path;
+  final request = http.MultipartRequest('PUT', Uri.parse(url));
+
+  try {
+    // Add data fields
+    data.forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    // Add file fields
+    for (final entry in files.entries) {
+      final key = entry.key;
+      final file = entry.value;
+
+      if (file == null) continue;
+
+      if (kIsWeb && file is Uint8List) {
+        request.files.add(http.MultipartFile.fromBytes(
+          key,
+          file,
+          filename: "web_image.png",
+        ));
+      } else if (file is File) {
+        request.files.add(await http.MultipartFile.fromPath(
+          key,
+          file.path,
+        ));
+      } else {
+        throw Exception(
+            "Unsupported file type for key '$key': ${file.runtimeType}");
+      }
+    }
+
+    // Add headers
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      if (requireToken)
+        "Authorization": loggedInUserController.accessToken.value,
+    });
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      return {
+        'error': jsonDecode(response.body)['error'] ??
+            'Upload failed with status ${response.statusCode}',
+      };
+    }
+  } catch (e) {
+    // Get.snackbar("Error", e.toString());
+    debugPrint(
+        "------------- ERROR IN putRequestWithFiles url: $url -------------");
+    debugPrint("error: $e");
   }
 }
