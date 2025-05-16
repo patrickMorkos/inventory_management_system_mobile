@@ -31,29 +31,29 @@ class CategoryController extends GetxController {
   }
 
   Future<bool> createCategory(String name, dynamic image) async {
-    // final body = {"category_name": name};
-    // final files = {"category_image_url": image}; // Still fine
+    final body = {"category_name": name};
+    final files = {"category_image_url": image}; // Still fine
 
-    // final res = await postRequestWithFiles(
-    //   path: "/api/category/create-category",
-    //   data: body,
-    //   files: files,
-    //   requireToken: true,
-    // );
+    final res = await postRequestWithFiles(
+      path: "/api/category/create-category",
+      data: body,
+      files: files,
+      requireToken: true,
+    );
 
-    // if (res?['id'] != null) {
-    //   await fetchCategories();
-    //   clearSearch();
-    //   return true;
-    // } else {
-    //   final error = res?['error'] ?? 'Failed to create category';
-    //   Get.snackbar(
-    //     "Error",
-    //     error,
-    //     backgroundColor: Colors.red,
-    //     colorText: Colors.white,
-    //   );
-    // }
+    if (res?['id'] != null) {
+      await fetchCategories();
+      clearSearch();
+      return true;
+    } else {
+      final error = res?['error'] ?? 'Failed to create category';
+      Get.snackbar(
+        "Error",
+        error,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
     return false;
   }
 

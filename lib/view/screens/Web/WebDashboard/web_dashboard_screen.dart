@@ -24,6 +24,41 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
       showCard: true,
       content: const CategoriesContent(),
     ),
+    GridItems(
+      title: 'Products',
+      route: '/products',
+      icon: 'assets/images/product.png',
+      showCard: true,
+      content: const CategoriesContent(),
+    ),
+    GridItems(
+      title: 'Clients',
+      route: '/clients',
+      icon: 'assets/images/parties.png',
+      showCard: true,
+      content: const CategoriesContent(),
+    ),
+    GridItems(
+      title: 'Salesmans',
+      route: '/salesmans',
+      icon: 'assets/images/salesman.jpg',
+      showCard: true,
+      content: const CategoriesContent(),
+    ),
+    GridItems(
+      title: 'Clients stock',
+      route: '/client-stock',
+      icon: 'assets/images/warehouse-svgrepo-com.png',
+      showCard: true,
+      content: const CategoriesContent(),
+    ),
+    GridItems(
+      title: 'Orders',
+      route: '/orders',
+      icon: 'assets/images/orders-history.png',
+      showCard: true,
+      content: const CategoriesContent(),
+    ),
   ];
 
   // For navigation highlight (index of the selected menu item).
