@@ -23,7 +23,7 @@ class SidebarTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        color: selected ? Colors.white.withOpacity(0.12) : Colors.transparent,
+        color: selected ? Colors.white : Colors.transparent,
         child: Row(
           children: [
             if (iconPath != null)

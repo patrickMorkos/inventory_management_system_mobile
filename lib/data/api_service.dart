@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 final LoggedInUserController loggedInUserController =
@@ -116,7 +115,6 @@ Future<dynamic> postRequestWithFiles({
   required Map<String, dynamic> files,
   bool requireToken = false,
 }) async {
-  print("postRequestWithFiles called");
   final String url = host + path;
   final request = http.MultipartRequest('POST', Uri.parse(url));
 

@@ -533,8 +533,6 @@ class _CreateNewOrderScreenState extends State<CreateNewOrderScreen> {
                           vanProductsController.addItemQuantity(
                               productId, itemQty);
                           updateTotalPrice();
-                        } else {
-                          print("Product ID is null. Cannot delete.");
                         }
                       });
                     },

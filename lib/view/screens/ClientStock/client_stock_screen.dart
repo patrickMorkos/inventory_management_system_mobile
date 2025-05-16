@@ -228,7 +228,6 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                                     isDense: true,
                                   ),
                                   onChanged: (value) {
-                                    print("value: $value");
                                     setState(() {
                                       boxQuantity = int.tryParse(value) ?? 0;
                                     });
@@ -279,7 +278,6 @@ class _ClientStockScreenState extends State<ClientStockScreen> {
                                         true, // Makes the text field more compact
                                   ),
                                   onChanged: (value) {
-                                    print("value: $value");
                                     setState(() {
                                       itemQuantity = int.tryParse(value) ?? 0;
                                     });
