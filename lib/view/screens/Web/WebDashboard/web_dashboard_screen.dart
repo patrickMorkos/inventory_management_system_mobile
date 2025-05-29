@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
 import 'package:inventory_management_system_mobile/view/screens/Web/CategoriesContent/categories_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/Web/OrdersContent/orders_content.dart';
 import 'package:inventory_management_system_mobile/view/screens/Web/WebDashboard/web_dashboard_tools.dart';
 
 class WebDashboardScreen extends StatefulWidget {
@@ -57,7 +58,7 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
       route: '/orders',
       icon: 'assets/images/orders-history.png',
       showCard: true,
-      content: const CategoriesContent(),
+      content: OrdersContent(),
     ),
   ];
 

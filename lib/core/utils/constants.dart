@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 //The main color of the app
 const kMainColor = Color(0xff8424FF);
@@ -47,3 +48,13 @@ final List<Color> accentColors = const [
   Color(0xFFF1F8E9),
   Color(0xFFFFF8E1),
 ];
+
+// Function to format the date
+String formatDate(String dateString) {
+  try {
+    DateTime dateTime = DateTime.parse(dateString);
+    return DateFormat('dd-MMM-yyyy hh:mm a').format(dateTime);
+  } catch (e) {
+    return dateString;
+  }
+}

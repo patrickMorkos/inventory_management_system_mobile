@@ -40,6 +40,7 @@ Future<dynamic> postRequest({
 Future<dynamic> getRequest({
   required String path,
   bool requireToken = false,
+  bool isBytesResponse = false,
 }) async {
   final String url = host + path;
   try {
@@ -51,7 +52,11 @@ Future<dynamic> getRequest({
           "Authorization": loggedInUserController.accessToken.value,
       },
     );
-    return jsonDecode(response.body);
+    if (isBytesResponse) {
+      return response.bodyBytes;
+    } else {
+      return jsonDecode(response.body);
+    }
   } catch (e) {
     // Get.snackbar("Error", e.toString());
     debugPrint("------------- ERROR IN getRequest url: $url -------------");
