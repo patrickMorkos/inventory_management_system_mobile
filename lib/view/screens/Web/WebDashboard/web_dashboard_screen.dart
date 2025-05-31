@@ -34,7 +34,7 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
       route: '/products',
       icon: 'assets/images/product.png',
       showCard: true,
-      content: const ProductsContent(),
+      content: ProductsContent(),
     ),
     GridItems(
       title: 'Clients',

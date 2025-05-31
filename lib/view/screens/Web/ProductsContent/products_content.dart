@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
+import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/products_table.dart';
 
 class ProductsContent extends StatelessWidget {
-  const ProductsContent({super.key});
+  ProductsContent({super.key});
+  final controller = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Text("Products Content"),
-        ),
-      ),
+    if (controller.filteredProducts.isEmpty) {
+      controller.fetchProducts();
+    }
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: ProductsTable(),
     );
   }
 }
