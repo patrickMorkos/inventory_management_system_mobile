@@ -16,7 +16,7 @@ class ProductController extends GetxController {
       isLoading.value = true;
       final response = await getRequest(
         path:
-            '/api/main-warehouse-stock/get-all-main-warehouse-stock-products?client_id=4',
+            '/api/main-warehouse-stock/get-all-main-warehouse-stock-products?client_id=-1',
         requireToken: true,
       );
       products.value =

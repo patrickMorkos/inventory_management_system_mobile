@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
+import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/prices_popup.dart';
 
 class ProductsTable extends StatelessWidget {
   ProductsTable({super.key});
@@ -148,9 +149,8 @@ class ProductsTable extends StatelessWidget {
                                           onPressed: () {
                                             showDialog(
                                               context: context,
-                                              builder: (_) => const AlertDialog(
-                                                title: Text("Prices Popup"),
-                                              ),
+                                              builder: (_) =>
+                                                  PricesPopup(product: product),
                                             );
                                           },
                                         ),
