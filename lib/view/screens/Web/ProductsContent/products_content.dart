@@ -9,9 +9,7 @@ class ProductsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (controller.filteredProducts.isEmpty) {
-      controller.fetchProducts();
-    }
+    controller.fetchProducts();
     return Padding(
       padding: const EdgeInsets.all(24),
       child: ProductsTable(),

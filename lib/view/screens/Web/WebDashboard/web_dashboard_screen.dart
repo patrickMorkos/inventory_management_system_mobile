@@ -27,7 +27,7 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
       route: '/categories',
       icon: 'assets/images/category-icon.png',
       showCard: true,
-      content: const CategoriesContent(),
+      content: CategoriesContent(),
     ),
     GridItems(
       title: 'Products',

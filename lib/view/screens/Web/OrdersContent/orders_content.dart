@@ -4,6 +4,7 @@ import 'package:inventory_management_system_mobile/core/controllers/web_order_co
 import 'orders_table.dart';
 
 class OrdersContent extends StatelessWidget {
+  OrdersContent({super.key});
   final controller = Get.put(WebOrderController());
 
   @override

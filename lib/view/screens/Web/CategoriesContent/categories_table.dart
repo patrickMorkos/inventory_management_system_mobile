@@ -13,10 +13,6 @@ class CategoriesTable extends StatelessWidget {
       Get.put(CategoryController(), permanent: true);
   @override
   Widget build(BuildContext context) {
-    if (controller.categories.isEmpty && !controller.isLoading.value) {
-      controller.fetchCategories();
-    }
-
     return Obx(() {
       final items = controller.filteredCategories;
       final totalItems = items.length;
