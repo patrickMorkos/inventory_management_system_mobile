@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 
 class CreateProductModal extends StatefulWidget {
@@ -31,6 +32,7 @@ class _CreateProductModalState extends State<CreateProductModal> {
   bool isTaxable = false;
   File? selectedImageFile;
   String? selectedImageFileName;
+  final ProductController productController = Get.find<ProductController>();
 
   Future<void> fetchCategories() async {
     var response = await getRequest(
@@ -269,7 +271,8 @@ class _CreateProductModalState extends State<CreateProductModal> {
               );
 
               if (stockRes != null) {
-                Get.back(); // Close modal
+                productController.fetchProducts(); // Refresh product list
+                Get.back(); // Then close modal
                 Get.snackbar("Success", "Product created successfully!",
                     backgroundColor: Colors.green, colorText: Colors.white);
               } else {
