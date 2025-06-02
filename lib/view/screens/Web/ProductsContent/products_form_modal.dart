@@ -202,7 +202,22 @@ class _CreateProductModalState extends State<CreateProductModal> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Image.file(selectedImageFile!, height: 100),
-              )
+              ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: Row(
+                children: const [
+                  Icon(Icons.info_outline, color: Colors.orange),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Note: Please set the product prices using the "Prices" button in the main table after creating the product.',
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
