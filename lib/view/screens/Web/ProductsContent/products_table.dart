@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
 import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/prices_popup.dart';
+import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/products_form_modal.dart';
 
 class ProductsTable extends StatelessWidget {
   ProductsTable({super.key});
@@ -72,7 +73,10 @@ class ProductsTable extends StatelessWidget {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Add modal
+                  showDialog(
+                    context: context,
+                    builder: (_) => CreateProductModal(),
+                  );
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Create'),
