@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
 import 'package:inventory_management_system_mobile/core/models/product_model.dart';
+import 'package:inventory_management_system_mobile/data/api_service.dart';
 
 class PricesPopup extends StatefulWidget {
   final ProductModel product;
@@ -14,6 +17,58 @@ class _PricesPopupState extends State<PricesPopup> {
   bool _isEditing = false;
 
   late Map<String, List<TextEditingController>> _controllers;
+
+  Future<void> _submitChanges() async {
+    final Map<String, List<double?>> originalPrices = {
+      "A1": [widget.product.boxPriceA1, widget.product.itemPriceA1],
+      "A2": [widget.product.boxPriceA2, widget.product.itemPriceA2],
+      "B1": [widget.product.boxPriceB1, widget.product.itemPriceB1],
+      "B2": [widget.product.boxPriceB2, widget.product.itemPriceB2],
+      "C1": [widget.product.boxPriceC1, widget.product.itemPriceC1],
+      "C2": [widget.product.boxPriceC2, widget.product.itemPriceC2],
+      "D1": [widget.product.boxPriceD1, widget.product.itemPriceD1],
+      "D2": [widget.product.boxPriceD2, widget.product.itemPriceD2],
+    };
+
+    final Map<String, dynamic> updates = {};
+
+    String _getApiKey(String key, {required bool isBox}) {
+      final classLetter = key[0].toLowerCase();
+      final classNumber = key[1];
+      final type = isBox ? "box" : "item";
+      return "${type}_price_${classLetter}${classNumber}";
+    }
+
+    _controllers.forEach((key, controllers) {
+      final original = originalPrices[key]!;
+      final currentBox = double.tryParse(controllers[0].text);
+      final currentItem = double.tryParse(controllers[1].text);
+
+      if (currentBox != null && currentBox != original[0]) {
+        updates[_getApiKey(key, isBox: true)] = currentBox;
+      }
+      if (currentItem != null && currentItem != original[1]) {
+        updates[_getApiKey(key, isBox: false)] = currentItem;
+      }
+    });
+
+    if (updates.isEmpty) {
+      debugPrint("No changes detected, not sending request.");
+      return;
+    }
+
+    final body = {"product_price": updates};
+
+    await putRequest(
+      path: "/api/product/update-product/${widget.product.id}",
+      body: body,
+      requireToken: true,
+    );
+
+    debugPrint("Sent updated prices: $body");
+    Navigator.of(context).pop();
+    Get.find<ProductController>().fetchProducts();
+  }
 
   @override
   void initState() {
@@ -104,16 +159,9 @@ class _PricesPopupState extends State<PricesPopup> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (_isEditing) {
-              final updatedPrices = _controllers.map((key, value) => MapEntry(
-                    key,
-                    [
-                      double.tryParse(value[0].text),
-                      double.tryParse(value[1].text)
-                    ],
-                  ));
-              print("Updated Prices: $updatedPrices");
+              await _submitChanges();
             }
             setState(() {
               _isEditing = !_isEditing;
