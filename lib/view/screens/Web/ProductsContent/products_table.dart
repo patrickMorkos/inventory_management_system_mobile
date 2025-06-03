@@ -170,12 +170,19 @@ class ProductsTable extends StatelessWidget {
                                           children: [
                                             IconButton(
                                               icon: const Icon(Icons.edit),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (_) =>
+                                                      CreateProductModal(
+                                                          product: product),
+                                                );
+                                              },
                                             ),
-                                            IconButton(
-                                              icon: const Icon(Icons.delete),
-                                              onPressed: () {},
-                                            ),
+                                            // IconButton(
+                                            //   icon: const Icon(Icons.delete),
+                                            //   onPressed: () {},
+                                            // ),
                                           ],
                                         ),
                                       ),

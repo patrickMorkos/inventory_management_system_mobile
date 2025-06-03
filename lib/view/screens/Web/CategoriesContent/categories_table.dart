@@ -157,12 +157,12 @@ class CategoriesTable extends StatelessWidget {
                                                 );
                                               },
                                             ),
-                                            IconButton(
-                                              icon: const Icon(Icons.delete),
-                                              onPressed: () =>
-                                                  showConfirmDeleteDialog(
-                                                      cat.id),
-                                            ),
+                                            // IconButton(
+                                            //   icon: const Icon(Icons.delete),
+                                            //   onPressed: () =>
+                                            //       showConfirmDeleteDialog(
+                                            //           cat.id),
+                                            // ),
                                           ],
                                         ),
                                       ),

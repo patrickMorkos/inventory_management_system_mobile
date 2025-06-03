@@ -6,11 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
+import 'package:inventory_management_system_mobile/core/models/product_model.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
 
 class CreateProductModal extends StatefulWidget {
-  const CreateProductModal({super.key});
-
+  final ProductModel? product;
+  const CreateProductModal({super.key, this.product});
   @override
   State<CreateProductModal> createState() => _CreateProductModalState();
 }
@@ -60,11 +61,42 @@ class _CreateProductModalState extends State<CreateProductModal> {
     }
   }
 
+  String? existingImageUrl;
+
   @override
   void initState() {
     super.initState();
-    fetchCategories();
-    fetchBrands();
+
+    fetchCategories().then((_) {
+      if (widget.product != null) {
+        selectedCategory = categories.firstWhereOrNull(
+          (cat) => cat['category_name'] == widget.product!.categoryName,
+        );
+        setState(() {});
+      }
+    });
+
+    fetchBrands().then((_) {
+      if (widget.product != null) {
+        selectedBrand = brands.firstWhereOrNull(
+          (brand) => brand['brand_name'] == widget.product!.brandName,
+        );
+        setState(() {});
+      }
+    });
+
+    if (widget.product != null) {
+      nameController.text = widget.product!.name;
+      barcodeController.text = widget.product!.barcod ?? '';
+      unitController.text = widget.product!.unit ?? '';
+      packController.text = widget.product!.pack?.toString() ?? '';
+      boxQtyController.text = widget.product!.boxQuantity.toString();
+      itemQtyController.text = widget.product!.itemQuantity.toString();
+      isTaxable = widget.product!.isTaxable ?? false;
+      selectedImageFile = null;
+      selectedImageBytes = null;
+      existingImageUrl = widget.product!.imageUrl;
+    }
   }
 
   Future<void> pickImage() async {
@@ -202,6 +234,11 @@ class _CreateProductModalState extends State<CreateProductModal> {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Image.file(selectedImageFile!, height: 100),
+              )
+            else if (existingImageUrl != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Image.network(existingImageUrl!, height: 100),
               ),
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
@@ -242,7 +279,147 @@ class _CreateProductModalState extends State<CreateProductModal> {
                   backgroundColor: Colors.red, colorText: Colors.white);
               return;
             }
+            final Map<String, dynamic> files = {};
+            bool shouldUpdateImage = (kIsWeb && selectedImageBytes != null) ||
+                (!kIsWeb && selectedImageFile != null);
 
+            if (widget.product != null) {
+              bool shouldUpdateProduct = false;
+              bool shouldUpdateQuantities = false;
+
+              // Check quantity fields
+              final originalBoxQty = widget.product!.boxQuantity;
+              final originalItemQty = widget.product!.itemQuantity;
+
+              if (boxQty != originalBoxQty || itemQty != originalItemQty) {
+                shouldUpdateQuantities = true;
+              }
+
+              // Check all other fields
+              if (name != widget.product!.name ||
+                  barcode != (widget.product!.barcod ?? '') ||
+                  unit != (widget.product!.unit ?? '') ||
+                  pack != (widget.product!.pack ?? 0) ||
+                  selectedBrand?['brand_name'] != widget.product!.brandName ||
+                  selectedCategory?['category_name'] !=
+                      widget.product!.categoryName ||
+                  isTaxable != (widget.product!.isTaxable ?? false)) {
+                // because you defaulted it
+                shouldUpdateProduct = true;
+              }
+
+              if (kIsWeb && selectedImageBytes != null) {
+                files["image_url"] = selectedImageBytes!;
+              } else if (!kIsWeb && selectedImageFile != null) {
+                files["image_url"] = selectedImageFile!;
+              }
+
+              if (shouldUpdateProduct || shouldUpdateImage) {
+                final Map<String, dynamic> body = {};
+
+                if (name != widget.product!.name) {
+                  body["name"] = name;
+                }
+
+                if (barcode != (widget.product!.barcod ?? '')) {
+                  body["barcod"] = barcode;
+                }
+
+                if (unit != (widget.product!.unit ?? '')) {
+                  body["unit"] = unit;
+                }
+
+                if (pack != (widget.product!.pack ?? 0)) {
+                  body["number_of_items_per_box"] = pack;
+                }
+
+                if (selectedBrand?["brand_name"] != widget.product!.brandName) {
+                  body["brand_id"] = selectedBrand!["id"];
+                }
+
+                if (selectedCategory?["category_name"] !=
+                    widget.product!.categoryName) {
+                  body["category_id"] = selectedCategory!["id"];
+                }
+
+                // Assume isTaxable is always sent when changed manually
+                body["is_taxable"] = isTaxable;
+
+                // Always send update timestamp
+                body["updatedAt"] = DateTime.now().toIso8601String();
+
+                Map<String, dynamic>? res;
+                try {
+                  if (files.isNotEmpty) {
+                    res = await putRequestWithFiles(
+                      path: "/api/product/update-product/${widget.product!.id}",
+                      data: body,
+                      files: files,
+                      requireToken: true,
+                    );
+                  } else {
+                    res = await putRequest(
+                      path: "/api/product/update-product/${widget.product!.id}",
+                      body: body,
+                      requireToken: true,
+                    );
+                  }
+                } catch (e) {
+                  Get.snackbar("Error", "Update failed: ${e.toString()}",
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                  return;
+                }
+
+                if (res != null && res['id'] != null) {
+                  print("Product updated!");
+                } else {
+                  Get.snackbar("Error", "Failed to update product.",
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                  return;
+                }
+              }
+
+              if (shouldUpdateQuantities) {
+                Map<String, dynamic>? res;
+                try {
+                  res = await putRequest(
+                    path:
+                        "/api/main-warehouse-stock/update-products-quantities",
+                    body: [
+                      {
+                        "product_id": widget.product!.id,
+                        "box_quantity": boxQty,
+                        "items_quantity": itemQty,
+                      }
+                    ],
+                    requireToken: true,
+                  );
+                } catch (e) {
+                  Get.snackbar(
+                      "Error", "Quantity update failed: ${e.toString()}",
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                  return;
+                }
+
+                if (res != null) {
+                  print("Quantities updated!");
+                } else {
+                  Get.snackbar("Error", "Failed to update product quantities.",
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                  return;
+                }
+              }
+
+              if (!shouldUpdateProduct && !shouldUpdateQuantities) {
+                print("No changes detected.");
+              }
+
+              productController.fetchProducts(); // Refresh table
+              Navigator.pop(context);
+              return;
+            }
+
+            // CREATE MODE – existing logic
             final body = {
               "barcod": barcode,
               "name": name,
@@ -254,8 +431,6 @@ class _CreateProductModalState extends State<CreateProductModal> {
               "updatedAt": DateTime.now().toIso8601String(),
               "number_of_items_per_box": pack
             };
-
-            final Map<String, dynamic> files = {};
 
             if (kIsWeb && selectedImageBytes != null) {
               files["image_url"] = selectedImageBytes!;
@@ -300,7 +475,7 @@ class _CreateProductModalState extends State<CreateProductModal> {
                   backgroundColor: Colors.red, colorText: Colors.white);
             }
           },
-          child: Text('Create'),
+          child: Text(widget.product == null ? 'Create' : 'Update'),
         ),
       ],
     );

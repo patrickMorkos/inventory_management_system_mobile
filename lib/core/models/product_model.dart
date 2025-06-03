@@ -25,6 +25,7 @@ class ProductModel {
   final double? itemPriceD2;
   final String? unit;
   final int? pack;
+  final bool? isTaxable;
 
   ProductModel({
     required this.id,
@@ -53,6 +54,7 @@ class ProductModel {
     required this.itemPriceD2,
     required this.unit,
     required this.pack,
+    required this.isTaxable,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -86,6 +88,7 @@ class ProductModel {
       itemPriceD2: productPrice['item_price_d2']?.toDouble(),
       unit: product['unit'],
       pack: product['number_of_items_per_box'],
+      isTaxable: product['is_taxable'],
     );
   }
 }
