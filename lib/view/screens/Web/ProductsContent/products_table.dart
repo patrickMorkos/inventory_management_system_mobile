@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/product_controller.dart';
-import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/prices_popup.dart';
-import 'package:inventory_management_system_mobile/view/screens/Web/ProductsContent/products_form_modal.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/ProductsContent/prices_popup.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/ProductsContent/products_form_modal.dart';
 
 class ProductsTable extends StatelessWidget {
   ProductsTable({super.key});

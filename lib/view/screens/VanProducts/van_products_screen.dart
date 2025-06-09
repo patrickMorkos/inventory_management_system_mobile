@@ -12,7 +12,7 @@ import 'package:inventory_management_system_mobile/core/controllers/order_contro
 import 'package:inventory_management_system_mobile/core/controllers/van_products_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
-import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen_tools.dart';
+import 'package:inventory_management_system_mobile/view/screens/allproducts/all_products_screen_tools.dart';
 import 'package:inventory_management_system_mobile/view/widgets/empty_screen_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:intl/intl.dart';
