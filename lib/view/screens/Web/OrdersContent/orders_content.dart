@@ -13,7 +13,7 @@ class OrdersContent extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Expanded(child: OrdersTable()),
+      child: OrdersTable(),
     );
   }
 }

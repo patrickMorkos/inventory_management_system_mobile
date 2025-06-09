@@ -103,7 +103,7 @@ class _WebDashboardScreenState extends State<WebDashboardScreen> {
                 selected: _selectedIndex == index,
                 onTap: () {
                   setState(() => _selectedIndex = index);
-                  Get.toNamed(item.route);
+                  // Get.toNamed(item.route);
                 },
               );
             }),
