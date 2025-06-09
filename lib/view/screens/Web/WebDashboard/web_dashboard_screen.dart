@@ -4,13 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/core/models/grid_items.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/CategoriesContent/categories_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/ClientStockContent/client_stock_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/ClientsContent/clients_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/OrdersContent/orders_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/ProductsContent/products_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/SalesmansContent/salesmans_content.dart';
-import 'package:inventory_management_system_mobile/view/screens/web/WebDashboard/web_dashboard_tools.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/categoriescontent/categories_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/clientstockcontent/client_stock_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/clientscontent/clients_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/orderscontent/orders_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/productscontent/products_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/salesmanscontent/salesmans_content.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/webdashboard/web_dashboard_tools.dart';
 
 class WebDashboardScreen extends StatefulWidget {
   const WebDashboardScreen({super.key});

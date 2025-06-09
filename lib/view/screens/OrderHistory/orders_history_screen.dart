@@ -6,7 +6,7 @@ import 'package:inventory_management_system_mobile/core/controllers/client_contr
 import 'package:inventory_management_system_mobile/core/controllers/logged_in_user_controller.dart';
 import 'package:inventory_management_system_mobile/core/utils/constants.dart';
 import 'package:inventory_management_system_mobile/data/api_service.dart';
-import 'package:inventory_management_system_mobile/view/screens/ClientQrCodeScan/sale_products_dialog.dart';
+import 'package:inventory_management_system_mobile/view/screens/clientqrcodescan/sale_products_dialog.dart';
 
 class OrdersHistoryScreen extends StatefulWidget {
   const OrdersHistoryScreen({super.key});

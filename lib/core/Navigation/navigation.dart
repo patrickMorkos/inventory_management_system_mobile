@@ -1,18 +1,18 @@
 //! This is a navigator where routes for each screen are set
 import 'package:get/get.dart';
-import 'package:inventory_management_system_mobile/view/screens/AllCategories/all_categories_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/AllProducts/all_products_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/ClientQrCodeScan/client_qr_code_scan_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/ClientStock/client_stock_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/CreateNewClient/create_new_client_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/CreateNewOrder/create_new_order_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/Dashboard/dashboard_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/Login/login_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/OrderHistory/orders_history_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/ReturnProduct/return_product_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/VanCategories/van_categories_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/VanProducts/van_products_screen.dart';
-import 'package:inventory_management_system_mobile/view/screens/Web/WebDashboard/web_dashboard_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/allcategories/all_categories_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/allproducts/all_products_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/clientqrcodescan/client_qr_code_scan_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/clientstock/client_stock_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/createnewclient/create_new_client_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/createneworder/create_new_order_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/dashboard/dashboard_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/login/login_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/orderhistory/orders_history_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/returnproduct/return_product_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/vancategories/van_categories_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/vanproducts/van_products_screen.dart';
+import 'package:inventory_management_system_mobile/view/screens/web/webdashboard/web_dashboard_screen.dart';
 
 class Navigation {
   List<GetPage<dynamic>> routes = [
