@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inventory_management_system_mobile/core/controllers/category_controller.dart';
 import 'package:inventory_management_system_mobile/view/screens/web/categoriescontent/categories_form_modal.dart';
-import 'confirm_delete_dialog.dart';
 
 class CategoriesTable extends StatelessWidget {
   CategoriesTable({super.key});
